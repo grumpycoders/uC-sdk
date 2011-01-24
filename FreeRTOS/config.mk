@@ -1,5 +1,9 @@
 TARGET_INCLUDES = $(ROOTDIR)/FreeRTOS/Source/include
 
+ifeq ($(USE_MPU),true)
+TARGET_CPPFLAGS += -DportUSING_MPU_WRAPPERS=1
+endif
+
 ifeq ($(CPU),arm)
 ifeq ($(CPU_FLAVOR),lpc1768)
 TARGET_INCLUDES += $(ROOTDIR)/config/arm/lpc1768 $(ROOTDIR)/arch/arm/lpc17xx/Core/CM3/DeviceSupport/NXP/LPC17xx $(ROOTDIR)/arch/arm/lpc17xx/Core/CM3/CoreSupport

@@ -5,10 +5,6 @@ all: $(TARGET_LIB)
 include $(ROOTDIR)/common.mk
 include config.mk
 
-ifeq ($(USE_MPU),true)
-TARGET_CPPFLAGS += -DportUSING_MPU_WRAPPERS=1
-endif
-
 TARGET_SRCS = Source/croutine.c Source/list.c Source/queue.c Source/tasks.c
 
 ifeq ($(CPU),arm)
