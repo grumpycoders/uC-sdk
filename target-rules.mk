@@ -11,12 +11,15 @@ TARGET_OBJS = $(addsuffix .o, $(basename $(TARGET_SRCS)))
 ifneq ($(TARGET),)
 TARGET_ELF = $(addsuffix .elf, $(basename $(TARGET)))
 TARGET_BIN = $(addsuffix .bin, $(basename $(TARGET)))
+TARGET_MAP = $(addsuffix .map, $(basename $(TARGET)))
 TARGET_OBJS += $(addsuffix .o, $(basename $(TARGET)))
 endif
 
 $(TARGET_ELF): $(TARGET_OBJS)
 	$(E) [TL]     Linking $@
-	$(Q)$(TARGET_LD) -o $@ $^ -T$(LDSCRIPT) $(LIBS)
+	$(Q)$(TARGET_LD) -Wl,--gc-sections -Wl,-O3 -Wl,-Map=$(TARGET_MAP) -o $@ $^ -T$(LDSCRIPT) $(LIBS)
+
+$(TARGET_MAP): $(TARGET_ELF)
 
 $(TARGET_BIN): $(TARGET_ELF)
 	$(E) [TB]     Creating $@

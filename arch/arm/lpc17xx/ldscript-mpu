@@ -148,10 +148,11 @@ SECTIONS
   __cs3_region_size_rom = LENGTH(rom);
   __cs3_region_num = 1;
 
-  .privileged_data :
+  .data :
   {
+    __cs3_region_start_ram = .;
     __privileged_data_start__ = .;
-    *(.priviledge_data)
+    *( privileged_data )
     __privileged_data_end___len = . - __privileged_data_start__ - 1 ;
     __privileged_data_end___len |= __privileged_data_end___len >> 1 ;
     __privileged_data_end___len |= __privileged_data_end___len >> 2 ;
@@ -161,11 +162,6 @@ SECTIONS
     . = ALIGN( MAX( __privileged_data_end___len + 1, 32 ) ) ;
 
     __privileged_data_end__ = .;
-  } >ram
-
-  .data :
-  {
-    __cs3_region_start_ram = .;
     *(.cs3.region-head.ram)
     KEEP(*(.jcr))
     *(.got.plt) *(.got)
