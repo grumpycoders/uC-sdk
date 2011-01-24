@@ -8,22 +8,25 @@ include common.mk
 all: libs $(TARGET)
 
 clean: clean-generic
-	$(MAKE) -C FreeRTOS clean
-	$(MAKE) -C arch clean
-	$(MAKE) -C os clean
+	$(Q)$(MAKE) $(MAKE_OPTS) -C FreeRTOS clean
+	$(Q)$(MAKE) $(MAKE_OPTS) -C arch clean
+	$(Q)$(MAKE) $(MAKE_OPTS) -C os clean
 
 .PHONY: libs FreeRTOS arch os
 
 libs: FreeRTOS arch os
 
 FreeRTOS:
-	$(MAKE) -C FreeRTOS
+	$(E) "[MAKE]   Entering FreeRTOS"
+	$(Q)$(MAKE) $(MAKE_OPTS) -C FreeRTOS
 
 arch:
-	$(MAKE) -C arch
+	$(E) "[MAKE]   Entering arch"
+	$(Q)$(MAKE) $(MAKE_OPTS) -C arch
 
 os:
-	$(MAKE) -C os
+	$(E) "[MAKE]   Entering os"
+	$(Q)$(MAKE) $(MAKE_OPTS) -C os
 
 include FreeRTOS/config.mk
 include arch/config.mk
