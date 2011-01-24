@@ -8,6 +8,20 @@
 
 TARGET_OBJS = $(addsuffix .o, $(basename $(TARGET_SRCS)))
 
+ifneq ($(TARGET),)
+TARGET_ELF = $(addsuffix .elf, $(basename $(TARGET)))
+TARGET_BIN = $(addsuffix .bin, $(basename $(TARGET)))
+TARGET_OBJS += $(addsuffix .o, $(basename $(TARGET)))
+endif
+
+$(TARGET_ELF): $(TARGET_OBJS)
+	$(E) [TL]     Linking $@
+	$(Q)$(TARGET_LD) -o $@ $^ -T$(LDSCRIPT) $(LIBS)
+
+$(TARGET_BIN): $(TARGET_ELF)
+	$(E) [TB]     Creating $@
+	$(Q)$(TARGET_OBJDUMP) $< -O binary $@
+
 $(TARGET_LIB): $(TARGET_OBJS)
 	$(E) [TLIB]   Creating $@
 	$(Q)$(TARGET_AR) rcs $@ $^
@@ -15,4 +29,4 @@ $(TARGET_LIB): $(TARGET_OBJS)
 .PHONY: clean-generic
 
 clean-generic:
-	rm -f $(TARGET_LIB) $(TARGET_OBJS)
+	rm -f $(TARGET_LIB) $(TARGET_OBJS) $(TARGET) $(TARGET_ELF) $(TARGET_BIN)

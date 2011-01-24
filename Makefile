@@ -1,13 +1,15 @@
+TARGET = demo.bin
+LIBS = -LFreeRTOS -Larch -lFreeRTOS -larch
+
 export ROOTDIR = $(CURDIR)
 
-include $(ROOTDIR)/common.mk
+include common.mk
 
-all: libs
+all: libs $(TARGET)
 
-clean:
+clean: clean-generic
 	$(MAKE) -C FreeRTOS clean
 	$(MAKE) -C arch clean
-
 
 .PHONY: libs FreeRTOS arch
 
@@ -19,3 +21,6 @@ FreeRTOS:
 arch:
 	$(MAKE) -C arch
 
+include FreeRTOS/config.mk
+include arch/config.mk
+include target-rules.mk
