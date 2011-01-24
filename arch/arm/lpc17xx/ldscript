@@ -18,7 +18,7 @@
 OUTPUT_FORMAT ("elf32-littlearm", "elf32-bigarm", "elf32-littlearm")
 /*ENTRY(_start)*/
 SEARCH_DIR(.)
-GROUP(-lgcc -lc -lcs3 -lcs3unhosted -lcs3micro)
+GROUP(-lgcc -lc)
 
 MEMORY
 {
@@ -49,6 +49,7 @@ SECTIONS
   {
     CREATE_OBJECT_SYMBOLS
     __cs3_region_start_rom = .;
+    
     *(.cs3.region-head.rom)
     __cs3_interrupt_vector = __cs3_interrupt_vector_cortex_m;
     *(.cs3.interrupt_vector)
@@ -175,6 +176,11 @@ SECTIONS
   __cs3_region_zero_size_ram = _end - _edata;
   __cs3_region_size_ram = LENGTH(ram);
   __cs3_region_num = 1;
+  
+  __FLASH_segment_start__ = ORIGIN(rom);
+  __FLASH_segment_end__ = __FLASH_segment_start__ + LENGTH(rom);
+  __SRAM_segment_start__ = ORIGIN(ram);
+  __SRAM_segment_end__ = __SRAM_segment_start__ + LENGTH(ram);
 
   .stab 0 (NOLOAD) : { *(.stab) }
   .stabstr 0 (NOLOAD) : { *(.stabstr) }
