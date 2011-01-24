@@ -261,7 +261,7 @@ void debug_frmwrk_init(void)
 	PINSEL_ConfigPin(&PinCfg);
 	PinCfg.Pinnum = 3;
 	PINSEL_ConfigPin(&PinCfg);
-#elif #if (USED_UART_DEBUG_PORT==1)
+#elif (USED_UART_DEBUG_PORT==1)
 	/*
 	 * Initialize UART1 pin connect
 	 */
