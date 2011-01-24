@@ -20,8 +20,10 @@
     .section ".stack", "w"
     .align  3
     .globl  __cs3_stack_mem
+    .globl  __stack_mem
     .globl  __cs3_stack_size
 __cs3_stack_mem:
+__stack_start:
     .if     Stack_Size
     .space  Stack_Size
     .endif
