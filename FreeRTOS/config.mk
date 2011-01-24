@@ -1,4 +1,4 @@
-TARGET_INCLUDES = $(ROOTDIR)/FreeRTOS/Source/include
+TARGET_INCLUDES += $(ROOTDIR)/FreeRTOS/Source/include
 
 ifeq ($(USE_MPU),true)
 TARGET_CPPFLAGS += -DportUSING_MPU_WRAPPERS=1

@@ -153,7 +153,7 @@ static void prvRestoreContextOfFirstTask( void ) __attribute__(( naked )) PRIVIL
  * C portion of the SVC handler.  The SVC handler is split between an asm entry
  * and a C wrapper for simplicity of coding and maintenance.
  */
-static void prvSVCHandler( unsigned long *pulRegisters ) __attribute__(( noinline )) PRIVILEGED_FUNCTION;
+void prvSVCHandler( unsigned long *pulRegisters ) PRIVILEGED_FUNCTION;
 
 /*
  * Prototypes for all the MPU wrappers.
@@ -246,14 +246,10 @@ void vPortSVCHandler( void )
 			"	b prvSVCHandler					\n"
 			:::"r0"
 	);
-
-	/* This will never get executed, but is required to prevent prvSVCHandler
-	being removed by the optimiser. */
-	prvSVCHandler( NULL );
 }
 /*-----------------------------------------------------------*/
 
-static void prvSVCHandler(	unsigned long *pulParam )
+void prvSVCHandler(	unsigned long *pulParam )
 {
 unsigned char ucSVCNumber;
 
