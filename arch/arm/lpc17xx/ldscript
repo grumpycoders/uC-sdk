@@ -43,6 +43,9 @@ PROVIDE(__cs3_stack_size = __cs3_region_start_ram + __cs3_region_size_ram - _end
 PROVIDE(__cs3_heap_start = _end);
 PROVIDE(__cs3_heap_end = __cs3_region_start_ram + __cs3_region_size_ram);
 
+PROVIDE(__heap_start = __cs3_heap_start);
+PROVIDE(__heap_end = __cs3_heap_end);
+
 SECTIONS
 {
   .text :
@@ -133,6 +136,12 @@ SECTIONS
   __cs3_region_size_rom = LENGTH(rom);
   __cs3_region_num = 1;
 
+  .data_begin :
+  {
+    . = ALIGN(8);
+    __rom_data_begin = .;
+  } > rom
+
   .data :
   {
     __cs3_region_start_ram = .;
@@ -155,6 +164,12 @@ SECTIONS
     _end = .;
     __end = .;
   } >ram AT>rom
+  .data_end :
+  {
+    . = ALIGN(8);
+    __rom_data_end = .;
+  } > rom
+
   /* This used for USB RAM section */
 	.usb_ram (NOLOAD):
 	{

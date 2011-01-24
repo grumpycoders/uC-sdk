@@ -8,7 +8,7 @@
 
 // Mostly stolen from mbed-freertos
 
-extern unsigned int __cs3_heap_start, __cs3_heap_end;
+extern unsigned int __heap_start, __heap_end;
 
 /* Low-level bulk RAM allocator -- used by Newlib's Malloc */
 void *heap_end = NULL;
@@ -21,7 +21,7 @@ PRIVILEGED_FUNCTION void *_sbrk_r(struct _reent *ptr, ptrdiff_t incr)
         /* Initialize on first call */
         if (heap_end == NULL)
         {
-            heap_end = (void *)&__cs3_heap_start;
+            heap_end = (void *)&__heap_start;
         }
 
         prev_heap_end = heap_end;
@@ -30,7 +30,7 @@ PRIVILEGED_FUNCTION void *_sbrk_r(struct _reent *ptr, ptrdiff_t incr)
         next_heap_end = (void *)((((unsigned int)heap_end + incr) + 7) & ~7);
 
         /* Check if this allocation would exceed the end of the ram - would probably get into the stack first however */
-        if (next_heap_end > (void *)&__cs3_heap_end)
+        if (next_heap_end > (void *)&__heap_end)
         {
             ptr->_errno = ENOMEM;
             ret = NULL;
