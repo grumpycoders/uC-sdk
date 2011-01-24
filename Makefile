@@ -10,10 +10,11 @@ all: libs $(TARGET)
 clean: clean-generic
 	$(MAKE) -C FreeRTOS clean
 	$(MAKE) -C arch clean
+	$(MAKE) -C os clean
 
-.PHONY: libs FreeRTOS arch
+.PHONY: libs FreeRTOS arch os
 
-libs: FreeRTOS arch
+libs: FreeRTOS arch os
 
 FreeRTOS:
 	$(MAKE) -C FreeRTOS
@@ -21,6 +22,10 @@ FreeRTOS:
 arch:
 	$(MAKE) -C arch
 
+os:
+	$(MAKE) -C os
+
 include FreeRTOS/config.mk
 include arch/config.mk
+include os/config.mk
 include target-rules.mk
