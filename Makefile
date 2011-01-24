@@ -1,5 +1,5 @@
 TARGET = demo.bin
-LIBS = -LFreeRTOS -Larch -Los -lFreeRTOS -larch -los
+LIBS = FreeRTOS/libFreeRTOS.a arch/libarch.a -lc os/libos.a
 
 export ROOTDIR = $(CURDIR)
 

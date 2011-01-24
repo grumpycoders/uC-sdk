@@ -20,7 +20,7 @@ $(TARGET_ELF): $(TARGET_OBJS)
 
 $(TARGET_BIN): $(TARGET_ELF)
 	$(E) [TB]     Creating $@
-	$(Q)$(TARGET_OBJDUMP) $< -O binary $@
+	$(Q)$(TARGET_OBJCOPY) $< -O binary $@
 
 $(TARGET_LIB): $(TARGET_OBJS)
 	$(E) [TLIB]   Creating $@
