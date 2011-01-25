@@ -17,10 +17,10 @@ void litLED(int led, int value) {
         return;
     
     switch (led) {
-        case 1: led = LED1_wire; break;
-        case 2: led = LED2_wire; break;
-        case 3: led = LED3_wire; break;
-        case 4: led = LED4_wire; break;
+        case 1: led = 1 << LED1_wire; break;
+        case 2: led = 1 << LED2_wire; break;
+        case 3: led = 1 << LED3_wire; break;
+        case 4: led = 1 << LED4_wire; break;
     }
     
     if (value) {
