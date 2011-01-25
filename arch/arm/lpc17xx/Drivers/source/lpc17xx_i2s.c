@@ -323,7 +323,7 @@ Status I2S_FreqConfig(LPC_I2S_TypeDef *I2Sx, uint32_t Freq, uint8_t TRMode) {
 	uint32_t x, y;
 	uint16_t dif;
 	uint16_t error;
-	uint8_t x_divide, y_divide;
+	uint8_t x_divide = 0, y_divide = 0;
 	uint16_t ErrorOptimal = 0xFFFF;
 
 	CHECK_PARAM(PARAM_I2Sx(I2Sx));

@@ -73,9 +73,9 @@ static void can_SetBaudrate (LPC_CAN_TypeDef *CANx, uint32_t baudrate);
 static void can_SetBaudrate (LPC_CAN_TypeDef *CANx, uint32_t baudrate)
 {
 	uint32_t result = 0;
-	uint8_t NT, TSEG1, TSEG2;
+	uint8_t NT, TSEG1 = 0, TSEG2 = 0;
 	uint32_t CANPclk = 0;
-	uint32_t BRP;
+	uint32_t BRP = 0;
 	CHECK_PARAM(PARAM_CANx(CANx));
 
 	if (CANx == LPC_CAN1)

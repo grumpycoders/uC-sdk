@@ -1,6 +1,6 @@
 %.o: %.c
 	$(E) "[TC]     Compiling $<"
-	$(Q)$(TARGET_CC) $(addprefix -I, $(TARGET_INCLUDES)) $(TARGET_CPPFLAGS) -c -o $@ $<
+	$(Q)$(TARGET_CC) -ffunction-sections -Wall -Werror $(addprefix -I, $(TARGET_INCLUDES)) $(TARGET_CPPFLAGS) -c -o $@ $<
 
 %.o: %.s
 	$(E) "[TS]     Compiling $<"
