@@ -70,7 +70,7 @@ SECTIONS
     ASSERT (. != __cs3_reset, "No reset code");
     
     *( .privileged_code )
-    *( .privileged_functions )
+    *( privileged_functions )
 
     __privileged_code_end___len = . - __privileged_code_start__ - 1 ;
     __privileged_code_end___len |= __privileged_code_end___len >> 1 ;

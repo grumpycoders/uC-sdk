@@ -147,7 +147,7 @@ rom_to_ram_copy_check:
     .fnend
     .size   __cs3_reset_cortex_m,.-__cs3_reset_cortex_m
 
-    .section ".text"
+    .section ".privileged_code"
 
 /* Exception Handlers */
 
