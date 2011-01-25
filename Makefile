@@ -15,9 +15,9 @@ clean: clean-generic
 
 .PHONY: libs FreeRTOS arch os
 
-FreeRTOS/libFreeRTOS.a: libs
-arch/libarch.a: libs
-os/libos.a: libs
+FreeRTOS/libFreeRTOS.a: FreeRTOS
+arch/libarch.a: arch
+os/libos.a: os
 
 libs: FreeRTOS arch os
 
