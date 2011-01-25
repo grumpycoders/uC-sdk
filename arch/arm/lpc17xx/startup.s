@@ -9,6 +9,9 @@
 //*** <<< Use Configuration Wizard in Context Menu >>> ***
 */
 
+    .cpu cortex-m3
+    .syntax unified
+
 
 /*
 // <h> Stack Configuration
@@ -125,6 +128,16 @@ __cs3_interrupt_vector_cortex_m:
     .type   __cs3_reset_cortex_m, %function
 __cs3_reset_cortex_m:
     .fnstart
+    LDR     R0, =__rom_data_begin
+    LDR     R1, =__rom_data_end
+    LDR     R2, =__ram_data_begin
+    B       rom_to_ram_copy_check
+rom_to_ram_copy_loop:
+    LDR     R3, [R0], #4
+    STR     R3, [R2], #4
+rom_to_ram_copy_check:
+    CMP     R1, R0
+    BCC     rom_to_ram_copy_loop
     LDR     R0, =SystemInit
     BLX     R0
     LDR     R0,=_start

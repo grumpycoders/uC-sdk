@@ -15,7 +15,7 @@ TARGET_MAP = $(addsuffix .map, $(basename $(TARGET)))
 TARGET_OBJS += $(addsuffix .o, $(basename $(TARGET)))
 endif
 
-$(TARGET_ELF): $(TARGET_OBJS)
+$(TARGET_ELF): $(TARGET_OBJS) $(LIBDEPS)
 	$(E) "[TL]     Linking $@"
 	$(Q)$(TARGET_LD) -Wl,--gc-sections -Wl,-O3 -Wl,-Map=$(TARGET_MAP) -o $@ $^ -T$(LDSCRIPT) $(LIBS)
 

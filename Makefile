@@ -1,5 +1,6 @@
 TARGET = demo.bin
-LIBS = -Wl,--start-group -lc FreeRTOS/libFreeRTOS.a arch/libarch.a os/libos.a -Wl,--end-group
+LIBDEPS = FreeRTOS/libFreeRTOS.a arch/libarch.a os/libos.a
+LIBS = -Wl,--start-group -lc $(LIBDEPS) -Wl,--end-group
 
 export ROOTDIR = $(CURDIR)
 
@@ -13,6 +14,10 @@ clean: clean-generic
 	$(Q)$(MAKE) $(MAKE_OPTS) -C os clean
 
 .PHONY: libs FreeRTOS arch os
+
+FreeRTOS/libFreeRTOS.a: libs
+arch/libarch.a: libs
+os/libos.a: libs
 
 libs: FreeRTOS arch os
 
