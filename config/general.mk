@@ -1,2 +1,2 @@
 VERBOSE = false
-MAKE_OPTS = --no-print-directory
+MAKE_OPTS = --no-print-directory -s
