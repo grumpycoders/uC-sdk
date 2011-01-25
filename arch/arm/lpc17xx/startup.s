@@ -58,7 +58,7 @@ __cs3_heap_end:
 
 __cs3_interrupt_vector_cortex_m:
     .long   __cs3_stack                 /* Top of Stack                 */
-    .long   __cs3_reset                 /* Reset Handler                */
+    .long   __cs3_reset_cortex_m        /* Reset Handler                */
     .long   NMI_Handler                 /* NMI Handler                  */
     .long   HardFault_Handler           /* Hard Fault Handler           */
     .long   MemManage_Handler           /* MPU Fault Handler            */
