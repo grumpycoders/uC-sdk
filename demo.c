@@ -1,7 +1,7 @@
 #include <FreeRTOS.h>
 #include <task.h>
-#include <debug_frmwrk.h>
 #include <lpc17xx_gpio.h>
+#include <BoardConsole.h>
 
 #define LED1_wire 18
 #define LED2_wire 20
@@ -31,12 +31,12 @@ void litLED(int led, int value) {
 }
 
 int main() {
-    debug_frmwrk_init();
     setupLEDs();
     litLED(1, 1);
     litLED(2, 0);
     litLED(3, 1);
     litLED(4, 0);
+    BoardConsolePuts("Hello World.");
     vTaskStartScheduler();
     return 0;
 }
