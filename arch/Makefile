@@ -5,6 +5,7 @@ all: $(TARGET_LIB)
 include $(ROOTDIR)/common.mk
 include config.mk
 include $(ROOTDIR)/FreeRTOS/config.mk
+include $(ROOTDIR)/os/config.mk
 
 ifeq ($(CPU),arm)
 ifeq ($(CPU_FLAVOR),lpc1768)
