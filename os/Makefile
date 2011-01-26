@@ -7,7 +7,7 @@ include config.mk
 include $(ROOTDIR)/FreeRTOS/config.mk
 include $(ROOTDIR)/arch/config.mk
 
-TARGET_SRCS = src/init.c src/sbrk.c src/sprintf.c src/malloc.c src/free.c src/fclose.c src/read.c src/lseek.c src/write.c src/close.c
+TARGET_SRCS = src/init.c src/sbrk.c src/sprintf.c src/malloc.c src/free.c src/fclose.c src/read.c src/lseek.c src/write.c src/close.c src/osdebug.c
 
 include $(ROOTDIR)/target-rules.mk
 

@@ -6,6 +6,8 @@
 #include "task.h"
 #include "mpu_wrappers.h"
 
+#include <osdebug.h>
+
 // Mostly stolen from mbed-freertos
 
 extern uintptr_t __heap_start, __heap_end;
@@ -17,6 +19,8 @@ PRIVILEGED_FUNCTION void *_sbrk_r(struct _reent *ptr, ptrdiff_t incr)
 {
     void *prev_heap_end, *next_heap_end, *ret;
     void *stack_min = (void *)(__stack_start ? __stack_start : __heap_end);
+    
+    DBGOUT("_sbrk_r(%p, %u)\r\n", ptr, incr);
 
     taskENTER_CRITICAL();
     {
