@@ -88,7 +88,7 @@ void osDbgPrintf(const char * str, ...) {
                     dbgput(&hex_conv[(arg_p >> (i << 2)) & 15], 1);
                 }
             } else {
-                dbgput("(nil)", 4);
+                dbgput("(nil)", 5);
             }
             break;
         case 'x':
