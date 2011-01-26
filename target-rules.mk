@@ -1,10 +1,10 @@
 %.o: %.c
 	$(E) "[TC]     Compiling $<"
-	$(Q)$(TARGET_CC) -ffunction-sections -Wall -Werror $(addprefix -I, $(TARGET_INCLUDES)) $(TARGET_CPPFLAGS) -c -o $@ $<
+	$(Q)$(TARGET_CC) -ffunction-sections -Wall -Werror $(addprefix -I, $(TARGET_INCLUDES)) $(TARGET_CFLAGS) $(TARGET_CPPFLAGS) -c -o $@ $<
 
 %.o: %.s
 	$(E) "[TS]     Compiling $<"
-	$(Q)$(TARGET_AS) $(addprefix -I, $(TARGET_INCLUDES)) $(TARGET_CPPFLAGS) -c -o $@ $<
+	$(Q)$(TARGET_AS) $(addprefix -I, $(TARGET_INCLUDES)) $(TARGET_ASFLAGS) $(TARGET_CPPFLAGS) -c -o $@ $<
 
 TARGET_OBJS = $(addsuffix .o, $(basename $(TARGET_SRCS)))
 
