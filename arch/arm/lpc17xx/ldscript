@@ -43,6 +43,8 @@ PROVIDE(__cs3_stack_size = __cs3_region_start_ram + __cs3_region_size_ram - _end
 PROVIDE(__cs3_heap_start = _end);
 PROVIDE(__cs3_heap_end = __cs3_region_start_ram + __cs3_region_size_ram);
 
+PROVIDE(__rom_data_len = __rom_data_end - __rom_data_begin);
+
 PROVIDE(__heap_start = __cs3_heap_start);
 PROVIDE(__heap_end = __cs3_heap_end);
 
@@ -145,6 +147,7 @@ SECTIONS
   .data :
   {
     __cs3_region_start_ram = .;
+    __ram_data_begin = .;
     *(.cs3.region-head.ram)
     KEEP(*(.jcr))
     *(.got.plt) *(.got)
