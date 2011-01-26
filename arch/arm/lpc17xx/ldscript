@@ -48,12 +48,15 @@ PROVIDE(__rom_data_len = __rom_data_end - __rom_data_begin);
 PROVIDE(__heap_start = __cs3_heap_start);
 PROVIDE(__heap_end = __cs3_heap_end);
 
+PROVIDE(__bss_ram_len = __bss_ram_end - __bss_ram_begin);
+
 SECTIONS
 {
   .text :
   {
     CREATE_OBJECT_SYMBOLS
     __cs3_region_start_rom = .;
+    __privileged_code_start__ = . ;
     
     *(.cs3.region-head.rom)
     __cs3_interrupt_vector = __cs3_interrupt_vector_cortex_m;
@@ -67,6 +70,20 @@ SECTIONS
     *(.cs3.reset)
     /* Make sure we pulled in some reset code.  */
     ASSERT (. != __cs3_reset, "No reset code");
+    
+    *( .privileged_code )
+    *( privileged_functions )
+
+    __privileged_code_end___len = . - __privileged_code_start__ - 1 ;
+    __privileged_code_end___len |= __privileged_code_end___len >> 1 ;
+    __privileged_code_end___len |= __privileged_code_end___len >> 2 ;
+    __privileged_code_end___len |= __privileged_code_end___len >> 4 ;
+    __privileged_code_end___len |= __privileged_code_end___len >> 8 ;
+    __privileged_code_end___len |= __privileged_code_end___len >> 16 ;
+    . = ALIGN( MAX( __privileged_code_end___len + 1, 32 ) ) ;
+
+    __privileged_code_end__ = .;
+    __privileged_functions_end__ = .;
 
     *(.text .text.* .gnu.linkonce.t.*)
     *(.plt)
@@ -137,7 +154,7 @@ SECTIONS
   } >rom
   __cs3_region_size_rom = LENGTH(rom);
   __cs3_region_num = 1;
-
+  
   .data_begin :
   {
     . = ALIGN(8);
@@ -148,6 +165,17 @@ SECTIONS
   {
     __cs3_region_start_ram = .;
     __ram_data_begin = .;
+    __privileged_data_start__ = .;
+    *( privileged_data )
+    __privileged_data_end___len = . - __privileged_data_start__ - 1 ;
+    __privileged_data_end___len |= __privileged_data_end___len >> 1 ;
+    __privileged_data_end___len |= __privileged_data_end___len >> 2 ;
+    __privileged_data_end___len |= __privileged_data_end___len >> 4 ;
+    __privileged_data_end___len |= __privileged_data_end___len >> 8 ;
+    __privileged_data_end___len |= __privileged_data_end___len >> 16 ;
+    . = ALIGN( MAX( __privileged_data_end___len + 1, 32 ) ) ;
+
+    __privileged_data_end__ = .;
     *(.cs3.region-head.ram)
     KEEP(*(.jcr))
     *(.got.plt) *(.got)
@@ -157,21 +185,24 @@ SECTIONS
     . = ALIGN (8);
     _edata = .;
   } >ram AT>rom
-  .bss :
-  {
-    *(.shbss)
-    *(.bss .bss.* .gnu.linkonce.b.*)
-    *(COMMON)
-    *(.ram.b)
-    . = ALIGN (8);
-    _end = .;
-    __end = .;
-  } >ram AT>rom
   .data_end :
   {
     . = ALIGN(8);
     __rom_data_end = .;
   } > rom
+
+  .bss :
+  {
+    __bss_ram_begin = .;
+    *(.shbss)
+    *(.bss .bss.* .gnu.linkonce.b.*)
+    *(COMMON)
+    *(.ram.b)
+    . = ALIGN (8);
+    __bss_ram_end = .;
+    _end = .;
+    __end = .;
+  } >ram
 
   /* This used for USB RAM section */
 	.usb_ram (NOLOAD):

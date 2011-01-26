@@ -140,6 +140,11 @@ __cs3_reset_cortex_m:
     MOV     R2, R4
     BL      memcpy
     
+    LDR     R0, =__bss_ram_begin
+    MOV     R1, #0
+    LDR     R2, =__bss_ram_len
+    BL      memset
+    
     LDR     R0, =SystemInit
     BLX     R0
     LDR     R0,=_start
