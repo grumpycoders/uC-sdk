@@ -6,7 +6,7 @@
 
 static const char hex_conv[] = "0123456789ABCDEF";
 static void dbgput(const void * _str, int n) {
-    const char * str = (const char *) str;
+    const char * str = (const char *) _str;
     while(n--)
         BoardConsolePutc(*(str++));
 }
