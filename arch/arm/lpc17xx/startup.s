@@ -119,6 +119,35 @@ __cs3_interrupt_vector_cortex_m:
 
     .thumb
 
+/* Fault handlers wrappers */
+
+    .section .privileged_code,"x",%progbits
+    .thumb_func
+    .type   NMI_Handler, %function
+NMI_Handler:
+    MOV     R0, 2
+    B       general_handler
+    .type   HardFault_Handler, %function
+HardFault_Handler:
+    MOV     R0, 3
+    B       general_handler
+    .type   MemManage_Handler, %function
+MemManage_Handler:
+    MOV     R0, 4
+    B       general_handler
+    .type   BusFault_Handler, %function
+BusFault_Handler:
+    MOV     R0, 5
+    B       general_handler
+    .type   UsageFault_Handler, %function
+UsageFault_Handler:
+    MOV     R0, 6
+    B       general_handler
+    .type   general_handler, %function
+general_handler:
+    MOV     R1, SP
+    PUSH    {R4-R11}
+    B       general_C_handler
 
 /* Reset Handler */
 
