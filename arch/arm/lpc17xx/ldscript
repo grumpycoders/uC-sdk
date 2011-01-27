@@ -172,23 +172,24 @@ SECTIONS
     *(.shdata)
     *(.data .data.* .gnu.linkonce.d.*)
     *(.ram)
-    . = ALIGN (8);
+    . = ALIGN (32);
     _edata = .;
   } >ram AT>rom
   .data_end :
   {
-    . = ALIGN(8);
+    . = ALIGN(32);
     __rom_data_end = .;
   } > rom
 
   .bss :
   {
+    . = ALIGN(32);
     __bss_ram_begin = .;
     *(.shbss)
     *(.bss .bss.* .gnu.linkonce.b.*)
     *(COMMON)
     *(.ram.b)
-    . = ALIGN (8);
+    . = ALIGN(32);
     __bss_ram_end = .;
     _end = .;
     __end = .;
