@@ -148,7 +148,12 @@ general_handler:
     MOV     R1, SP
     SUB     R1, #32
     PUSH    {R4-R11}
-    B       general_C_handler
+    MOV     R4, LR
+    BL      general_C_handler
+    AND     R0, #7
+    ORR     LR, R4, R0
+    POP     {R4-R11}
+    BX      LR
 
 /* Reset Handler */
 
