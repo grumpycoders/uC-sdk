@@ -158,36 +158,6 @@ __cs3_reset_cortex_m:
 
 /* Exception Handlers */
 
-    .weak   NMI_Handler
-    .type   NMI_Handler, %function
-NMI_Handler:
-    B       .
-    .size   NMI_Handler, . - NMI_Handler
-
-    .weak   HardFault_Handler
-    .type   HardFault_Handler, %function
-HardFault_Handler:
-    B       .
-    .size   HardFault_Handler, . - HardFault_Handler
-
-    .weak   MemManage_Handler
-    .type   MemManage_Handler, %function
-MemManage_Handler:
-    B       .
-    .size   MemManage_Handler, . - MemManage_Handler
-
-    .weak   BusFault_Handler
-    .type   BusFault_Handler, %function
-BusFault_Handler:
-    B       .
-    .size   BusFault_Handler, . - BusFault_Handler
-
-    .weak   UsageFault_Handler
-    .type   UsageFault_Handler, %function
-UsageFault_Handler:
-    B       .
-    .size   UsageFault_Handler, . - UsageFault_Handler
-
     .weak   SVC_Handler
     .type   SVC_Handler, %function
 SVC_Handler:
