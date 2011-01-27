@@ -2,6 +2,7 @@
 #include <task.h>
 #include <lpc17xx_gpio.h>
 #include <BoardConsole.h>
+#include <osdebug.h>
 
 #define LED1_wire 18
 #define LED2_wire 20
@@ -12,7 +13,7 @@ static void setupLEDs() {
     GPIO_SetDir(1, (1 << LED1_wire) | (1 << LED2_wire) | (1 << LED3_wire) | (1 << LED4_wire), 1);
 }
 
-void litLED(int led, int value) {
+static void litLED(int led, int value) {
     if ((led > 4) || (led < 0))
         return;
     
@@ -30,13 +31,31 @@ void litLED(int led, int value) {
     }
 }
 
+static void simpleTask1(void *p) {
+    while (1) {
+        BoardConsolePuts("Task 1");
+        vTaskDelay(1234);
+    }
+}
+
+static void simpleTask2(void *p) {
+    while (1) {
+        BoardConsolePuts("Task 2");
+        vTaskDelay(1357);
+    }
+}
+
 int main() {
     setupLEDs();
-    litLED(1, 1);
+    litLED(1, 0);
     litLED(2, 0);
-    litLED(3, 1);
+    litLED(3, 0);
     litLED(4, 0);
-    BoardConsolePuts("Hello World.");
+    BoardConsolePuts("Creating simple tasks.");
+    xTaskCreate(simpleTask1, (signed char *) "st1", configMINIMAL_STACK_SIZE, (void *)NULL, tskIDLE_PRIORITY | portPRIVILEGE_BIT, NULL);
+    xTaskCreate(simpleTask2, (signed char *) "st2", configMINIMAL_STACK_SIZE, (void *)NULL, tskIDLE_PRIORITY | portPRIVILEGE_BIT, NULL);
+    BoardConsolePuts("Scheduler starting.");
     vTaskStartScheduler();
+    BoardConsolePuts("Scheduler exitting.");
     return 0;
 }

@@ -71,11 +71,11 @@ __cs3_interrupt_vector_cortex_m:
     .long   0                           /* Reserved                     */
     .long   0                           /* Reserved                     */
     .long   0                           /* Reserved                     */
-    .long   SVC_Handler                 /* SVCall Handler               */
+    .long   vPortSVCHandler             /* SVCall Handler               */
     .long   DebugMon_Handler            /* Debug Monitor Handler        */
     .long   0                           /* Reserved                     */
-    .long   PendSV_Handler              /* PendSV Handler               */
-    .long   SysTick_Handler             /* SysTick Handler              */
+    .long   xPortPendSVHandler          /* PendSV Handler               */
+    .long   xPortSysTickHandler         /* SysTick Handler              */
 
     /* External Interrupts */
     .long   WDT_IRQHandler              /* 16: Watchdog Timer               */
@@ -190,31 +190,12 @@ __cs3_reset_cortex_m:
 
     .section ".privileged_code"
 
-/* Exception Handlers */
-
-    .weak   SVC_Handler
-    .type   SVC_Handler, %function
-SVC_Handler:
-    B       .
-    .size   SVC_Handler, . - SVC_Handler
 
     .weak   DebugMon_Handler
     .type   DebugMon_Handler, %function
 DebugMon_Handler:
     B       .
     .size   DebugMon_Handler, . - DebugMon_Handler
-
-    .weak   PendSV_Handler
-    .type   PendSV_Handler, %function
-PendSV_Handler:
-    B       .
-    .size   PendSV_Handler, . - PendSV_Handler
-
-    .weak   SysTick_Handler
-    .type   SysTick_Handler, %function
-SysTick_Handler:
-    B       .
-    .size   SysTick_Handler, . - SysTick_Handler
 
 
 /* IRQ Handlers */

@@ -7,7 +7,7 @@ void vConfigureTimerForRunTimeStats() {
 }
 
 void vApplicationTickHook() {
-    DBGOUT("vApplicationTickHook()\r\n");
+//    DBGOUT("vApplicationTickHook()\r\n");
 }
 
 void vApplicationStackOverflowHook(xTaskHandle *pxTask, signed portCHAR *pcTaskName) {
@@ -15,5 +15,5 @@ void vApplicationStackOverflowHook(xTaskHandle *pxTask, signed portCHAR *pcTaskN
 }
 
 void vApplicationIdleHook() {
-    DBGOUT("vApplicationIdleHook()\r\n");
+//    DBGOUT("vApplicationIdleHook()\r\n");
 }
