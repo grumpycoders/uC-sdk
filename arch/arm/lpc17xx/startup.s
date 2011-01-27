@@ -145,6 +145,9 @@ __cs3_reset_cortex_m:
     LDR     R2, =__bss_ram_len
     BL      memset
     
+    LDR     R0, =lpc17xx_deinit_all
+    BLX     R0
+    
     LDR     R0, =SystemInit
     BLX     R0
     LDR     R0,=_start
