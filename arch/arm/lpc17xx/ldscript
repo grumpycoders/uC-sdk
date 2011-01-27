@@ -54,6 +54,7 @@ SECTIONS
 {
   .text :
   {
+    . = ALIGN(32);
     CREATE_OBJECT_SYMBOLS
     __cs3_region_start_rom = .;
     __privileged_code_start__ = . ;
@@ -73,14 +74,8 @@ SECTIONS
     
     *( .privileged_code )
     *( privileged_functions )
-
-    __privileged_code_end___len = . - __privileged_code_start__ - 1 ;
-    __privileged_code_end___len |= __privileged_code_end___len >> 1 ;
-    __privileged_code_end___len |= __privileged_code_end___len >> 2 ;
-    __privileged_code_end___len |= __privileged_code_end___len >> 4 ;
-    __privileged_code_end___len |= __privileged_code_end___len >> 8 ;
-    __privileged_code_end___len |= __privileged_code_end___len >> 16 ;
-    . = ALIGN( MAX( __privileged_code_end___len + 1, 32 ) ) ;
+    
+    . = ALIGN(32);
 
     __privileged_code_end__ = .;
     __privileged_functions_end__ = .;
@@ -163,17 +158,12 @@ SECTIONS
 
   .data :
   {
+    . = ALIGN(32);
     __cs3_region_start_ram = .;
     __ram_data_begin = .;
     __privileged_data_start__ = .;
     *( privileged_data )
-    __privileged_data_end___len = . - __privileged_data_start__ - 1 ;
-    __privileged_data_end___len |= __privileged_data_end___len >> 1 ;
-    __privileged_data_end___len |= __privileged_data_end___len >> 2 ;
-    __privileged_data_end___len |= __privileged_data_end___len >> 4 ;
-    __privileged_data_end___len |= __privileged_data_end___len >> 8 ;
-    __privileged_data_end___len |= __privileged_data_end___len >> 16 ;
-    . = ALIGN( MAX( __privileged_data_end___len + 1, 32 ) ) ;
+    . = ALIGN(32);
 
     __privileged_data_end__ = .;
     *(.cs3.region-head.ram)
