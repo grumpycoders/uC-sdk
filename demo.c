@@ -13,7 +13,7 @@ static void setupLEDs() {
 }
 
 void litLED(int led, int value) {
-    if ((led >= 4) || (led < 0))
+    if ((led > 4) || (led < 0))
         return;
     
     switch (led) {
