@@ -1,5 +1,6 @@
 #include <FreeRTOS.h>
 #include <task.h>
+#include <semphr.h>
 #include <lpc17xx_gpio.h>
 #include <BoardConsole.h>
 #include <osdebug.h>
@@ -31,16 +32,22 @@ static void litLED(int led, int value) {
     }
 }
 
+xSemaphoreHandle handle;
+
 static void simpleTask1(void *p) {
     while (1) {
+        xSemaphoreTake(handle, portMAX_DELAY);
         BoardConsolePuts("Task 1");
+        xSemaphoreGive(handle);
         vTaskDelay(1234);
     }
 }
 
 static void simpleTask2(void *p) {
     while (1) {
+        xSemaphoreTake(handle, portMAX_DELAY);
         BoardConsolePuts("Task 2");
+        xSemaphoreGive(handle);
         vTaskDelay(1357);
     }
 }
@@ -52,14 +59,16 @@ static void badTask(void *x) {
 }
 
 int main() {
+    handle = xSemaphoreCreateMutex();
+
     setupLEDs();
     litLED(1, 0);
     litLED(2, 0);
     litLED(3, 0);
     litLED(4, 0);
     BoardConsolePuts("Creating simple tasks.");
-    xTaskCreate(simpleTask1, (signed char *) "st1", configMINIMAL_STACK_SIZE, (void *)NULL, tskIDLE_PRIORITY | portPRIVILEGE_BIT, NULL);
-    xTaskCreate(simpleTask2, (signed char *) "st2", configMINIMAL_STACK_SIZE, (void *)NULL, tskIDLE_PRIORITY | portPRIVILEGE_BIT, NULL);
+    xTaskCreate(simpleTask1, (signed char *) "st1", configMINIMAL_STACK_SIZE, (void *)NULL, tskIDLE_PRIORITY, NULL);
+    xTaskCreate(simpleTask2, (signed char *) "st2", configMINIMAL_STACK_SIZE, (void *)NULL, tskIDLE_PRIORITY, NULL);
     xTaskCreate(badTask, (signed char *) "bad", configMINIMAL_STACK_SIZE, (void *)NULL, tskIDLE_PRIORITY, NULL);
     BoardConsolePuts("Scheduler starting.");
     vTaskStartScheduler();

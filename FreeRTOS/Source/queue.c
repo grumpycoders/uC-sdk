@@ -53,6 +53,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <osdebug.h>
 
 /* Defining MPU_WRAPPERS_INCLUDED_FROM_API_FILE prevents task.h from redefining
 all the API functions to use the MPU wrappers.  That should only be done when
@@ -1092,11 +1093,20 @@ static void prvCopyDataFromQueue( xQUEUE * const pxQueue, const void *pvBuffer )
 {
 	if( pxQueue->uxQueueType != queueQUEUE_IS_MUTEX )
 	{
+	        DBGOUT("ret: %p\r\n", __builtin_return_address(0));
+		DBGOUT("pxQueue: %p\r\n", pxQueue);
+		DBGOUT("pxQueue->uxQueueType: %d\r\n", pxQueue->uxQueueType);
+		DBGOUT("pxQueue->pcReadFrom:  %p\r\n", pxQueue->pcReadFrom);
+		DBGOUT("pxQueue->uxItemSize:  %d\r\n", pxQueue->uxItemSize);
 		pxQueue->pcReadFrom += pxQueue->uxItemSize;
+		DBGOUT("pxQueue->pcReadFrom:  %p\r\n", pxQueue->pcReadFrom);
 		if( pxQueue->pcReadFrom >= pxQueue->pcTail )
 		{
 			pxQueue->pcReadFrom = pxQueue->pcHead;
 		}
+		DBGOUT("pxQueue->pcHead:      %p\r\n", pxQueue->pcHead);
+		DBGOUT("pxQueue->pcReadFrom:  %p\r\n", pxQueue->pcReadFrom);
+		DBGOUT("pvBuffer: %p\r\n", pvBuffer);
 		memcpy( ( void * ) pvBuffer, ( void * ) pxQueue->pcReadFrom, ( unsigned ) pxQueue->uxItemSize );
 	}
 }

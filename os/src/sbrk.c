@@ -17,25 +17,19 @@ extern uintptr_t __stack_start;
 /* Low-level bulk RAM allocator -- used by Newlib's Malloc */
 static void *heap_end = (void *) &__heap_start;
 
-#define USE_SBRK_MUTEX 0
-
-#if USE_SBRK_MUTEX
-static xSemaphoreHandle sbrk_sem;
+static xSemaphoreHandle sbrk_sem = NULL;
 
 __attribute__((constructor)) static void sbrk_init() {
-    DBGOUT("Creating Mutex...");
     sbrk_sem = xSemaphoreCreateMutex();
 }
-#endif
 
 void *_sbrk_r(struct _reent *ptr, ptrdiff_t incr)
 {
     void *prev_heap_end, *next_heap_end, *ret;
     void *stack_min = (void *) &__stack_start;
-
-#if USE_SBRK_MUTEX
-    xSemaphoreTake(sbrk_sem, portMAX_DELAY);
-#endif
+    
+    if (sbrk_sem)
+        xSemaphoreTake(sbrk_sem, portMAX_DELAY);
 
     prev_heap_end = heap_end;
 
@@ -51,9 +45,8 @@ void *_sbrk_r(struct _reent *ptr, ptrdiff_t incr)
         ret = (void *)prev_heap_end;
     }
 
-#if USE_SBRK_MUTEX
-    xSemaphoreGive(sbrk_sem);
-#endif
+    if (sbrk_sem)
+        xSemaphoreGive(sbrk_sem);
 
     return ret;
 }
