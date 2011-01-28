@@ -169,9 +169,9 @@ UsageFault_Handler:
     MOV     R0, 6
     .type   general_handler, %function
 general_handler:
-    MOV     R1, SP
-    SUB     R1, #32
     PUSH    {R4-R11}
+    MOV     R1, SP
+    MOV     R2, LR
     MOV     R4, LR
     BL      general_C_handler
     AND     R0, #7
