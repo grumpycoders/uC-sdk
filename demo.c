@@ -4,6 +4,7 @@
 #include <lpc17xx_gpio.h>
 #include <BoardConsole.h>
 #include <osdebug.h>
+#include <stdio.h>
 
 #define LED1_wire 18
 #define LED2_wire 20
@@ -60,7 +61,7 @@ static void badTask(void *x) {
 
 int main() {
     handle = xSemaphoreCreateMutex();
-
+    printf("Hello world - from stdio!\r\n");
     setupLEDs();
     litLED(1, 0);
     litLED(2, 0);
