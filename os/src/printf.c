@@ -3,12 +3,12 @@
 #include <stdarg.h>
 #include <osdebug.h>
 
-int sprintf(char * str, const char * fmt, ...) {
+int printf(const char * fmt, ...) {
     int r;
     va_list ap;
-    DBGOUT("sprintf(%p, %p, ...)\r\n", str, fmt);
+    DBGOUT("printf(%p, ...)\r\n", fmt);
     va_start(ap, fmt);
-    r = _vsprintf_r(_impure_ptr, str, fmt, ap);
+    r = _vprintf_r(_impure_ptr, fmt, ap);
     va_end(ap);
     return r;
 }

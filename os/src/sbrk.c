@@ -15,7 +15,8 @@ extern uintptr_t __heap_start, __heap_end;
 
 /* Low-level bulk RAM allocator -- used by Newlib's Malloc */
 static void *heap_end = NULL;
-PRIVILEGED_FUNCTION void *_sbrk_r(struct _reent *ptr, ptrdiff_t incr)
+
+void *_sbrk_r(struct _reent *ptr, ptrdiff_t incr)
 {
     void *prev_heap_end, *next_heap_end, *ret;
 //    void *stack_min = (void *)(__stack_start ? __stack_start : __heap_end);

@@ -3,7 +3,6 @@
 
 extern void __libc_init_array();
 extern void __libc_fini_array();
-extern void __main();
 extern int main(int, char **, char **);
 extern void BoardEarlyInit();
 extern void BoardLateInit();
@@ -22,6 +21,7 @@ void _start() {
     BoardEarlyInit();
     BoardConsoleInit();
     BoardConsolePuts("uC-sdk - booting.");    
+//    __sinit(_impure_ptr);
     __libc_init_array();
     BoardLateInit();
     atexit(__libc_fini_array);
