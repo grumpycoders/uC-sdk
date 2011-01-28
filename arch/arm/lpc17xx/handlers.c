@@ -32,6 +32,9 @@ static void print_fault_data(struct fault_data_cpu_t * fault_data_cpu, struct fa
 
 void general_C_handler(enum FaultType fault, struct fault_data_extra_t * fault_data_extra, uintptr_t lr) {
     uintptr_t eflags = lr & 15;
+    uint8_t MMFSR = SCB->CFSR & 0xff;
+    uint8_t BFSR = (SCB->CFSR >> 8) & 0xff;
+    uint16_t UFSR = (SCB->CFSR >> 16) & 0xffff;
     struct fault_data_cpu_t * fault_data_cpu = (struct fault_data_cpu_t *) ((eflags & 4) ? (void *) __get_PSP() : (void *) (fault_data_extra + 1));
     DBGOUT("***FAULT***\r\neflags = 0x0%x\r\nPSP = %p\r\nType: ", eflags, __get_PSP());
     switch (fault) {
@@ -39,20 +42,27 @@ void general_C_handler(enum FaultType fault, struct fault_data_extra_t * fault_d
         DBGOUT("NMI\r\n");
         break;
     case HardFault:
-        DBGOUT("HardFault\r\nHFSR: %p\r\n", SCB->HFSR);
+        DBGOUT("HardFault\r\n");
         break;
     case MemManage:
-        DBGOUT("MemManage\r\nCSFR: %p\r\nMMFAR: %p\r\n", SCB->CFSR, SCB->MMFAR);
+        DBGOUT("MemManage\r\n");
         break;
     case BusFault:
-        DBGOUT("BusFault\r\nCFSR: %p\r\nBFAR: %p\r\n", SCB->CFSR, SCB->BFAR);
+        DBGOUT("BusFault\r\n");
         break;
     case UsageFault:
-        DBGOUT("UsageFault\r\nCFSR: %p\r\nBFAR: %p\r\n", SCB->CFSR, SCB->BFAR);
+        DBGOUT("UsageFault\r\n");
         break;
     default:
         DBGOUT("Unknown\r\n");
     }
+
+    DBGOUT("*MMFSR* MMARVALID: %d - MSTKERR: %d - MUNSTKERR: %d - DACCVIOL: %d - IACCVIOL: %d\r\n", MMFSR & 128 ? 1 : 0, MMFSR & 16 ? 1 : 0, MMFSR & 8 ? 1 : 0, MMFSR & 2 ? 1 : 0, MMFSR & 1);
+    DBGOUT("*BFSR* BFARVALID: %d - STKERR: %d - UNSTKERR: %d - IMPREISERR: %d - PRECISERR: %d - IBUSERR: %d\r\n", BFSR & 128 ? 1 : 0, BFSR & 16 ? 1 : 0, BFSR & 8 ? 1 : 0, BFSR & 4 ? 1 : 0, BFSR & 2 ? 1 : 0, BFSR & 1);
+    DBGOUT("*UFSR* DIVBYZERO: %d - UNALIGNED: %d - NOCP: %d - INVPC: %d - INVSTATE: %d - UNDEFINSTR: %d\r\n", UFSR & 512 ? 1 : 0, UFSR & 256 ? 1 : 0, UFSR & 8 ? 1 : 0, UFSR & 4 ? 1 : 0, UFSR & 2 ? 1 : 0, UFSR & 1);
+    DBGOUT("*HFSR* DEBUGEVT: %d - FORCED: %d - VECTBL: %d\r\n", SCB->HFSR & 0x80000000 ? 1 : 0, SCB->HFSR & 0x40000000 ? 1 : 0, SCB->HFSR & 2 ? 1 : 0);
+    DBGOUT("*DFSR* EXTERNAL: %d - VCATCH: %d - DWTTRAP: %d - BKPT: %d - HALTED: %d\r\n", SCB->DFSR & 16 ? 1 : 0, SCB->DFSR & 8 ? 1 : 0, SCB->DFSR & 4 ? 1 : 0, SCB->DFSR & 2 ? 1 : 0, SCB->DFSR & 1);
+    DBGOUT("MMAR = %p - BFAR = %p - AFSR: %d\r\n", SCB->MMFAR, SCB->BFAR, SCB->AFSR);
     
     print_fault_data(fault_data_cpu, fault_data_extra);
     
