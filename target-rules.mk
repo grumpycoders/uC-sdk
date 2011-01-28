@@ -1,10 +1,10 @@
 %.o: %.c
 	$(E) "[TC]     Compiling $<"
-	$(Q)$(TARGET_CC) -ffunction-sections -Wall -Werror $(addprefix -I, $(TARGET_INCLUDES)) $(TARGET_CFLAGS) $(TARGET_CPPFLAGS) -c -o $@ $<
+	$(Q)$(TARGET_CC) -ffunction-sections -Wall -Werror $(addprefix -I, $(TARGET_INCLUDES)) $(TARGET_CFLAGS) $(TARGET_CPPFLAGS) -g -c -o $@ $<
 
 %.o: %.s
 	$(E) "[TS]     Compiling $<"
-	$(Q)$(TARGET_AS) $(addprefix -I, $(TARGET_INCLUDES)) $(TARGET_ASFLAGS) $(TARGET_CPPFLAGS) -c -o $@ $<
+	$(Q)$(TARGET_AS) $(addprefix -I, $(TARGET_INCLUDES)) $(TARGET_ASFLAGS) $(TARGET_CPPFLAGS) -g -c -o $@ $<
 
 TARGET_OBJS = $(addsuffix .o, $(basename $(TARGET_SRCS)))
 
@@ -17,7 +17,7 @@ endif
 
 $(TARGET_ELF): $(TARGET_OBJS) $(LIBDEPS) $(LDSCRIPT)
 	$(E) "[TL]     Linking $@"
-	$(Q)$(TARGET_LD) -Wl,--gc-sections -Wl,-O3 -Wl,-Map=$(TARGET_MAP) -o $@ $(TARGET_OBJS) -T$(LDSCRIPT) $(LIBS)
+	$(Q)$(TARGET_LD) -Wl,--gc-sections -Wl,-O3 -Wl,-Map=$(TARGET_MAP) -o $@ $(TARGET_OBJS) -g -T$(LDSCRIPT) $(LIBS)
 
 $(TARGET_MAP): $(TARGET_ELF)
 
