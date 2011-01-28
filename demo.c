@@ -51,10 +51,7 @@ static void badTask(void *x) {
     *p = 42;
 }
 
-extern char blah[32];
-
 int main() {
-    BoardConsolePuts(blah);
     setupLEDs();
     litLED(1, 0);
     litLED(2, 0);
