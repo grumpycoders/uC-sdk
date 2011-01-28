@@ -1,6 +1,7 @@
 #include <reent.h>
 #include <malloc.h>
-#include <osdebug.h>
+#include <FreeRTOS.h>
+#include <semphr.h>
 
 static xSemaphoreHandle malloc_sem = NULL;
 
@@ -16,4 +17,5 @@ void * malloc(size_t size) {
     ptr =_malloc_r(_impure_ptr, size);
     if (malloc_sem)
         xSemaphoreGive(malloc_sem);
+    return ptr;
 }
