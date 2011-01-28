@@ -23,7 +23,7 @@
     .section ".stack", "w"
     .align  3
     .globl  __cs3_stack_mem
-    .globl  __stack_mem
+    .globl  __stack_start
     .globl  __cs3_stack_size
 __cs3_stack_mem:
 __stack_start:
@@ -54,12 +54,11 @@ __cs3_heap_end:
 
 
 /* Vector Table */
+    .section ".cs3.interrupt_vector_mutable"
+    .globl  __cs3_interrupt_vector_cortex_m_mutable
+    .type   __cs3_interrupt_vector_cortex_m_mutable, %object
 
-    .section ".cs3.interrupt_vector"
-    .globl  __cs3_interrupt_vector_cortex_m
-    .type   __cs3_interrupt_vector_cortex_m, %object
-
-__cs3_interrupt_vector_cortex_m:
+__cs3_interrupt_vector_cortex_m_mutable:
     .long   __cs3_stack                 /* Top of Stack                 */
     .long   __cs3_reset_cortex_m        /* Reset Handler                */
     .long   NMI_Handler                 /* NMI Handler                  */
@@ -114,6 +113,32 @@ __cs3_interrupt_vector_cortex_m:
     .long   USBActivity_IRQHandler      /* 49: USB Activity                 */
     .long   CANActivity_IRQHandler      /* 50: CAN Activity                 */
 
+    .size   __cs3_interrupt_vector_cortex_m_mutable, . - __cs3_interrupt_vector_cortex_m_mutable
+
+
+    .section ".cs3.interrupt_vector"
+    .globl  __cs3_interrupt_vector_cortex_m
+    .type   __cs3_interrupt_vector_cortex_m, %object
+
+__cs3_interrupt_vector_cortex_m:
+    .long   __cs3_stack                 /* Top of Stack                 */
+    .long   __cs3_reset_cortex_m        /* Reset Handler                */
+    .long   NMI_Handler                 /* NMI Handler                  */
+    .long   HardFault_Handler           /* Hard Fault Handler           */
+    .long   MemManage_Handler           /* MPU Fault Handler            */
+    .long   BusFault_Handler            /* Bus Fault Handler            */
+    .long   UsageFault_Handler          /* Usage Fault Handler          */
+    .long   0                           /* Reserved - ROM CRC check ?   */
+    .long   0                           /* Reserved                     */
+    .long   0                           /* Reserved                     */
+    .long   0                           /* Reserved                     */
+    .long   vPortSVCHandler             /* SVCall Handler               */
+    .long   DebugMon_Handler            /* Debug Monitor Handler        */
+    .long   0                           /* Reserved                     */
+    .long   xPortPendSVHandler          /* PendSV Handler               */
+    .long   xPortSysTickHandler         /* SysTick Handler              */
+
+
     .size   __cs3_interrupt_vector_cortex_m, . - __cs3_interrupt_vector_cortex_m
 
 
@@ -121,7 +146,7 @@ __cs3_interrupt_vector_cortex_m:
 
 /* Fault handlers wrappers */
 
-    .section .privileged_code,"x",%progbits
+    .section .handlers,"x",%progbits
     .thumb_func
     .type   NMI_Handler, %function
 NMI_Handler:
@@ -142,7 +167,6 @@ BusFault_Handler:
     .type   UsageFault_Handler, %function
 UsageFault_Handler:
     MOV     R0, 6
-    B       general_handler
     .type   general_handler, %function
 general_handler:
     MOV     R1, SP
@@ -188,7 +212,7 @@ __cs3_reset_cortex_m:
     .fnend
     .size   __cs3_reset_cortex_m,.-__cs3_reset_cortex_m
 
-    .section ".privileged_code"
+    .section .handlers,"x",%progbits
 
 
     .weak   DebugMon_Handler

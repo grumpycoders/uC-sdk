@@ -15,5 +15,4 @@ void vApplicationStackOverflowHook(xTaskHandle *pxTask, signed portCHAR *pcTaskN
 }
 
 void vApplicationIdleHook() {
-//    DBGOUT("vApplicationIdleHook()\r\n");
 }

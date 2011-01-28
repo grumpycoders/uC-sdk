@@ -45,7 +45,16 @@ static void simpleTask2(void *p) {
     }
 }
 
+static void badTask(void *x) {
+    vTaskDelay(5000);
+    char * p = (char *) 0x10000000;
+    *p = 42;
+}
+
+extern char blah[32];
+
 int main() {
+    BoardConsolePuts(blah);
     setupLEDs();
     litLED(1, 0);
     litLED(2, 0);
@@ -54,6 +63,7 @@ int main() {
     BoardConsolePuts("Creating simple tasks.");
     xTaskCreate(simpleTask1, (signed char *) "st1", configMINIMAL_STACK_SIZE, (void *)NULL, tskIDLE_PRIORITY | portPRIVILEGE_BIT, NULL);
     xTaskCreate(simpleTask2, (signed char *) "st2", configMINIMAL_STACK_SIZE, (void *)NULL, tskIDLE_PRIORITY | portPRIVILEGE_BIT, NULL);
+    xTaskCreate(badTask, (signed char *) "bad", configMINIMAL_STACK_SIZE, (void *)NULL, tskIDLE_PRIORITY, NULL);
     BoardConsolePuts("Scheduler starting.");
     vTaskStartScheduler();
     BoardConsolePuts("Scheduler exitting.");

@@ -1,5 +1,5 @@
 export BOARD = mbed
-export USE_MPU = false
+export USE_MPU = true
 
 
 ifeq ($(BOARD),mbed)

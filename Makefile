@@ -2,6 +2,8 @@ TARGET = demo.bin
 LIBDEPS = FreeRTOS/libFreeRTOS.a arch/libarch.a os/libos.a
 LIBS = -Wl,--start-group -lc $(LIBDEPS) -Wl,--end-group
 
+TARGET_SRCS = extern.c
+
 export ROOTDIR = $(CURDIR)
 
 include common.mk

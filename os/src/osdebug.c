@@ -82,13 +82,9 @@ void osDbgPrintf(const char * str, ...) {
             break;
         case 'p':
             arg_p = va_arg(ap, uintptr_t);
-            if (arg_p) {
-                dbgput("0x", 2);
-                for (i = sizeof(arg_p) * 2 - 1; i >= 0; i--) {
-                    dbgput(&hex_conv[(arg_p >> (i << 2)) & 15], 1);
-                }
-            } else {
-                dbgput("(nil)", 5);
+            dbgput("0x", 2);
+            for (i = sizeof(arg_p) * 2 - 1; i >= 0; i--) {
+                dbgput(&hex_conv[(arg_p >> (i << 2)) & 15], 1);
             }
             break;
         case 'x':

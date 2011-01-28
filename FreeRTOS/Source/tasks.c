@@ -168,8 +168,8 @@ PRIVILEGED_DATA static unsigned portBASE_TYPE uxTaskNumber 						= ( unsigned po
 
 #if ( configGENERATE_RUN_TIME_STATS == 1 )
 
-	PRIVILEGED_DATA static char pcStatsString[ 50 ] ;
-	PRIVILEGED_DATA static unsigned long ulTaskSwitchedInTime = 0UL;	/*< Holds the value of a timer/counter the last time a task was switched in. */
+	static char pcStatsString[ 50 ] ;
+	static unsigned long ulTaskSwitchedInTime = 0UL;	/*< Holds the value of a timer/counter the last time a task was switched in. */
 	static void prvGenerateRunTimeStatsForTasksInList( const signed char *pcWriteBuffer, xList *pxList, unsigned long ulTotalRunTime ) PRIVILEGED_FUNCTION;
 
 #endif
