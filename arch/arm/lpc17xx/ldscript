@@ -173,7 +173,7 @@ SECTIONS
     __cs3_interrupt_vector_mutable = __cs3_interrupt_vector_cortex_m_mutable;
     *(.cs3.interrupt_vector_mutable)
     /* Make sure we pulled in an interrupt vector.  */
-    ASSERT (. != __cs3_interrupt_vector_cortex_m_mutable, "No interrupt vector");
+    ASSERT (. != __cs3_interrupt_vector_cortex_m_mutable, "No interrupt vector mutable table");
     *( privileged_data )
 
     __privileged_data_end___len = . - __privileged_data_start__ - 1 ;

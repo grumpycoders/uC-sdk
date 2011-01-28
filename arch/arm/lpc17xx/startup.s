@@ -129,14 +129,6 @@ __cs3_interrupt_vector_cortex_m:
     .long   BusFault_Handler            /* Bus Fault Handler            */
     .long   UsageFault_Handler          /* Usage Fault Handler          */
     .long   0                           /* Reserved - ROM CRC check ?   */
-    .long   0                           /* Reserved                     */
-    .long   0                           /* Reserved                     */
-    .long   0                           /* Reserved                     */
-    .long   vPortSVCHandler             /* SVCall Handler               */
-    .long   DebugMon_Handler            /* Debug Monitor Handler        */
-    .long   0                           /* Reserved                     */
-    .long   xPortPendSVHandler          /* PendSV Handler               */
-    .long   xPortSysTickHandler         /* SysTick Handler              */
 
 
     .size   __cs3_interrupt_vector_cortex_m, . - __cs3_interrupt_vector_cortex_m
