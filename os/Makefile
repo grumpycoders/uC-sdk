@@ -8,7 +8,7 @@ include $(ROOTDIR)/FreeRTOS/config.mk
 include $(ROOTDIR)/arch/config.mk
 
 TARGET_SRCS = src/init.c src/sbrk.c src/sprintf.c src/malloc.c src/free.c src/fclose.c src/read.c src/lseek.c src/write.c src/close.c src/osdebug.c \
-src/printf.c src/fstat.c src/isatty.c src/fprintf.c
+src/printf.c src/fstat.c src/isatty.c src/fprintf.c src/fio.c
 
 include $(ROOTDIR)/target-rules.mk
 
