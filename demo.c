@@ -5,6 +5,7 @@
 #include <BoardConsole.h>
 #include <osdebug.h>
 #include <stdio.h>
+#include <fio.h>
 
 #define LED1_wire 18
 #define LED2_wire 20
@@ -59,9 +60,18 @@ static void badTask(void *x) {
     *p = 42;
 }
 
+static const char msg[] = "Hello world - from fwrite!\r\n";
+
 int main() {
+    FILE * f;
+    register_devfs();
     handle = xSemaphoreCreateMutex();
     printf("Hello world - from stdio!\r\n");
+    fflush(stdout);
+    f = fopen("/dev/stdout", "w");
+    fwrite(msg, 1, sizeof(msg), f);
+    fflush(f);
+    fclose(f);
     setupLEDs();
     litLED(1, 0);
     litLED(2, 0);

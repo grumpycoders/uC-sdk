@@ -2,7 +2,14 @@
 #include <string.h>
 #include <FreeRTOS.h>
 #include <semphr.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include "fio.h"
+#include "filesystem.h"
+#include "osdebug.h"
+#include "hash-djb2.h"
 
 static struct fddef_t fio_fds[MAX_FDS];
 
@@ -137,4 +144,34 @@ int fio_close(int fd) {
         r = -2;
     }
     return r;
+}
+
+#define stdin_hash 0x0BA00421
+#define stdout_hash 0x7FA08308
+#define stderr_hash 0x7FA058A3
+
+static int devfs_open(void * opaque, const char * path, int flags, int mode) {
+    uint32_t h = hash_djb2((const uint8_t *) path, -1);
+    switch (h) {
+    case stdin_hash:
+        if (flags & (O_WRONLY | O_RDWR))
+            return -1;
+        return fio_open(stdin_read, NULL, NULL, NULL, NULL);
+        break;
+    case stdout_hash:
+        if (flags & O_RDONLY)
+            return -1;
+        return fio_open(NULL, stdout_write, NULL, NULL, NULL);
+        break;
+    case stderr_hash:
+        if (flags & O_RDONLY)
+            return -1;
+        return fio_open(NULL, stdout_write, NULL, NULL, NULL);
+        break;
+    }
+    return -1;
+}
+
+void register_devfs() {
+    register_fs("dev", devfs_open, NULL);
 }
