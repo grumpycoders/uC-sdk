@@ -23,8 +23,7 @@ __attribute__((constructor)) static void sbrk_init() {
     sbrk_sem = xSemaphoreCreateMutex();
 }
 
-void *_sbrk_r(struct _reent *ptr, ptrdiff_t incr)
-{
+void *_sbrk_r(struct _reent *ptr, ptrdiff_t incr) {
     void *prev_heap_end, *next_heap_end, *ret;
     void *stack_min = (void *) &__stack_start;
     
@@ -50,4 +49,3 @@ void *_sbrk_r(struct _reent *ptr, ptrdiff_t incr)
 
     return ret;
 }
-
