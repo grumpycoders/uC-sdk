@@ -1,7 +1,25 @@
 #include <reent.h>
 #include <osdebug.h>
+#include <errno.h>
+#include "fio.h"
 
 _off_t _lseek_r(struct _reent * reent, int fd, _off_t seek, int wheel) {
-    DBGOUT("_lseek_r(%p, %d, %d, %d)\r\n", reent, fd, (int) seek, wheel);
-    return 0;
+    off_t r;
+    
+    if ((wheel != SEEK_SET) && (wheel != SEEK_CUR) && (wheel != SEEK_END)) {
+        reent->_errno = EINVAL;
+        return -1;
+    }
+    
+    if (!fio_is_open(fd)) {
+        reent->_errno = EBADF;
+        return -1;
+    }
+    
+    r = fio_seek(fd, seek, wheel);
+    
+    if (r < 0)
+        reent->_errno = EINVAL;
+    
+    return r;
 }

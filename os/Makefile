@@ -14,6 +14,7 @@ src/filesystem.c \
 src/fio.c \
 src/hash-djb2.c \
 src/osdebug.c \
+src/romfs.c \
 \
 src/close.c \
 src/fstat.c \
@@ -28,6 +29,7 @@ src/fclose.c \
 src/fflush.c \
 src/fopen.c \
 src/fprintf.c \
+src/fread.c \
 src/free.c \
 src/fwrite.c \
 src/malloc.c \

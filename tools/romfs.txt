@@ -1,0 +1,6 @@
+Format is excessively simple and short. Read the source for help.
+
+Converting to an object:
+
+$ arm-none-eabi-objcopy -I binary -O elf32-littlearm \
+--prefix-sections '.romfs' --binary-architecture arm my-romfs.bin my-romfs.o

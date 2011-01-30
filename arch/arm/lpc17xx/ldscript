@@ -101,30 +101,30 @@ SECTIONS
     *(.eh_frame_hdr)
     *(.eh_frame)
 
-    . = ALIGN(4);
+    . = ALIGN(16);
     KEEP(*(.init))
 
-    . = ALIGN(4);
+    . = ALIGN(16);
     __preinit_array_start = .;
     KEEP (*(.preinit_array))
     __preinit_array_end = .;
 
-    . = ALIGN(4);
+    . = ALIGN(16);
     __init_array_start = .;
     KEEP (*(SORT(.init_array.*)))
     KEEP (*(.init_array))
     __init_array_end = .;
 
-    . = ALIGN(0x4);
+    . = ALIGN(16);
     KEEP (*crtbegin.o(.ctors))
     KEEP (*(EXCLUDE_FILE (*crtend.o) .ctors))
     KEEP (*(SORT(.ctors.*)))
     KEEP (*crtend.o(.ctors))
 
-    . = ALIGN(4);
+    . = ALIGN(16);
     KEEP(*(.fini))
 
-    . = ALIGN(4);
+    . = ALIGN(16);
     __fini_array_start = .;
     KEEP (*(.fini_array))
     KEEP (*(SORT(.fini_array.*)))
@@ -135,13 +135,16 @@ SECTIONS
     KEEP (*(SORT(.dtors.*)))
     KEEP (*crtend.o(.dtors))
 
-    . = ALIGN(4);
+    . = ALIGN(16);
     __cs3_regions = .;
     LONG (0)
     LONG (__cs3_region_init_ram)
     LONG (__cs3_region_start_ram)
     LONG (__cs3_region_init_size_ram)
     LONG (__cs3_region_zero_size_ram)
+
+    . = ALIGN(16);
+    *(.romfs.data)
   }
 
   /* .ARM.exidx is sorted, so has to go in its own output section.  */

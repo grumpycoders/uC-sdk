@@ -146,6 +146,11 @@ int fio_close(int fd) {
     return r;
 }
 
+void fio_set_opaque(int fd, void * opaque) {
+    if (fio_is_open_int(fd))
+        fio_fds[fd].opaque = opaque;
+}
+
 #define stdin_hash 0x0BA00421
 #define stdout_hash 0x7FA08308
 #define stderr_hash 0x7FA058A3

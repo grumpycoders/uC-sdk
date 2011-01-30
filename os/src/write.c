@@ -4,7 +4,7 @@
 #include "fio.h"
 
 _ssize_t _write_r(struct _reent * reent, int fd, const void * buf, size_t size) {
-    int r;
+    _ssize_t r;
     
     if (!fio_is_open(fd)) {
         reent->_errno = EBADF;
