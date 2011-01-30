@@ -21,7 +21,7 @@ void usage(const char * binname) {
     exit(-1);
 }
 
-void processdir(DIR * dirp, const char * curpath, FILE * outfile) {
+void processdir(DIR * dirp, const char * curpath, FILE * outfile, const char * prefix) {
     char fullpath[1024];
     char buf[16 * 1024];
     struct dirent * ent;
@@ -32,7 +32,9 @@ void processdir(DIR * dirp, const char * curpath, FILE * outfile) {
     FILE * infile;
 
     while ((ent = readdir(dirp))) {
-        strcpy(fullpath, curpath);
+        strcpy(fullpath, prefix);
+        strcat(fullpath, "/");
+        strcat(fullpath, curpath);
         strcat(fullpath, ent->d_name);
         switch(ent->d_type) {
         case DT_DIR:
@@ -42,7 +44,7 @@ void processdir(DIR * dirp, const char * curpath, FILE * outfile) {
                 continue;
             strcat(fullpath, "/");
             rec_dirp = opendir(fullpath);
-            processdir(rec_dirp, fullpath, outfile);
+            processdir(rec_dirp, fullpath, outfile, prefix);
             closedir(rec_dirp);
             break;
         case DT_REG:
@@ -90,7 +92,7 @@ int main(int argc, char ** argv) {
             o++;
             switch (*o) {
             case 'd':
-                dirname = o;
+                dirname = *argv++;
                 break;
             default:
                 usage(binname);
@@ -119,7 +121,7 @@ int main(int argc, char ** argv) {
         exit(-1);
     }
 
-    processdir(dirp, "", outfile);
+    processdir(dirp, "", outfile, dirname);
     fwrite(&z, 1, 8, outfile);
     if (outname)
         fclose(outfile);

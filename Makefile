@@ -2,6 +2,8 @@ TARGET = demo.bin
 LIBDEPS = FreeRTOS/libFreeRTOS.a arch/libarch.a os/libos.a
 LIBS = -Wl,--start-group -lc $(LIBDEPS) -Wl,--end-group
 
+TARGET_SRCS = test-romfs.o
+
 export ROOTDIR = $(CURDIR)
 
 include common.mk
@@ -36,6 +38,12 @@ os:
 
 tools:
 	$(E) "[MAKE]   Entering tools"
+	$(Q)$(MAKE) $(MAKE_OPTS) -C tools
+
+test-romfs.o: tools
+	$(E) "[ROMFS]  Building test romfs"
+	$(Q) tools/mkromfs -d test test-romfs.bin
+	$(Q) $(TARGET_OBJCOPY_BIN) --prefix-sections '.romfs' test-romfs.bin test-romfs.o
 	$(Q)$(MAKE) $(MAKE_OPTS) -C tools
 
 include FreeRTOS/config.mk

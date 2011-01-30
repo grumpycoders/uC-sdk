@@ -6,6 +6,7 @@
 #include <osdebug.h>
 #include <stdio.h>
 #include <fio.h>
+#include <romfs.h>
 
 #define LED1_wire 18
 #define LED2_wire 20
@@ -62,16 +63,25 @@ static void badTask(void *x) {
 
 static const char msg[] = "Hello world - from fwrite!\r\n";
 
+extern uint8_t _binary_test_romfs_bin_start[];
+
 int main() {
-    FILE * f;
+    FILE * f1, * f2;
+    char buf[32];
+    int c;
     register_devfs();
+    register_romfs("romfs", _binary_test_romfs_bin_start);
     handle = xSemaphoreCreateMutex();
     printf("Hello world - from stdio!\r\n");
     fflush(stdout);
-    f = fopen("/dev/stdout", "w");
-    fwrite(msg, 1, sizeof(msg), f);
-    fflush(f);
-    fclose(f);
+    f1 = fopen("/dev/stdout", "w");
+    fwrite(msg, 1, sizeof(msg), f1);
+    f2 = fopen("/romfs/test.txt", "r");
+    c = fread(buf, 1, 32, f2);
+    fwrite(buf, 1, c, f1);
+    fflush(f1);
+    fclose(f1);
+    fclose(f2);
     setupLEDs();
     litLED(1, 0);
     litLED(2, 0);
