@@ -15,6 +15,7 @@ clean: clean-generic
 	$(Q)$(MAKE) $(MAKE_OPTS) -C arch clean
 	$(Q)$(MAKE) $(MAKE_OPTS) -C os clean
 	$(Q)$(MAKE) $(MAKE_OPTS) -C tools clean
+	$(Q)rm test-romfs.bin
 
 .PHONY: libs FreeRTOS arch os tools
 
