@@ -9,6 +9,7 @@ include $(ROOTDIR)/arch/config.mk
 
 TARGET_SRCS = \
 src/init.c \
+src/hooks.c \
 \
 src/filesystem.c \
 src/fio.c \

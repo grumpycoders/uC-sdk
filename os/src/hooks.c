@@ -1,5 +1,5 @@
-#include "FreeRTOS.h"
-#include "task.h"
+#include <FreeRTOS.h>
+#include <task.h>
 #include "osdebug.h"
 
 void vConfigureTimerForRunTimeStats() {
