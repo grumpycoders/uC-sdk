@@ -35,6 +35,9 @@ void general_C_handler(enum FaultType fault, struct fault_data_extra_t * fault_d
     uint8_t MMFSR = SCB->CFSR & 0xff;
     uint8_t BFSR = (SCB->CFSR >> 8) & 0xff;
     uint16_t UFSR = (SCB->CFSR >> 16) & 0xffff;
+    (void) MMFSR;
+    (void) BFSR;
+    (void) UFSR;
     struct fault_data_cpu_t * fault_data_cpu = (struct fault_data_cpu_t *) ((eflags & 4) ? (void *) __get_PSP() : (void *) (fault_data_extra + 1));
     DBGOUT("***FAULT***\r\neflags = 0x0%x\r\nPSP = %p\r\nType: ", eflags, __get_PSP());
     switch (fault) {

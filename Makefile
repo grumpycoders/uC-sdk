@@ -41,7 +41,7 @@ tools:
 	$(E) "[MAKE]   Entering tools"
 	$(Q)$(MAKE) $(MAKE_OPTS) -C tools
 
-test-romfs.o: tools
+test-romfs.o: tools/mkromfs
 	$(E) "[ROMFS]  Building test romfs"
 	$(Q) tools/mkromfs -d test-romfs test-romfs.bin
 	$(Q) $(TARGET_OBJCOPY_BIN) --prefix-sections '.romfs' test-romfs.bin test-romfs.o

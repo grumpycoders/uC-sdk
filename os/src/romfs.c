@@ -90,6 +90,6 @@ static int romfs_open(void * opaque, const char * path, int flags, int mode) {
 }
 
 void register_romfs(const char * mountpoint, const uint8_t * romfs) {
-    DBGOUT("Registering romfs `%s' @ %p\r\n", mountpoint, romfs);
+//    DBGOUT("Registering romfs `%s' @ %p\r\n", mountpoint, romfs);
     register_fs(mountpoint, romfs_open, (void *) romfs);
 }

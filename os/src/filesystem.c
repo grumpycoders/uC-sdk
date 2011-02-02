@@ -22,6 +22,7 @@ __attribute__((constructor)) void fs_init() {
 
 int register_fs(const char * mountpoint, fs_open_t callback, void * opaque) {
     int i;
+    DBGOUT("register_fs(\"%s\", %p, %p)\r\n", mountpoint, callback, opaque);
     
     for (i = 0; i < MAX_FS; i++) {
         if (!fss[i].cb) {
@@ -39,6 +40,7 @@ int fs_open(const char * path, int flags, int mode) {
     const char * slash;
     uint32_t hash;
     int i;
+//    DBGOUT("fs_open(\"%s\", %i, %i)\r\n", path, flags, mode);
     
     while (path[0] == '/')
         path++;

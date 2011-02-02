@@ -3,9 +3,11 @@
 #include <string.h>
 #include <errno.h>
 #include "fio.h"
+#include "osdebug.h"
 
 int _fstat_r(struct _reent * reent, int fd, struct stat * buf) {
     off_t c;
+//    DBGOUT("_fstat_r(%p, %i, %p)\r\n", reent, fd, buf);
     memset(buf, 0, sizeof(struct stat));
     
     if (!fio_is_open(fd)) {

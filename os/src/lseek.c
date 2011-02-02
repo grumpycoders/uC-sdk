@@ -2,9 +2,11 @@
 #include <osdebug.h>
 #include <errno.h>
 #include "fio.h"
+#include "osdebug.h"
 
 _off_t _lseek_r(struct _reent * reent, int fd, _off_t seek, int wheel) {
     off_t r;
+//    DBGOUT("_lseek_r(%p, %i, %i, %i)\r\n", reent, fd, seek, wheel);
     
     if ((wheel != SEEK_SET) && (wheel != SEEK_CUR) && (wheel != SEEK_END)) {
         reent->_errno = EINVAL;

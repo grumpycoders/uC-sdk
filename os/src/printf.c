@@ -6,6 +6,7 @@
 int printf(const char * fmt, ...) {
     int r;
     va_list ap;
+//    DBGOUT("printf(\"%p\", ...)\r\n", fmt);
     va_start(ap, fmt);
     r = _vprintf_r(_impure_ptr, fmt, ap);
     va_end(ap);

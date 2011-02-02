@@ -36,6 +36,10 @@ src/malloc.c \
 src/printf.c \
 src/sprintf.c \
 
+ifeq ($(CPU),arm)
+TARGET_SRCS += src/semifs.c
+endif
+
 include $(ROOTDIR)/target-rules.mk
 
 clean: clean-generic

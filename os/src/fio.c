@@ -75,6 +75,7 @@ int fio_is_open(int fd) {
 
 int fio_open(fdread_t fdread, fdwrite_t fdwrite, fdseek_t fdseek, fdclose_t fdclose, void * opaque) {
     int fd;
+//    DBGOUT("fio_open(%p, %p, %p, %p, %p)\r\n", fdread, fdwrite, fdseek, fdclose, opaque);
     xSemaphoreTake(fio_sem, portMAX_DELAY);
     fd = fio_findfd();
     
@@ -92,6 +93,7 @@ int fio_open(fdread_t fdread, fdwrite_t fdwrite, fdseek_t fdseek, fdclose_t fdcl
 
 ssize_t fio_read(int fd, void * buf, size_t count) {
     ssize_t r = 0;
+//    DBGOUT("fio_read(%i, %p, %i)\r\n", fd, buf, count);
     if (fio_is_open_int(fd)) {
         if (fio_fds[fd].fdread) {
             r = fio_fds[fd].fdread(fio_fds[fd].opaque, buf, count);
@@ -106,6 +108,7 @@ ssize_t fio_read(int fd, void * buf, size_t count) {
 
 ssize_t fio_write(int fd, const void * buf, size_t count) {
     ssize_t r = 0;
+//    DBGOUT("fio_write(%i, %p, %i)\r\n", fd, buf, count);
     if (fio_is_open_int(fd)) {
         if (fio_fds[fd].fdwrite) {
             r = fio_fds[fd].fdwrite(fio_fds[fd].opaque, buf, count);
@@ -120,6 +123,7 @@ ssize_t fio_write(int fd, const void * buf, size_t count) {
 
 off_t fio_seek(int fd, off_t offset, int whence) {
     off_t r = 0;
+//    DBGOUT("fio_seek(%i, %i, %i)\r\n", fd, offset, whence);
     if (fio_is_open_int(fd)) {
         if (fio_fds[fd].fdseek) {
             r = fio_fds[fd].fdseek(fio_fds[fd].opaque, offset, whence);
@@ -134,6 +138,7 @@ off_t fio_seek(int fd, off_t offset, int whence) {
 
 int fio_close(int fd) {
     int r = 0;
+//    DBGOUT("fio_close(%i)\r\n", fd);
     if (fio_is_open_int(fd)) {
         if (fio_fds[fd].fdclose)
             r = fio_fds[fd].fdclose(fio_fds[fd].opaque);
@@ -157,6 +162,7 @@ void fio_set_opaque(int fd, void * opaque) {
 
 static int devfs_open(void * opaque, const char * path, int flags, int mode) {
     uint32_t h = hash_djb2((const uint8_t *) path, -1);
+//    DBGOUT("devfs_open(%p, \"%s\", %i, %i)\r\n", opaque, path, flags, mode);
     switch (h) {
     case stdin_hash:
         if (flags & (O_WRONLY | O_RDWR))
@@ -178,5 +184,6 @@ static int devfs_open(void * opaque, const char * path, int flags, int mode) {
 }
 
 void register_devfs() {
+    DBGOUT("Registering devfs.\r\n");
     register_fs("dev", devfs_open, NULL);
 }
