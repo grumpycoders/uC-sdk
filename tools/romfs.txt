@@ -4,3 +4,6 @@ Converting to an object:
 
 $ arm-none-eabi-objcopy -I binary -O elf32-littlearm \
 --prefix-sections '.romfs' --binary-architecture arm my-romfs.bin my-romfs.o
+
+
+Note: this format has absolutely nothing in common with Linux's romfs.
