@@ -47,6 +47,11 @@ is being done, unlike a normal libm). Be careful though, as most uC processors
 dont contain any FPU. Using any kind of math will greatly increase the code
 size, as well as CPU usage while processing.
 
+acorn:
+
+This will be the library containing utilities for embedded development, such as
+generic i2c access, malloc wrapping for RTOS multithreading, etc.
+
 
 ARM / Cortex-M3 / mbed
 ----------------------

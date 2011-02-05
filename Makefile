@@ -1,5 +1,5 @@
 TARGET = demo.bin
-LIBDEPS = FreeRTOS/libFreeRTOS.a arch/libarch.a os/libos.a libc/libc.a libm/libm.a
+LIBDEPS = FreeRTOS/libFreeRTOS.a arch/libarch.a os/libos.a libc/libc.a libm/libm.a acorn/libacorn.a
 LIBS = -Wl,--start-group $(LIBDEPS) -Wl,--end-group
 
 TARGET_SRCS = test-romfs.o
@@ -16,18 +16,20 @@ clean: clean-generic
 	$(Q)$(MAKE) $(MAKE_OPTS) -C os clean
 	$(Q)$(MAKE) $(MAKE_OPTS) -C libc clean
 	$(Q)$(MAKE) $(MAKE_OPTS) -C libm clean
+	$(Q)$(MAKE) $(MAKE_OPTS) -C acorn clean
 	$(Q)$(MAKE) $(MAKE_OPTS) -C tools clean
 	$(Q)rm -f test-romfs.bin
 
-.PHONY: libs FreeRTOS arch os libc libm tools deps
+.PHONY: libs FreeRTOS arch os libc libm acorn tools deps
 
 FreeRTOS/libFreeRTOS.a: FreeRTOS
 arch/libarch.a: arch
 os/libos.a: os
 libc/libc.a: libc
-libm/libm/a: libm
+libm/libm.a: libm
+acorn/libacorn.a: acorn
 
-libs: FreeRTOS arch os libc libm
+libs: FreeRTOS arch os libc libm acorn
 
 FreeRTOS:
 	$(E) "[MAKE]   Entering FreeRTOS"
@@ -48,6 +50,10 @@ libc:
 libm:
 	$(E) "[MAKE]   Entering libm"
 	$(Q)$(MAKE) $(MAKE_OPTS) -C libm
+
+acorn:
+	$(E) "[MAKE]   Entering acorn"
+	$(Q)$(MAKE) $(MAKE_OPTS) -C acorn
 
 tools:
 	$(E) "[MAKE]   Entering tools"
@@ -70,6 +76,8 @@ deps: ldeps
 	$(Q)$(MAKE) $(MAKE_OPTS) -C libc ldeps
 	$(E) "[DEPS]   Creating dependency tree for libm"
 	$(Q)$(MAKE) $(MAKE_OPTS) -C libm ldeps
+	$(E) "[DEPS]   Creating dependency tree for acorn"
+	$(Q)$(MAKE) $(MAKE_OPTS) -C acorn ldeps
 
 include FreeRTOS/config.mk
 include arch/config.mk

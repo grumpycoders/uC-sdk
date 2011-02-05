@@ -20,7 +20,7 @@ extern realloc_t realloc;
 static inline void * calloc(size_t nmemb, size_t size) {
     uint8_t * r = malloc(nmemb * size);
     size_t i;
-    for (i = 0; i < size; i++)
+    for (i = 0; i < (size * nmemb); i++)
         r[i] = 0;
     return r;
 }
