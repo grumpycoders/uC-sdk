@@ -30,7 +30,7 @@ static heap_t * find_fit(heap_t * head, size_t size) {
     return prev;
 }
 
-void * malloc(size_t size) {
+void * base_malloc(size_t size) {
     void * ptr = NULL, * heap_ptr;
     heap_t * new, * prev;
     
@@ -103,7 +103,7 @@ void * malloc(size_t size) {
     return ptr;
 }
 
-void * realloc(void * ptr, size_t size) {
+void * base_realloc(void * ptr, size_t size) {
     heap_t * prev;
     void * new = NULL;
     
@@ -155,7 +155,7 @@ void * realloc(void * ptr, size_t size) {
     return new;
 }
 
-void free(void * ptr) {
+void base_free(void * ptr) {
     heap_t * cur;
     void * top;
     size_t size;
@@ -200,3 +200,7 @@ void free(void * ptr) {
 
 __attribute__((weak)) void * __builtin_new(size_t size) { return malloc(size); }
 __attribute__((weak)) void __builtin_delete(void * ptr) { free(ptr); }
+
+malloc_t malloc = base_malloc;
+free_t free = base_free;
+realloc_t realloc = base_realloc;

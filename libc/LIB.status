@@ -90,7 +90,7 @@ putchar    - missing
 getdelim   - missing, gnu replacement to gets
 getline    - missing, gnu replacement to gets
 *puts      - missing
-ungetc     - missing
+ungetc     - missing, won't implement, as we don't bufferize at all.
 fread      - ok, inlined
 fwrite     - ok, inlined
 fseek      - missing
