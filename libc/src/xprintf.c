@@ -213,7 +213,7 @@ static int getdigit(long double *val, int *cnt){
 ** seems to make a big difference in determining how fast this beast
 ** will run.
 */
-static int vxprintf(func,arg,format,ap)
+int vxprintf(func,arg,format,ap)
   void (*func)(const char*,int,void*);
   void *arg;
   const char *format;
@@ -665,20 +665,6 @@ static int vxprintf(func,arg,format,ap)
 } /* End of function */
 
 /*
-** This non-standard function is still occasionally useful....
-*/
-int xprintf(
-  void (*func)(char*,int,void*),
-  void *arg,
-  const char *format,
-  ...
-){
-  va_list ap;
-  va_start(ap,format);
-  return vxprintf(func,arg,format,ap);
-}
-
-/*
 ** Now for string-print, also as found in any standard library.
 ** Add to this the snprint function which stops added characters
 ** to the string at a given length.
@@ -713,38 +699,12 @@ static void sout(txt,amt,arg)
   ((struct s_strargument*)arg)->next = head;
 }
 
-int sprintf(char *buf, const char *fmt, ...){
-  int rc;
-  va_list ap;
-  struct s_strargument arg;
-
-  va_start(ap,fmt);
-  arg.next = buf;
-  arg.last = 0;
-  *arg.next = 0;
-  rc = vxprintf(sout,&arg,fmt,ap);
-  va_end(ap);
-  return rc;
-}
 int vsprintf(char *buf,const char *fmt,va_list ap){
   struct s_strargument arg;
   arg.next = buf;
   arg.last = 0;
   *buf = 0;
   return vxprintf(sout,&arg,fmt,ap);
-}
-int snprintf(char *buf, size_t n, const char *fmt, ...){
-  int rc;
-  va_list ap;
-  struct s_strargument arg;
-
-  va_start(ap,fmt);
-  arg.next = buf;
-  arg.last = &arg.next[n-1];
-  *arg.next = 0;
-  rc = vxprintf(sout,&arg,fmt,ap);
-  va_end(ap);
-  return rc;
 }
 int vsnprintf(char *buf, size_t n, const char *fmt, va_list ap){
   struct s_strargument arg;
@@ -799,31 +759,6 @@ static void mout(zNewText,nNewChar,arg)
 ** We changed the name to TclMPrint() to conform with the Tcl private
 ** routine naming conventions.
 */
-int asprintf(char ** out, const char *zFormat, ...){
-  va_list ap;
-  struct sgMprintf sMprintf;
-  char *zNew;
-  char zBuf[200];
-  int r;
-
-  va_start(ap,zFormat);
-  sMprintf.nChar = 0;
-  sMprintf.nAlloc = sizeof(zBuf);
-  sMprintf.zText = zBuf;
-  sMprintf.zBase = zBuf;
-  r = vxprintf(mout,&sMprintf,zFormat,ap);
-  va_end(ap);
-  if( sMprintf.zText==sMprintf.zBase ){
-    zNew = malloc( sMprintf.nChar+1 );
-    if( zNew ) strcpy(zNew,zBuf);
-  }else{
-    zNew = realloc(sMprintf.zText,sMprintf.nChar+1);
-  }
-  
-  *out = zNew;
-
-  return r;
-}
 
 /* This is the varargs version of mprintf.  
 **
@@ -860,31 +795,10 @@ static void fout(zNewText,nNewChar,arg)
   int nNewChar;
   void *arg;
 {
-  fwrite(zNewText,1,nNewChar,(FILE*)arg);
+  write(*(int*)arg,zNewText,nNewChar);
 }
 
 /* The public interface routines */
-int fprintf(FILE *pOut, const char *zFormat, ...){
-  va_list ap;
-  int retc;
-
-  va_start(ap,zFormat);  
-  retc = vxprintf(fout,pOut,zFormat,ap);
-  va_end(ap);
-  return retc;
-}
-int vfprintf(FILE *pOut, const char *zFormat, va_list ap){
-  return vxprintf(fout,pOut,zFormat,ap);
-}
-int printf(const char *zFormat, ...){
-  va_list ap;
-  int retc;
-
-  va_start(ap,zFormat);
-  retc = vxprintf(fout,stdout,zFormat,ap);
-  va_end(ap);
-  return retc;
-}
-int vprintf(const char *zFormat, va_list ap){
-  return vxprintf(fout,stdout,zFormat,ap);
+int vdprintf(int fd, const char *zFormat, va_list ap){
+  return vxprintf(fout,&fd,zFormat,ap);
 }

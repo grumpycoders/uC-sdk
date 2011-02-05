@@ -33,6 +33,7 @@ src/malloc.c \
 \
 src/xprintf.c \
 src/xscanf.c \
+src/yscanf.c \
 
 include $(ROOTDIR)/target-rules.mk
 

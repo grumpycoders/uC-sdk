@@ -11,7 +11,7 @@
  * VAL(a)       leads to 1 if a is true and valid
  */
 #define NEXT(c) ((c)=xgetc(opaque),size++,incount++)
-#define PREV(c) do{if((c)!=EOF)xungetc((c),opaque);size--;incount--;}while(0)
+#define PREV(c) do{if((c)!=EOF)xungetc(opaque,(c));size--;incount--;}while(0)
 #define VAL(a)  ((a)&&size<=width)
 
 #ifdef NOFLOATINGPOINT
@@ -30,7 +30,7 @@ static const unsigned char undef[3][sizeof(double)]= /* Undefined numeric values
 };
 #endif
 
-int vxscanf(int (*xgetc)(void *),void (*xungetc)(int,void*),void *opaque,const char *format,va_list args)
+int vxscanf(int (*xgetc)(void *),void (*xungetc)(void*,int),void *opaque,const char *format,va_list args)
 {
   size_t blocks=0,incount=0;
   int c=0;

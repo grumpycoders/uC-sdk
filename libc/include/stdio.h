@@ -14,18 +14,37 @@ struct _FILE {
 };
 
 typedef struct _FILE FILE;
+extern FILE * stdin, * stdout, * stderr;
 
-int printf(const char * format, ...);
-int fprintf(FILE *stream, const char * format, ...);
-int sprintf(char * str, const char * format, ...);
-int snprintf(char * str, size_t size, const char * format, ...);
-int asprintf(char ** strp, const char * format, ...);
-
-int vprintf(const char * format, va_list ap);
-int vfprintf(FILE *stream, const char * format, va_list ap);
+int vdprintf(int fd, const char * format, va_list ap);
 int vsprintf(char * str, const char * format, va_list ap);
 int vsnprintf(char * str, size_t size, const char * format, va_list ap);
 int vasprintf(char ** strp, const char * format, va_list ap);
+int vxprintf(void (*func)(const char *, int, void *), void * arg, const char * format, va_list ap);
+static inline int vfprintf(FILE * stream, const char * format, va_list ap) { return vdprintf(stream->fd, format, ap); }
+static inline int vprintf(const char * format, va_list ap) { return vfprintf(stdout, format, ap); }
+
+static inline int dprintf(int fd, const char * format, ...) { va_list ap; int r; va_start(ap, format); r = vdprintf(fd, format, ap); va_end(ap); return r; }
+static inline int sprintf(char * str, const char * format, ...) { va_list ap; int r; va_start(ap, format); r = vsprintf(str, format, ap); va_end(ap); return r; }
+static inline int snprintf(char * str, size_t size, const char * format, ...) { va_list ap; int r; va_start(ap, format); r = vsnprintf(str, size, format, ap); va_end(ap); return r; }
+static inline int asprintf(char ** strp, const char * format, ...) { va_list ap; int r; va_start(ap, format); r = vasprintf(strp, format, ap); va_end(ap); return r; }
+static inline int xprintf(void (*func)(const char *, int, void *), void * arg, const char * format, ...) { va_list ap; int r; va_start(ap, format); r = vxprintf(func, arg, format, ap); va_end(ap); return r; }
+static inline int fprintf(FILE * stream, const char * format, ...) { va_list ap; int r; va_start(ap, format); r = vfprintf(stream, format, ap); va_end(ap); return r; }
+static inline int printf(const char * format, ...) { va_list ap; int r; va_start(ap, format); r = vprintf(format, ap); va_end(ap); return r; }
+
+int vdscanf(int fd, const char * format, va_list ap);
+int vsscanf(const char * str, const char * format, va_list ap);
+int vxscanf(int (*xgetc)(void *), void (*xungetc)(void *, int), void * opaque, const char * format, va_list args);
+static inline int vfscanf(FILE * stream, const char * format, va_list ap) { return vdscanf(stream->fd, format, ap); }
+static inline int vscanf(const char * format, va_list ap) { return vfscanf(stdin, format, ap); }
+
+static inline int dscanf(int fd, const char * format, ...) { va_list ap; int r; va_start(ap, format); r = vdscanf(fd, format, ap); va_end(ap); return r; }
+static inline int sscanf(const char * str, const char * format, ...)  { va_list ap; int r; va_start(ap, format); r = vsscanf(str, format, ap); va_end(ap); return r; }
+static inline int xscanf(int (*xgetc)(void *), void (*xungetc)(void *, int), void * opaque, const char *format, ...) { va_list ap; int r; va_start(ap, format); r = vxscanf(xgetc, xungetc, opaque, format, ap); va_end(ap); return r; }
+static inline int fscanf(FILE * stream, const char * format, ...) { va_list ap; int r; va_start(ap, format); r = vfscanf(stream, format, ap); va_end(ap); return r; }
+static inline int scanf(const char * format, ...) { va_list ap; int r; va_start(ap, format); r = vscanf(format, ap); va_end(ap); return r; }
+
+
 
 void __sinit(struct _reent *);
 
@@ -150,6 +169,19 @@ static inline size_t fwrite(const void * _ptr, size_t size, size_t nmemb, FILE *
     return nmemb;
 }
 
-extern FILE * stdin, * stdout, * stderr;
+static inline int fgetc(FILE * stream) {
+    uint8_t v;
+
+    if (!stream) {
+        _impure_ptr->_errno = EINVAL;
+        return -1;
+    }
+    
+    if (read(stream->fd, &v, 1) != 1)
+        return EOF;
+    return v;
+}
+
+static inline int getc() { return fgetc(stdin); }
 
 #endif

@@ -78,10 +78,9 @@ fdopen     - missing
 setbuf     - missing
 setvbuf    - missing
 
-*printf    - ok (f, s, vf, v, vs, sn, vsn, vas, as)
-*dprintf   - missing
-*scanf     - missing (f, s, vf, v, vs)
-*getc      - missing
+*printf    - ok, v-versions inlined (f, s, d, sn, as + x)
+*scanf     - ok, v-versions inlined (f, s, d + x)
+*getc      - ok, inlined (f, .)
 getchar    - missing
 *putc      - missing
 putchar    - missing
