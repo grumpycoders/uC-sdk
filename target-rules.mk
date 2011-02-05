@@ -2,17 +2,42 @@
 	$(E) "[TC]     Compiling $<"
 	$(Q)$(TARGET_CC) -ffunction-sections -Wall -Werror $(addprefix -I, $(TARGET_INCLUDES)) $(TARGET_CFLAGS) $(TARGET_CPPFLAGS) -g -c -o $@ $<
 
+%.o: %.cc
+	$(E) "[TCXX]   Compiling $<"
+	$(Q)$(TARGET_CXX) -ffunction-sections -Wall -Werror $(addprefix -I, $(TARGET_INCLUDES)) $(TARGET_CFLAGS) $(TARGET_CPPFLAGS) -g -c -o $@ $<
+
+%.o: %.cpp
+	$(E) "[TCXX]   Compiling $<"
+	$(Q)$(TARGET_CXX) -ffunction-sections -Wall -Werror $(addprefix -I, $(TARGET_INCLUDES)) $(TARGET_CFLAGS) $(TARGET_CPPFLAGS) -g -c -o $@ $<
+
 %.o: %.s
 	$(E) "[TS]     Compiling $<"
 	$(Q)$(TARGET_AS) $(addprefix -I, $(TARGET_INCLUDES)) $(TARGET_ASFLAGS) $(TARGET_CPPFLAGS) -g -c -o $@ $<
 
+%.dep: %.c
+	$(Q)$(TARGET_CC) -ffunction-sections -Wall -Werror $(addprefix -I, $(TARGET_INCLUDES)) $(TARGET_CFLAGS) $(TARGET_CPPFLAGS) -g -M -MF $@ $<
+
+%.dep: %.cc
+	$(Q)$(TARGET_CXX) -ffunction-sections -Wall -Werror $(addprefix -I, $(TARGET_INCLUDES)) $(TARGET_CFLAGS) $(TARGET_CPPFLAGS) -g -M -MF $@ $<
+
+%.dep: %.cpp
+	$(Q)$(TARGET_CXX) -ffunction-sections -Wall -Werror $(addprefix -I, $(TARGET_INCLUDES)) $(TARGET_CFLAGS) $(TARGET_CPPFLAGS) -g -M -MF $@ $<
+
+%.dep: %.s
+	$(Q)touch $@
+
+%.dep: %.o
+	$(Q)touch $@
+
 TARGET_OBJS = $(addsuffix .o, $(basename $(TARGET_SRCS)))
+TARGET_DEPS = $(addsuffix .dep, $(basename $(TARGET_SRCS)))
 
 ifneq ($(TARGET),)
 TARGET_ELF = $(addsuffix .elf, $(basename $(TARGET)))
 TARGET_BIN = $(addsuffix .bin, $(basename $(TARGET)))
 TARGET_MAP = $(addsuffix .map, $(basename $(TARGET)))
 TARGET_OBJS += $(addsuffix .o, $(basename $(TARGET)))
+TARGET_DEPS += $(addsuffix .dep, $(basename $(TARGET)))
 endif
 
 $(TARGET_ELF): $(TARGET_OBJS) $(LIBDEPS) $(LDSCRIPT) $(SPECS)
@@ -29,8 +54,12 @@ $(TARGET_LIB): $(TARGET_OBJS)
 	$(E) "[TLIB]   Creating $@"
 	$(Q)$(TARGET_AR) rcs $@ $^
 
-.PHONY: clean-generic
+.PHONY: clean-generic ldeps
 
 clean-generic:
 	$(E) "[CLEAN]  $(CURDIR)"
-	$(Q)rm -f $(TARGET_LIB) $(TARGET_OBJS) $(TARGET) $(TARGET_ELF) $(TARGET_BIN) $(TARGET_MAP)
+	$(Q)rm -f $(TARGET_LIB) $(TARGET_OBJS) $(TARGET) $(TARGET_ELF) $(TARGET_BIN) $(TARGET_MAP) $(TARGET_DEPS)
+
+ldeps: $(TARGET_DEPS)
+
+-include $(TARGET_DEPS)
