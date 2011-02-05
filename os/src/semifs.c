@@ -104,7 +104,7 @@ static ssize_t semifs_read(void * opaque, void * ptr, size_t len) {
 
     // Perform read
     int res = Semihost_SYS_READ(args);
-    DBGOUT("semifs_read: Semihost_SYS_READ returned %i\r\n", res);
+//    DBGOUT("semifs_read: Semihost_SYS_READ returned %i\r\n", res);
     if (res < 0)
         return -1;
 
@@ -187,6 +187,6 @@ static int semifs_open(void * opaque, const char *path, int flags, int mode) {
 }
 
 void register_semifs() {
-    DBGOUT("Registering semihost fs\r\n");
+//    DBGOUT("Registering semihost fs\r\n");
     register_fs("host", semifs_open, NULL);
 }
