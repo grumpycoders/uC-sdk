@@ -163,6 +163,7 @@ void free(void * ptr) {
     if (!ptr || !head)
         return;
     
+    // First block; bumping head ahead.
     if (ptr == head->ptr) {
         size = head->size + (size_t) (head->ptr - (void *) head);
         head = head->next;
@@ -177,17 +178,20 @@ void free(void * ptr) {
         return;
     }
     
+    // Finding the proper block
     cur = head;
     for (cur = head; ptr != cur->ptr; cur = cur->next)
         if (!cur->next)
             return;
     
     if (cur->next) {
+        // In the middle, just unlink it
         cur->next->prev = cur->prev;
     } else {
+        // At the end, shrink heap
         tail = cur->prev;
         top = sbrk(0);
-        size = (uintptr_t) top - (uintptr_t) cur->prev->ptr + cur->prev->size;
+        size = (top - cur->prev->ptr) - cur->prev->size;
         sbrk(-size);
     }
     
