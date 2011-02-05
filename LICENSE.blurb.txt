@@ -4,3 +4,6 @@ sure: you are allowed to use this project for free, in any commercial product,
 without tainting your commercial code's license in any way. However, you need
 to mention that this project is part of your product, and if you change the
 source code, you need to distribute the changes.
+
+TLDR: this is a non-reciprocal open source license, but you still have to
+mention the fact you're using this project.

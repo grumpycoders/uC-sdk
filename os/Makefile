@@ -6,6 +6,7 @@ include $(ROOTDIR)/common.mk
 include config.mk
 include $(ROOTDIR)/FreeRTOS/config.mk
 include $(ROOTDIR)/arch/config.mk
+include $(ROOTDIR)/libc/config.mk
 
 TARGET_SRCS = \
 src/init.c \
@@ -17,25 +18,7 @@ src/hash-djb2.c \
 src/osdebug.c \
 src/romfs.c \
 \
-src/close.c \
-src/fstat.c \
-src/isatty.c \
-src/lseek.c \
-src/open.c \
-src/read.c \
 src/sbrk.c \
-src/write.c \
-\
-src/fclose.c \
-src/fflush.c \
-src/fopen.c \
-src/fprintf.c \
-src/fread.c \
-src/free.c \
-src/fwrite.c \
-src/malloc.c \
-src/printf.c \
-src/sprintf.c \
 
 ifeq ($(CPU),arm)
 TARGET_SRCS += src/semifs.c

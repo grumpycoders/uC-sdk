@@ -1,6 +1,6 @@
 TARGET = demo.bin
-LIBDEPS = FreeRTOS/libFreeRTOS.a arch/libarch.a os/libos.a
-LIBS = -Wl,--start-group -lc $(LIBDEPS) -Wl,--end-group
+LIBDEPS = FreeRTOS/libFreeRTOS.a arch/libarch.a os/libos.a libc/libc.a
+LIBS = -Wl,--start-group $(LIBDEPS) -Wl,--end-group
 
 TARGET_SRCS = test-romfs.o
 
@@ -14,16 +14,18 @@ clean: clean-generic
 	$(Q)$(MAKE) $(MAKE_OPTS) -C FreeRTOS clean
 	$(Q)$(MAKE) $(MAKE_OPTS) -C arch clean
 	$(Q)$(MAKE) $(MAKE_OPTS) -C os clean
+	$(Q)$(MAKE) $(MAKE_OPTS) -C libc clean
 	$(Q)$(MAKE) $(MAKE_OPTS) -C tools clean
 	$(Q)rm -f test-romfs.bin
 
-.PHONY: libs FreeRTOS arch os tools
+.PHONY: libs FreeRTOS arch os libc tools
 
 FreeRTOS/libFreeRTOS.a: FreeRTOS
 arch/libarch.a: arch
 os/libos.a: os
+libc/libc.a: libc
 
-libs: FreeRTOS arch os
+libs: FreeRTOS arch os libc
 
 FreeRTOS:
 	$(E) "[MAKE]   Entering FreeRTOS"
@@ -36,6 +38,10 @@ arch:
 os:
 	$(E) "[MAKE]   Entering os"
 	$(Q)$(MAKE) $(MAKE_OPTS) -C os
+
+libc:
+	$(E) "[MAKE]   Entering libc"
+	$(Q)$(MAKE) $(MAKE_OPTS) -C libc
 
 tools:
 	$(E) "[MAKE]   Entering tools"
@@ -50,4 +56,5 @@ test-romfs.o: tools/mkromfs
 include FreeRTOS/config.mk
 include arch/config.mk
 include os/config.mk
+include libc/config.mk
 include target-rules.mk

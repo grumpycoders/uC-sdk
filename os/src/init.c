@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <BoardConsole.h>
 
 void __libc_init_array();
@@ -26,4 +27,12 @@ void _start() {
     BoardLateInit();
     atexit(__libc_fini_array);
     exit(main(0, NULL, NULL));
+}
+
+void startup_memcpy(void * dest, const void * src, size_t n) {
+    memcpy(dest, src, n);
+}
+
+void startup_memset(void * dest, int c, size_t n) {
+    memset(dest, c, n);
 }

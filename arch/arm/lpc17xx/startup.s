@@ -189,12 +189,12 @@ __cs3_reset_cortex_m:
     MOV     R1, R3
     MOV     R0, R2
     MOV     R2, R4
-    BL      memcpy
+    BL      startup_memcpy
     
     LDR     R0, =__bss_ram_begin
     MOV     R1, #0
     LDR     R2, =__bss_ram_len
-    BL      memset
+    BL      startup_memset
     
     BL      lpc17xx_deinit_all
     BL      SystemInit

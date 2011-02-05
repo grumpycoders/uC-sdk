@@ -6,6 +6,7 @@ include $(ROOTDIR)/common.mk
 include config.mk
 include $(ROOTDIR)/arch/config.mk
 include $(ROOTDIR)/os/config.mk
+include $(ROOTDIR)/libc/config.mk
 
 TARGET_SRCS = Source/croutine.c Source/list.c Source/queue.c Source/tasks.c
 

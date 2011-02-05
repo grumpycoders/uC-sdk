@@ -3,9 +3,11 @@
 #include <FreeRTOS.h>
 #include <semphr.h>
 #include <unistd.h>
+#ifdef USE_NEWLIB
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#endif
 #include "fio.h"
 #include "filesystem.h"
 #include "osdebug.h"
