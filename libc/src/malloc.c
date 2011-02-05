@@ -1,5 +1,6 @@
 #include <stddef.h>
 #include <stdint.h>
+#include "string.h"
 #include "malloc.h"
 
 void * sbrk(ptrdiff_t incr);

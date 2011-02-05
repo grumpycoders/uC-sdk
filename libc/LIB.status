@@ -94,16 +94,15 @@ fread      - ok, inlined
 fwrite     - ok, inlined
 fseek      - ok, inlined
 ftell      - ok, inlined
-rewind     - missing
+rewind     - ok, inlined
 fgetpos    - missing
 fsetpos    - missing
 clearerr   - missing
 feof       - ok, inlined
 ferror     - missing
-fileno     - ok, inlined
 
 perror     - missing
-fileno     - missing
+fileno     - ok, inlined
 pipe funcs - missing, can we make them ?
 lock funcs - missing, can we make them ?
 
@@ -124,35 +123,35 @@ String:
 ------
 
 memcpy      - ok, inlined
-memmove     - missing
+memmove     - ok, inlined
 memset      - ok, inlined
 memcmp      - ok, inlined
-memchr      - missing
+memchr      - ok, inlined
 
 strcpy      - ok, inlined
 strncpy     - ok, inlined
 strcat      - ok, inlined
-strncat     - missing
-strcmp      - missing
-strncmp     - missing
+strncat     - ok, inlined
+strcmp      - ok, inlined
+strncmp     - ok, inlined
 
 strcoll     - missing
 strxfrm     - missing
 
-strdup      - missing
+strdup      - ok, inlined
 
 strchr      - ok, inlined
-strrchr     - missing
+strrchr     - ok, inlined
 
 strcspn     - missing
 strspn      - missing
 strpbrk     - missing
-strstr      - missing
+strstr      - ok, inlined, dummy implementation (kmp eats too much stack space)
 strcasestr  - missing
 strtok      - missing
 
 strlen      - ok, inlined
-strerror    - missing
+strerror    - missing, won't implement
 
 bzero       - missing
 bcopy       - missing

@@ -3,7 +3,7 @@
 
 #include <reent.h>
 #include <stddef.h>
-#include <string.h>
+#include <stdint.h>
 
 typedef void * (*malloc_t)(size_t size);
 typedef void (*free_t)(void * ptr);
@@ -18,8 +18,10 @@ extern free_t free;
 extern realloc_t realloc;
 
 static inline void * calloc(size_t nmemb, size_t size) {
-    void * r = malloc(nmemb * size);
-    memset(r, 0, nmemb * size);
+    uint8_t * r = malloc(nmemb * size);
+    size_t i;
+    for (i = 0; i < size; i++)
+        r[i] = 0;
     return r;
 }
 

@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <BoardConsole.h>
 
 void __libc_init_array();
