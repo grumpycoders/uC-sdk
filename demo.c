@@ -8,6 +8,7 @@
 #include <fio.h>
 #include <romfs.h>
 #include <semifs.h>
+#include <malloc_wrapper.h>
 
 #define LED1_wire 18
 #define LED2_wire 20
@@ -67,6 +68,7 @@ static const char msg[] = "Hello world - from fwrite!\r\n";
 extern uint8_t _binary_test_romfs_bin_start[];
 
 int main() {
+    init_malloc_wrapper();
     FILE * f1, * f2, * f3;
     char buf[32];
     int c;

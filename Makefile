@@ -83,4 +83,6 @@ include FreeRTOS/config.mk
 include arch/config.mk
 include os/config.mk
 include libc/config.mk
+include libm/config.mk
+include acorn/config.mk
 include target-rules.mk
