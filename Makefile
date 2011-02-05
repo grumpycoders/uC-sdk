@@ -1,5 +1,5 @@
 TARGET = demo.bin
-LIBDEPS = FreeRTOS/libFreeRTOS.a arch/libarch.a os/libos.a libc/libc.a
+LIBDEPS = FreeRTOS/libFreeRTOS.a arch/libarch.a os/libos.a libc/libc.a libm/libm.a
 LIBS = -Wl,--start-group $(LIBDEPS) -Wl,--end-group
 
 TARGET_SRCS = test-romfs.o
@@ -15,17 +15,19 @@ clean: clean-generic
 	$(Q)$(MAKE) $(MAKE_OPTS) -C arch clean
 	$(Q)$(MAKE) $(MAKE_OPTS) -C os clean
 	$(Q)$(MAKE) $(MAKE_OPTS) -C libc clean
+	$(Q)$(MAKE) $(MAKE_OPTS) -C libm clean
 	$(Q)$(MAKE) $(MAKE_OPTS) -C tools clean
 	$(Q)rm -f test-romfs.bin
 
-.PHONY: libs FreeRTOS arch os libc tools deps
+.PHONY: libs FreeRTOS arch os libc libm tools deps
 
 FreeRTOS/libFreeRTOS.a: FreeRTOS
 arch/libarch.a: arch
 os/libos.a: os
 libc/libc.a: libc
+libm/libm/a: libm
 
-libs: FreeRTOS arch os libc
+libs: FreeRTOS arch os libc libm
 
 FreeRTOS:
 	$(E) "[MAKE]   Entering FreeRTOS"
@@ -42,6 +44,10 @@ os:
 libc:
 	$(E) "[MAKE]   Entering libc"
 	$(Q)$(MAKE) $(MAKE_OPTS) -C libc
+
+libm:
+	$(E) "[MAKE]   Entering libm"
+	$(Q)$(MAKE) $(MAKE_OPTS) -C libm
 
 tools:
 	$(E) "[MAKE]   Entering tools"
@@ -62,6 +68,8 @@ deps: ldeps
 	$(Q)$(MAKE) $(MAKE_OPTS) -C os ldeps
 	$(E) "[DEPS]   Creating dependency tree for libc"
 	$(Q)$(MAKE) $(MAKE_OPTS) -C libc ldeps
+	$(E) "[DEPS]   Creating dependency tree for libm"
+	$(Q)$(MAKE) $(MAKE_OPTS) -C libm ldeps
 
 include FreeRTOS/config.mk
 include arch/config.mk

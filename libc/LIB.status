@@ -165,16 +165,18 @@ strcasecmp  - missing
 strnicmp    - missing
 strncasecmp - missing
 
-isalnum     - missing
-iscntrl     - missing
-isdigit     - missing
-isgraph     - missing
-islower     - missing
-isprint     - missing
-ispunct     - missing
-isspace     - missing
-isupper     - missing
-isxdigit    - missing
+isalnum     - ok, inlined
+iscntrl     - ok, inlined
+isdigit     - ok, inlined
+isgraph     - ok, inlined
+islower     - ok, inlined
+isprint     - ok, inlined
+ispunct     - ok, inlined
+isspace     - ok, inlined
+isupper     - ok, inlined
+isxdigit    - ok, inlined
+tolower     - ok, inlined
+toupper     - ok, inlined
 
 asctime     - missing
 clock       - missing

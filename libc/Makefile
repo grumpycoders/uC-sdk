@@ -7,6 +7,7 @@ include config.mk
 include $(ROOTDIR)/FreeRTOS/config.mk
 include $(ROOTDIR)/arch/config.mk
 include $(ROOTDIR)/os/config.mk
+include $(ROOTDIR)/libm/config.mk
 
 ifneq ($(USE_FLOATINGPOINT),true)
 TARGET_CPPFLAGS = -DNOFLOATINGPOINT
@@ -31,6 +32,7 @@ src/exit.c \
 src/malloc.c \
 \
 src/xprintf.c \
+src/xscanf.c \
 
 include $(ROOTDIR)/target-rules.mk
 

@@ -7,6 +7,8 @@
 #include <unistd.h>
 #include <malloc.h>
 
+static const int EOF = -1;
+
 struct _FILE {
     int fd;
 };
