@@ -79,9 +79,11 @@ static inline char * strncpy(char * s1, const char * s2, size_t n) {
 }
 
 static inline const char * strchr(const char * s, char c) {
-    while (*s)
-        if (*s++ == c)
+    while (*s) {
+        if (*s == c)
             return s;
+        s++;
+    }
     return NULL;
 }
 
