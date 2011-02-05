@@ -42,7 +42,7 @@ setenv - missing
 system - missing, and won't be here anyway I think...
 
 bsearch - missing
-qsort   - missing
+qsort   - ok, stolen from libnix
 abs     - missing
 labs    - missing
 llabs   - missing

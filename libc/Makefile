@@ -22,6 +22,8 @@ src/write.c \
 src/stdio.c \
 src/errno.c \
 \
+src/qsort.c \
+\
 src/reent.c \
 \
 src/exit.c \
