@@ -92,14 +92,15 @@ getline    - missing, gnu replacement to gets
 ungetc     - missing, won't implement, as we don't bufferize at all.
 fread      - ok, inlined
 fwrite     - ok, inlined
-fseek      - missing
-ftell      - missing
+fseek      - ok, inlined
+ftell      - ok, inlined
 rewind     - missing
 fgetpos    - missing
 fsetpos    - missing
 clearerr   - missing
-feof       - missing
+feof       - ok, inlined
 ferror     - missing
+fileno     - ok, inlined
 
 perror     - missing
 fileno     - missing

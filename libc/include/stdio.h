@@ -11,6 +11,7 @@ static const int EOF = -1;
 
 struct _FILE {
     int fd;
+    int got_eof;
 };
 
 typedef struct _FILE FILE;
@@ -103,6 +104,7 @@ static inline FILE * fopen(const char * fname, const char * mode) {
     if (fd >= 0) {
         r = (FILE *) malloc(sizeof(FILE));
         r->fd = fd;
+        r->got_eof = 0;
     }
     
     return r;
@@ -126,21 +128,32 @@ static inline int fclose(FILE * stream) {
 static inline size_t fread(void * _ptr, size_t size, size_t nmemb, FILE * stream) {
     int i;
     uint8_t * ptr = (uint8_t *) _ptr;
+    size_t r;
     
     if (!stream) {
         _impure_ptr->_errno = EINVAL;
         return -1;
     }
     
-    if (size == 1)
-        return read(stream->fd, ptr, nmemb);
+    if (size == 1) {
+        r = read(stream->fd, ptr, nmemb);
+        if (r == 0)
+            stream->got_eof = 1;
+        return r;
+    }
     
-    if (nmemb == 1)
-        return read(stream->fd, ptr, size) == size ? 1 : 0;
+    if (nmemb == 1) {
+        r = read(stream->fd, ptr, size) == size ? 1 : 0;
+        if (r == 0)
+            stream->got_eof = 1;
+        return r;
+    }
     
     for (i = 0; i < nmemb; i++) {
-        if (read(stream->fd, ptr + size * i, size) != size)
+        if (read(stream->fd, ptr + size * i, size) != size) {
+            stream->got_eof = 1;
             return i;
+        }
     }
     
     return nmemb;
@@ -177,11 +190,30 @@ static inline int fgetc(FILE * stream) {
         return -1;
     }
     
-    if (read(stream->fd, &v, 1) != 1)
+    if (read(stream->fd, &v, 1) != 1) {
+        stream->got_eof = 1;
         return EOF;
+    }
     return v;
 }
 
+static inline int fseek(FILE * stream, off_t offset, int wheel) {
+    int r;
+    if (!stream) {
+        _impure_ptr->_errno = EINVAL;
+        return -1;
+    }
+    
+    r = lseek(stream->fd, offset, wheel) != -1 ? 0 : -1;
+    if (!r)
+        stream->got_eof = 0;
+    return r;
+}
+
 static inline int getc() { return fgetc(stdin); }
+static inline off_t ftell(FILE * stream) { return lseek(stream->fd, 0, SEEK_CUR); }
+static inline int feof(FILE * stream) { return stream->got_eof; }
+static inline int fileno(FILE * stream) { return stream->fd; }
+static inline void rewind(FILE * stream) { fseek(stream, 0, SEEK_SET); }
 
 #endif
