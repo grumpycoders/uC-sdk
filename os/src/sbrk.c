@@ -25,7 +25,7 @@ void * sbrk(ptrdiff_t incr) {
 
     /* Check if this allocation would exceed the end of the ram - would probably get into the stack first however */
     if (next_heap_end > stack_min) {
-        _impure_ptr->_errno = ENOMEM;
+        set_errno(ENOMEM);
         ret = NULL;
     } else {
         heap_end = next_heap_end;

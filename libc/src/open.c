@@ -12,6 +12,6 @@ int open(const char * path, int flags) {
     if (r >= 0)
         return r;
     
-    _impure_ptr->_errno = EACCES;
+    set_errno(EACCES);
     return -1;
 }

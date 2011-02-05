@@ -57,7 +57,7 @@ static inline FILE * fopen(const char * fname, const char * mode) {
     FILE * r = NULL;
     int flags = 0, plus = 0, append = 0, fd;
     if (!mode || !mode[0]) {
-        _impure_ptr->_errno = EINVAL;
+        set_errno(EINVAL);
         return NULL;
     }
     
@@ -65,7 +65,7 @@ static inline FILE * fopen(const char * fname, const char * mode) {
         plus = mode[2] == '+';
     } else if (mode[1]) {
         if (mode[1] != '+') {
-            _impure_ptr->_errno = EINVAL;
+            set_errno(EINVAL);
             return NULL;
         }
         plus = 1;
@@ -95,7 +95,7 @@ static inline FILE * fopen(const char * fname, const char * mode) {
         }
         break;
     default:
-        _impure_ptr->_errno = EINVAL;
+        set_errno(EINVAL);
         return NULL;
     }
     
@@ -114,7 +114,7 @@ static inline int fclose(FILE * stream) {
     int fd;
     
     if (!stream) {
-        _impure_ptr->_errno = EINVAL;
+        set_errno(EINVAL);
         return -1;
     }
     
@@ -131,7 +131,7 @@ static inline size_t fread(void * _ptr, size_t size, size_t nmemb, FILE * stream
     size_t r;
     
     if (!stream) {
-        _impure_ptr->_errno = EINVAL;
+        set_errno(EINVAL);
         return -1;
     }
     
@@ -164,7 +164,7 @@ static inline size_t fwrite(const void * _ptr, size_t size, size_t nmemb, FILE *
     const uint8_t * ptr = (const uint8_t *) _ptr;
     
     if (!stream) {
-        _impure_ptr->_errno = EINVAL;
+        set_errno(EINVAL);
         return -1;
     }
     
@@ -186,7 +186,7 @@ static inline int fgetc(FILE * stream) {
     uint8_t v;
 
     if (!stream) {
-        _impure_ptr->_errno = EINVAL;
+        set_errno(EINVAL);
         return -1;
     }
     
@@ -200,7 +200,7 @@ static inline int fgetc(FILE * stream) {
 static inline int fseek(FILE * stream, off_t offset, int wheel) {
     int r;
     if (!stream) {
-        _impure_ptr->_errno = EINVAL;
+        set_errno(EINVAL);
         return -1;
     }
     

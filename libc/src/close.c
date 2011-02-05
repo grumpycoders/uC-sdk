@@ -4,7 +4,7 @@
 
 int close(int fd) {
     if (!fio_is_open(fd)) {
-        _impure_ptr->_errno = EBADF;
+        set_errno(EBADF);
         return -1;
     }
     
