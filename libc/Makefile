@@ -20,6 +20,7 @@ src/read.c \
 src/write.c \
 \
 src/stdio.c \
+src/errno.c \
 \
 src/reent.c \
 \

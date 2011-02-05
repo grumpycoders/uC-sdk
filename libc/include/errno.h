@@ -137,4 +137,6 @@ enum errno_t {
     ERFKILL = 132,
 };
 
+volatile extern enum errno_t errno;
+
 #endif

@@ -1641,6 +1641,7 @@ void vTaskSwitchContext( void )
 
 	#if ( configUSE_NEWLIB_REENTRANT == 1 )
 		_impure_ptr = &(pxCurrentTCB->reent);
+		errno = _impure_ptr->_errno;
 	#endif
 
 	traceTASK_SWITCHED_IN();
