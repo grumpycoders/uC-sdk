@@ -1,8 +1,10 @@
+ifeq ($(NODEMO),)
 TARGET = demo.bin
+TARGET_SRCS = test-romfs.o
+endif
+
 LIBDEPS = FreeRTOS/libFreeRTOS.a arch/libarch.a os/libos.a libc/libc.a libm/libm.a acorn/libacorn.a
 LIBS = -Wl,--start-group $(LIBDEPS) -Wl,--end-group
-
-TARGET_SRCS = test-romfs.o
 
 export ROOTDIR = $(CURDIR)
 
