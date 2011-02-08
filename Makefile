@@ -1,6 +1,6 @@
 ifeq ($(NODEMO),)
 TARGET = demo.bin
-TARGET_SRCS = test-romfs.o
+TARGET_OBJS = test-romfs.o
 endif
 
 LIBDEPS = FreeRTOS/libFreeRTOS.a arch/libarch.a os/libos.a libc/libc.a libm/libm.a acorn/libacorn.a
@@ -61,7 +61,7 @@ tools:
 	$(E) "[MAKE]   Entering tools"
 	$(Q)$(MAKE) $(MAKE_OPTS) -C tools
 
-test-romfs.o: tools/mkromfs
+test-romfs.o:
 	$(E) "[ROMFS]  Building test romfs"
 	$(Q) tools/mkromfs -d test-romfs test-romfs.bin
 	$(Q) $(TARGET_OBJCOPY_BIN) --prefix-sections '.romfs' test-romfs.bin test-romfs.o

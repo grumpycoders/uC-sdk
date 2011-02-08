@@ -8,4 +8,5 @@ endif
 
 ifeq ($(DEBUG),true)
 TARGET_CPPFLAGS += -DFULLDEBUG
+HOST_CPPFLAGS += -DFULLDEBUG
 endif

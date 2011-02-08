@@ -17,3 +17,13 @@ TARGET_AS = $(TOOLCHAIN)-gcc
 TARGET_OBJCOPY = $(TOOLCHAIN)-objcopy
 
 TARGET_OBJCOPY_BIN = $(TARGET_OBJCOPY) -I binary -O $(TARGET_FORMAT) --binary-architecture $(CPU)
+
+
+HOST_CC = gcc
+HOST_CXX = g++
+HOST_LD = gcc
+HOST_RANLIB = ranlib
+HOST_AR = ar
+HOST_AS = as
+
+HOST_CPPFLAGS += -O3 -g

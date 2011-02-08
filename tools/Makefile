@@ -1,15 +1,8 @@
-CC = gcc
-LD = gcc
-CPPFLAGS = -O3
+TARGET = mkromfs
 
-TARGETS = mkromfs
-MKROMFS_SRCS = mkromfs.c
-MKROMFS_OBJS = $(addsuffix .o, $(basename $(MKROMFS_SRCS)))
+all: $(TARGET)
 
-all: $(TARGETS)
+include $(ROOTDIR)/common.mk
+include $(ROOTDIR)/host-rules.mk
 
-mkromfs: $(MKROMFS_OBJS)
-	$(LD) -o mkromfs $(MKROMFS_OBJS)
-
-clean:
-	rm -rf $(MKROMFS_OBJS) $(TARGETS)
+clean: clean-generic

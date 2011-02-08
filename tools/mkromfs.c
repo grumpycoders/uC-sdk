@@ -26,7 +26,7 @@ void processdir(DIR * dirp, const char * curpath, FILE * outfile, const char * p
     char buf[16 * 1024];
     struct dirent * ent;
     DIR * rec_dirp;
-    uint32_t cur_hash = hash_djb2(curpath, hash_init);
+    uint32_t cur_hash = hash_djb2((const uint8_t *) curpath, hash_init);
     uint32_t size, w, hash;
     uint8_t b;
     FILE * infile;
@@ -49,7 +49,7 @@ void processdir(DIR * dirp, const char * curpath, FILE * outfile, const char * p
             break;
         case DT_REG:
         case DT_LNK:
-            hash = hash_djb2(ent->d_name, cur_hash);
+            hash = hash_djb2((const uint8_t *) ent->d_name, cur_hash);
             infile = fopen(fullpath, "rb");
             if (!infile) {
                 perror("opening file");
@@ -126,4 +126,6 @@ int main(int argc, char ** argv) {
     if (outname)
         fclose(outfile);
     closedir(dirp);
+    
+    return 0;
 }

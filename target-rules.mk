@@ -29,8 +29,8 @@
 %.dep: %.o
 	$(Q)touch $@
 
-TARGET_OBJS = $(addsuffix .o, $(basename $(TARGET_SRCS)))
-TARGET_DEPS = $(addsuffix .dep, $(basename $(TARGET_SRCS)))
+TARGET_OBJS += $(addsuffix .o, $(basename $(TARGET_SRCS)))
+TARGET_DEPS += $(addsuffix .dep, $(basename $(TARGET_SRCS)))
 
 ifneq ($(TARGET),)
 TARGET_ELF = $(addsuffix .elf, $(basename $(TARGET)))
