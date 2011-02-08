@@ -1,0 +1,7 @@
+*.dep
+*.o
+*.bin
+*.elf
+*.a
+*.map
+tools/mkromfs
