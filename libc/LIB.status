@@ -85,7 +85,7 @@ getchar    - missing
 *putc      - missing
 putchar    - missing
 {get,put}w - missing
-*gets      - missing
+*gets      - ok, fgets only.
 getdelim   - missing, gnu replacement to gets
 getline    - missing, gnu replacement to gets
 *puts      - missing

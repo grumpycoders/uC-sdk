@@ -210,6 +210,40 @@ static inline int fseek(FILE * stream, off_t offset, int wheel) {
     return r;
 }
 
+static inline char * fgets(char * s, int n, FILE * stream) {
+    int r, fd;
+    char c, * copy = s;
+    if (!stream) {
+        set_errno(EINVAL);
+        return NULL;
+    }
+    
+    fd = stream->fd;
+    
+    while (--n) {
+        r = read(fd, &c, 1);
+        switch (r) {
+        case 0:
+            stream->got_eof = 1;
+            *s = 0;
+            return copy;
+        case 1:
+            *s++ = c;
+            if (c == '\n') {
+                *s = 0;
+                return copy;
+            }
+            break;
+        case -1:
+            return NULL;
+            break;
+        }
+    };
+    
+    *s = 0;
+    return copy;
+}
+
 static inline int getc() { return fgetc(stdin); }
 static inline off_t ftell(FILE * stream) { return lseek(stream->fd, 0, SEEK_CUR); }
 static inline int feof(FILE * stream) { return stream->got_eof; }
