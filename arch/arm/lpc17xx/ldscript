@@ -15,8 +15,7 @@
  * the new terms are clearly indicated on the first page of each file where
  * they apply. */
 
-OUTPUT_FORMAT ("elf32-littlearm", "elf32-bigarm", "elf32-littlearm")
-/*ENTRY(_start)*/
+OUTPUT_FORMAT ("elf32-littlearm")
 SEARCH_DIR(.)
 GROUP(-lgcc)
 
@@ -39,6 +38,9 @@ EXTERN(__cs3_interrupt_vector_cortex_m)
 EXTERN(__cs3_interrupt_vector_cortex_m_mutable)
 EXTERN(__cs3_start_c main __cs3_stack __cs3_stack_size __cs3_heap_end)
 
+EXTERN(__som)
+EXTERN(crp)
+
 PROVIDE(__cs3_stack = __cs3_region_start_ram + __cs3_region_size_ram);
 PROVIDE(__cs3_stack_size = __cs3_region_start_ram + __cs3_region_size_ram - _end);
 PROVIDE(__cs3_heap_start = _end);
@@ -50,6 +52,10 @@ PROVIDE(__heap_start = __cs3_heap_start);
 PROVIDE(__heap_end = __cs3_heap_end);
 
 PROVIDE(__bss_ram_len = __bss_ram_end - __bss_ram_begin);
+
+PROVIDE(__registry_space_1_len = __registry_space_1_end - __registry_space_1);
+PROVIDE(__registry_space_2_len = __registry_space_2_end - __registry_space_2);
+PROVIDE(__registry_space_3_len = __registry_space_3_end - __registry_space_3);
 
 SECTIONS
 {
@@ -67,6 +73,23 @@ SECTIONS
     ASSERT (. != __cs3_interrupt_vector_cortex_m, "No interrupt vector");
     *(.rom)
     *(.rom.b)
+    *(.hwregistry)
+    __registry_space_1 = .;
+    *(.registry_space_1)
+    . = 0x2fc;
+    __registry_space_1_end = .;
+    *(.crp)
+    __registry_space_2 = .;
+    *(.registry_space_2)
+    . = 0x43c;
+    __registry_space_2_end = .;
+    *(.som)
+    *(.backdoor)
+    __registry_space_3 = .;
+    *(.registry)
+    *(.registry_space_3)
+    . = 4K;
+    __registry_space_3_end = .;
 
     *( .privileged_code )
     *( privileged_functions )
