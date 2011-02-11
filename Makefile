@@ -3,7 +3,7 @@ TARGET = demo.bin
 TARGET_OBJS = test-romfs.o
 endif
 
-LIBDEPS = FreeRTOS/libFreeRTOS.a arch/libarch.a os/libos.a libc/libc.a libm/libm.a acorn/libacorn.a
+LIBDEPS = FreeRTOS/libFreeRTOS.a arch/libarch.a os/libos.a libc/libc.a libm/libm.a acorn/libacorn.a lwip/liblwip.a
 LIBS = -Wl,--start-group $(LIBDEPS) -Wl,--end-group
 
 export ROOTDIR = $(CURDIR)
@@ -19,10 +19,11 @@ clean: clean-generic
 	$(Q)$(MAKE) $(MAKE_OPTS) -C libc clean
 	$(Q)$(MAKE) $(MAKE_OPTS) -C libm clean
 	$(Q)$(MAKE) $(MAKE_OPTS) -C acorn clean
+	$(Q)$(MAKE) $(MAKE_OPTS) -C lwip clean
 	$(Q)$(MAKE) $(MAKE_OPTS) -C tools clean
 	$(Q)rm -f test-romfs.bin
 
-.PHONY: libs FreeRTOS arch os libc libm acorn tools deps
+.PHONY: libs FreeRTOS arch os libc libm acorn lwip tools deps
 
 FreeRTOS/libFreeRTOS.a: FreeRTOS
 arch/libarch.a: arch
@@ -30,8 +31,9 @@ os/libos.a: os
 libc/libc.a: libc
 libm/libm.a: libm
 acorn/libacorn.a: acorn
+lwip/liblwip.a: lwip
 
-libs: FreeRTOS arch os libc libm acorn
+libs: FreeRTOS arch os libc libm acorn lwip
 
 FreeRTOS:
 	$(E) "[MAKE]   Entering FreeRTOS"
@@ -57,6 +59,10 @@ acorn:
 	$(E) "[MAKE]   Entering acorn"
 	$(Q)$(MAKE) $(MAKE_OPTS) -C acorn
 
+lwip:
+	$(E) "[MAKE]   Entering lwip"
+	$(Q)$(MAKE) $(MAKE_OPTS) -C lwip
+
 tools:
 	$(E) "[MAKE]   Entering tools"
 	$(Q)$(MAKE) $(MAKE_OPTS) -C tools
@@ -80,6 +86,8 @@ deps: ldeps
 	$(Q)$(MAKE) $(MAKE_OPTS) -C libm ldeps
 	$(E) "[DEPS]   Creating dependency tree for acorn"
 	$(Q)$(MAKE) $(MAKE_OPTS) -C acorn ldeps
+	$(E) "[DEPS]   Creating dependency tree for lwip"
+	$(Q)$(MAKE) $(MAKE_OPTS) -C lwip ldeps
 
 include FreeRTOS/config.mk
 include arch/config.mk
