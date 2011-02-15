@@ -14,3 +14,9 @@ TARGET_INCLUDES += $(ROOTDIR)/FreeRTOS/Source/portable/GCC/ARM_CM3
 endif
 endif
 endif
+
+ifeq ($(CPU),mips)
+ifeq ($(CPU_FLAVOR),mips4)
+TARGET_INCLUDES += $(ROOTDIR)/config/mips/mips4 $(ROOTDIR)/FreeRTOS/Source/portable/MPLAB/PIC32MX
+endif
+endif

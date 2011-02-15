@@ -7,3 +7,13 @@ SPECS = $(ROOTDIR)/arch/arm/lpc17xx/specs
 TARGET_CPPFLAGS += -DTARGET_LITTLE_ENDIAN
 endif
 endif
+
+ifeq ($(CPU),mips)
+TARGET_INCLUDES += $(ROOTDIR)/arch/mips/include
+ifeq ($(CPU_FLAVOR),mips4)
+TARGET_INCLUDES += $(ROOTDIR)/arch/mips/mips4
+LDSCRIPT = $(ROOTDIR)/arch/mips/mips4/ldscript
+SPECS = $(ROOTDIR)/arch/mips/mips4/specs
+TARGET_CPPFLAGS += -DTARGET_LITTLE_ENDIAN
+endif
+endif

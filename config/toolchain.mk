@@ -8,6 +8,15 @@ TARGET_CPPFLAGS += -Os -mapcs-frame -msoft-float -mno-sched-prolog -fno-hosted -
 TARGET_CFLAGS += -mthumb
 endif
 
+ifeq ($(CPU),mips)
+TOOLCHAIN = mipsel-elf
+TARGET_FORMAT = elf32-littlemips
+ifeq ($(CPU_FLAVOR),mips4)
+TARGET_CPPFLAGS += 
+endif
+TARGET_CPPFLAGS += -Os -msoft-float -fno-hosted -ffunction-sections -fdata-sections -fshort-wchar -D__LITTLE_ENDIAN
+endif
+
 TARGET_CC = $(TOOLCHAIN)-gcc
 TARGET_CXX = $(TOOLCHAIN)-g++
 TARGET_LD = $(TOOLCHAIN)-gcc
