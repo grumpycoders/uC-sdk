@@ -1,3 +1,6 @@
+#ifdef _WIN32
+#include <windows.h>
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -36,8 +39,11 @@ void processdir(DIR * dirp, const char * curpath, FILE * outfile, const char * p
         strcat(fullpath, "/");
         strcat(fullpath, curpath);
         strcat(fullpath, ent->d_name);
-        switch(ent->d_type) {
-        case DT_DIR:
+    #ifdef _WIN32
+    if (GetFileAttributes(fullpath) & FILE_ATTRIBUTE_DIRECTORY) {
+    #else
+        if (ent->d_type == DT_DIR) {
+    #endif
             if (strcmp(ent->d_name, ".") == 0)
                 continue;
             if (strcmp(ent->d_name, "..") == 0)
@@ -46,9 +52,7 @@ void processdir(DIR * dirp, const char * curpath, FILE * outfile, const char * p
             rec_dirp = opendir(fullpath);
             processdir(rec_dirp, fullpath, outfile, prefix);
             closedir(rec_dirp);
-            break;
-        case DT_REG:
-        case DT_LNK:
+        } else {
             hash = hash_djb2((const uint8_t *) ent->d_name, cur_hash);
             infile = fopen(fullpath, "rb");
             if (!infile) {
@@ -73,7 +77,6 @@ void processdir(DIR * dirp, const char * curpath, FILE * outfile, const char * p
                 size -= w;
             }
             fclose(infile);
-            break;
         }
     }
 }
