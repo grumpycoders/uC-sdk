@@ -35,7 +35,11 @@ src/core/ipv4/ip_addr.c \
 src/core/ipv4/ip_frag.c \
 src/core/ipv4/inet_chksum.c \
 \
+src/api/err.c \
+\
 src/netif/etharp.c \
+\
+apps/webserver/httpd.c \
 
 ifeq ($(CPU),arm)
 ifeq ($(CPU_FLAVOR),lpc1768)

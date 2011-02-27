@@ -37,7 +37,8 @@ typedef uintptr_t   mem_ptr_t;
 #define PACK_STRUCT_END
 
 /* Plaform specific diagnostic output */
-#define LWIP_PLATFORM_DIAG(x) printf(stderr, x)
+#define LWIP_PLATFORM_DIAG2(...) fprintf(stderr, __VA_ARGS__)
+#define LWIP_PLATFORM_DIAG(x) LWIP_PLATFORM_DIAG2 x
 #define LWIP_PLATFORM_ASSERT(x) do { \
     fprintf(stderr, "Assert \"%s\" failed at line %d in %s\n", x, __LINE__, __FILE__); \
     exit(-1); \
