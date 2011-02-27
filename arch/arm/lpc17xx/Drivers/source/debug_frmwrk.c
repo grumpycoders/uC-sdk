@@ -53,7 +53,13 @@ uint8_t (*_db_get_char)(LPC_UART_TypeDef *UARTx);
  **********************************************************************/
 void UARTPutChar (LPC_UART_TypeDef *UARTx, uint8_t ch)
 {
+	if (ch == '\r') return;
+	if (ch == '\n') ch = '\r';
 	UART_Send(UARTx, &ch, 1, BLOCKING);
+	if (ch == '\r') {
+		ch = '\n';
+		UART_Send(UARTx, &ch, 1, BLOCKING);
+	}
 }
 
 
@@ -96,7 +102,7 @@ void UARTPuts(LPC_UART_TypeDef *UARTx, const void *str)
 void UARTPuts_(LPC_UART_TypeDef *UARTx, const void *str)
 {
 	UARTPuts (UARTx, str);
-	UARTPuts (UARTx, "\n\r");
+	UARTPuts (UARTx, "\r\n");
 }
 
 
