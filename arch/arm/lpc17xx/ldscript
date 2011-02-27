@@ -240,11 +240,21 @@ SECTIONS
     __end = .;
   } >ram
 
-  /* This used for USB RAM section */
-	.usb_ram (NOLOAD):
-	{
-		*.o (USB_RAM)
-	} > ram2
+    .eth_ram (NOLOAD):
+    {
+        *(.eth_ram)
+    } > ram1
+
+    .usb_ram (NOLOAD):
+    {
+        *(.usb_ram)
+    } > ram2
+
+    .can_ram (NOLOAD):
+    {
+        *(.can_ram)
+    } > ram3
+
   .heap (NOLOAD) :
   {
     *(.heap)

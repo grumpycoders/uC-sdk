@@ -11,20 +11,25 @@ include $(ROOTDIR)/libm/config.mk
 include $(ROOTDIR)/libc/config.mk
 
 TARGET_SRCS = \
+src/core/def.c \
 src/core/mem.c \
+src/core/memp.c \
 src/core/netif.c \
 src/core/pbuf.c \
 src/core/raw.c \
 src/core/stats.c \
+src/core/timers.c \
 src/core/sys.c \
 src/core/tcp.c \
 src/core/tcp_in.c \
 src/core/tcp_out.c \
 src/core/udp.c \
 src/core/dhcp.c \
+src/core/dns.c \
 src/core/init.c \
 \
 src/core/ipv4/ip.c \
+src/core/ipv4/icmp.c \
 src/core/ipv4/inet.c \
 src/core/ipv4/ip_addr.c \
 src/core/ipv4/ip_frag.c \

@@ -240,7 +240,7 @@ void sys_timeouts_init(void)
   sys_timeout(DNS_TMR_INTERVAL, dns_timer, NULL);
 #endif /* LWIP_DNS */
 
-#if NO_SYS
+#if !NO_SYS
   /* Initialise timestamp for sys_check_timeouts */
   timeouts_last_time = sys_now();
 #endif
