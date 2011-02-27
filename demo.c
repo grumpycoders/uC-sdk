@@ -18,6 +18,7 @@
 #include <lwip/tcp_impl.h>
 #include <netif/etharp.h>
 #include <netif/lpc17xx-if.h>
+#include <httpd.h>
 
 #define LED1_wire 18
 #define LED2_wire 20
@@ -48,6 +49,7 @@ static void litLED(int led, int value) {
 
 xSemaphoreHandle handle;
 
+#ifdef SHOW_SIMPLE_TASKS
 static void simpleTask1(void *p) {
     while (1) {
         xSemaphoreTake(handle, portMAX_DELAY);
@@ -65,6 +67,7 @@ static void simpleTask2(void *p) {
         vTaskDelay(1357);
     }
 }
+#endif
 
 #ifdef USE_BAD_TASK
 static void badTask(void *x) {
@@ -100,24 +103,24 @@ static void net_init() {
 }
 
 static inline int timestamp_expired(portTickType t, portTickType now, portTickType delay) {
-    return (int)(t + delay - now) >= 0;
+    return (int)(now - (t + delay)) >= 0;
 }
 
 static void lwip_poll(struct netif * netif) {
     portTickType now = xTaskGetTickCount();
 
     lpc17xx_if_check_input(netif);
-    if (timestamp_expired(ts_etharp, now, ARP_TMR_INTERVAL * 1000 / portTICK_RATE_MS)) {
+    if (timestamp_expired(ts_etharp, now, ARP_TMR_INTERVAL / portTICK_RATE_MS)) {
         etharp_tmr();
         ts_etharp = now;
     }
     
-    if (timestamp_expired(ts_tcp, now, TCP_TMR_INTERVAL * 1000 / portTICK_RATE_MS)) {
+    if (timestamp_expired(ts_tcp, now, TCP_TMR_INTERVAL / portTICK_RATE_MS)) {
         tcp_tmr();
         ts_tcp = now;
     }
     
-    if (timestamp_expired(ts_ipreass, now, IP_TMR_INTERVAL * 1000 / portTICK_RATE_MS)) {
+    if (timestamp_expired(ts_ipreass, now, IP_TMR_INTERVAL / portTICK_RATE_MS)) {
         ip_reass_tmr();
         ts_ipreass = now;
     }
@@ -142,6 +145,7 @@ void ENET_IRQHandler() {
 int main() {
     init_malloc_wrapper();
     net_init();
+    httpd_init("/romfs/");
     FILE * f1, * f2, * f3;
     char buf[32];
     int c;
@@ -152,6 +156,7 @@ int main() {
     printf("Hello world - from stdio!\r\n");
     fflush(stdout);
     f1 = fopen("/dev/stdout", "w");
+    fprintf(stderr, "f1 = %p\r\n", f1);
     fwrite(msg, 1, sizeof(msg), f1);
     f2 = fopen("/romfs/test.txt", "r");
     c = fread(buf, 1, 32, f2);
@@ -169,12 +174,14 @@ int main() {
     litLED(3, 0);
     litLED(4, 0);
     BoardConsolePuts("Creating simple tasks.");
+#ifdef SHOW_SIMPLE_TASKS
     xTaskCreate(simpleTask1, (signed char *) "st1", configMINIMAL_STACK_SIZE, (void *)NULL, tskIDLE_PRIORITY, NULL);
     xTaskCreate(simpleTask2, (signed char *) "st2", configMINIMAL_STACK_SIZE, (void *)NULL, tskIDLE_PRIORITY, NULL);
+#endif
 #ifdef USE_BAD_TASK
     xTaskCreate(badTask, (signed char *) "bad", configMINIMAL_STACK_SIZE, (void *)NULL, tskIDLE_PRIORITY, NULL);
 #endif
-    xTaskCreate(lwip_task, (signed char *) "lwip", 256, (void *) &board_netif, tskIDLE_PRIORITY | portPRIVILEGE_BIT, NULL);
+    xTaskCreate(lwip_task, (signed char *) "lwip", 1024, (void *) &board_netif, tskIDLE_PRIORITY | portPRIVILEGE_BIT, NULL);
     BoardConsolePuts("Scheduler starting.");
     vTaskStartScheduler();
     BoardConsolePuts("Scheduler exitting.");
