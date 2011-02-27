@@ -108,17 +108,17 @@ static inline char * strncpy(char * s1, const char * s2, size_t n) {
     return r;
 }
 
-static inline const char * strchr(const char * s, char c) {
+static inline char * strchr(const char * s, char c) {
     while (*s) {
         if (*s == c)
-            return s;
+            return (char *) s;
         s++;
     }
     
     return NULL;
 }
 
-static inline const char * strrchr(const char * s, char c) {
+static inline char * strrchr(const char * s, char c) {
     const char * r = NULL;
     
     while (*s) {
@@ -127,7 +127,7 @@ static inline const char * strrchr(const char * s, char c) {
         s++;
     }
     
-    return r;
+    return (char *) r;
 }
 
 static inline size_t strlen(const char * s) {
@@ -190,14 +190,16 @@ static inline char * strdup(const char * s) {
     return strcpy((char *) malloc(strlen(s) + 1), s);
 }
 
-static inline const char * strstr(const char * s1, const char * s2) {
+static inline char * strstr(const char * s1, const char * s2) {
     size_t l = strlen(s2);
     
     while (*s1) {
         if (!strncmp(s1, s2, l))
-            return s1;
+            return (char *) s1;
         s1++;
     }
+    
+    return NULL;
 }
 
 #endif
