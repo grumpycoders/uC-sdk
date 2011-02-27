@@ -300,4 +300,4 @@ void lpc17xx_if_check_input(struct netif * netif) {
     lpc17xx_if_input(netif);
 }
 
-__attribute__((section(".eth_ram"))) uint8_t lwip_ram_heap[16 * 1024];
+__attribute__((section(".eth_ram"))) uint8_t lwip_ram_heap[5632];

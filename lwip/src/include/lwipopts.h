@@ -22,7 +22,7 @@ extern uint8_t lwip_ram_heap[];
 #define MEM_LIBC_MALLOC   0
 #define MEMP_MEM_MALLOC   0
 #define MEM_ALIGNMENT     4
-#define MEM_SIZE          16000
+#define MEM_SIZE          5600
 #define MEMP_NUM_SYS_TIMEOUT 6
 
 #define LWIP_RAM_HEAP_POINTER lwip_ram_heap

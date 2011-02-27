@@ -174,7 +174,7 @@ int main() {
 #ifdef USE_BAD_TASK
     xTaskCreate(badTask, (signed char *) "bad", configMINIMAL_STACK_SIZE, (void *)NULL, tskIDLE_PRIORITY, NULL);
 #endif
-    xTaskCreate(lwip_task, (signed char *) "lwip", configMINIMAL_STACK_SIZE, (void *) &board_netif, tskIDLE_PRIORITY, NULL);
+    xTaskCreate(lwip_task, (signed char *) "lwip", 256, (void *) &board_netif, tskIDLE_PRIORITY | portPRIVILEGE_BIT, NULL);
     BoardConsolePuts("Scheduler starting.");
     vTaskStartScheduler();
     BoardConsolePuts("Scheduler exitting.");

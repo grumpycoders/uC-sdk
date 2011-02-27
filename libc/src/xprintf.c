@@ -141,7 +141,7 @@ static const info fmtinfo[] = {
   { 'S',   0,  0,                  0,    0, SEEIT,      },
   { '%',   0,  0,                  0,    0, PERCENT,    },
   { 'b',   2,  "01",               0, "b0", RADIX,      }, /* Binary notation */
-  { 'p',  10,  "0123456789",       0,    0, RADIX,      }, /* Pointers */
+  { 'p',  16,  "0123456789abcdef", 0, "x0", RADIX,      }, /* Pointers */
   { '\'',  0,  0,                  0,    0, CHARLIT,    }, /* Literal char */
 };
 #define NINFO  (sizeof(fmtinfo)/sizeof(info))  /* Size of the fmtinfo table */
@@ -348,6 +348,10 @@ int vxprintf(func,arg,format,ap)
       xtype = ERROR;
     }else{
       xtype = infop->type;
+      if( c=='p' ){
+        flag_alternateform = 1;
+        width = sizeof(uintptr_t)*2;
+      }
     }
 
     /*

@@ -69,9 +69,9 @@ static TX_Stat Tx_Stat[EMAC_NUM_TX_FRAG];
 
 /* EMAC local DMA buffers */
 /** Rx buffer data */
-static uint32_t rx_buf[EMAC_NUM_RX_FRAG][EMAC_ETH_MAX_FLEN>>2];
+static __attribute__((section(".eth_ram"))) uint32_t rx_buf[EMAC_NUM_RX_FRAG][EMAC_ETH_MAX_FLEN>>2];
 /** Tx buffer data */
-static uint32_t tx_buf[EMAC_NUM_TX_FRAG][EMAC_ETH_MAX_FLEN>>2];
+static __attribute__((section(".eth_ram"))) uint32_t tx_buf[EMAC_NUM_TX_FRAG][EMAC_ETH_MAX_FLEN>>2];
 
 /**
  * @}
