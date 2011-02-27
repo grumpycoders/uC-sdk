@@ -40,7 +40,7 @@ void processdir(DIR * dirp, const char * curpath, FILE * outfile, const char * p
         strcat(fullpath, curpath);
         strcat(fullpath, ent->d_name);
     #ifdef _WIN32
-    if (GetFileAttributes(fullpath) & FILE_ATTRIBUTE_DIRECTORY) {
+        if (GetFileAttributes(fullpath) & FILE_ATTRIBUTE_DIRECTORY) {
     #else
         if (ent->d_type == DT_DIR) {
     #endif
@@ -50,13 +50,13 @@ void processdir(DIR * dirp, const char * curpath, FILE * outfile, const char * p
                 continue;
             strcat(fullpath, "/");
             rec_dirp = opendir(fullpath);
-            processdir(rec_dirp, fullpath, outfile, prefix);
+            processdir(rec_dirp, fullpath + strlen(prefix) + 1, outfile, prefix);
             closedir(rec_dirp);
         } else {
             hash = hash_djb2((const uint8_t *) ent->d_name, cur_hash);
             infile = fopen(fullpath, "rb");
             if (!infile) {
-                perror("opening file");
+                perror("opening input file");
                 exit(-1);
             }
             b = (hash >>  0) & 0xff; fwrite(&b, 1, 1, outfile);
@@ -114,7 +114,7 @@ int main(int argc, char ** argv) {
         outfile = fopen(outname, "wb");
 
     if (!outfile) {
-        perror("opening file");
+        perror("opening output file");
         exit(-1);
     }
 
