@@ -65,7 +65,7 @@ int webfs_open_custom(struct webfs_file *file, const char *name) {
     
     file->data = (const char *) buf;
     file->len = len;
-    file->index = 0;
+    file->index = len;
     file->pextension = NULL;
     file->http_header_included = 0;
     
