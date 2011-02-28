@@ -40,6 +40,7 @@ src/api/err.c \
 src/netif/etharp.c \
 \
 apps/webserver/httpd.c \
+apps/echo/echo.c
 
 ifeq ($(CPU),arm)
 ifeq ($(CPU_FLAVOR),lpc1768)

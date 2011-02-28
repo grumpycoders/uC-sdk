@@ -23,9 +23,9 @@ typedef uintptr_t   mem_ptr_t;
 #define LWIP_ERR_T  int
 
 /* Define (sn)printf formatters for these lwIP types */
-#define U16_F "hu"
-#define S16_F "hd"
-#define X16_F "hx"
+#define U16_F "u"
+#define S16_F "d"
+#define X16_F "x"
 #define U32_F "u"
 #define S32_F "d"
 #define X32_F "x"

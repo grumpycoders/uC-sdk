@@ -16,9 +16,11 @@
 #include <lwip/init.h>
 #include <lwip/stats.h>
 #include <lwip/tcp_impl.h>
+#include <lwip/timers.h>
 #include <netif/etharp.h>
 #include <netif/lpc17xx-if.h>
-#include <httpd.h>
+#include <webserver/httpd.h>
+#include <echo/echo.h>
 
 #define LED1_wire 18
 #define LED2_wire 20
@@ -106,9 +108,11 @@ static inline int timestamp_expired(portTickType t, portTickType now, portTickTy
     return (int)(now - (t + delay)) >= 0;
 }
 
+uint32_t sys_now() { return xTaskGetTickCount(); }
+
 static void lwip_poll(struct netif * netif) {
     portTickType now = xTaskGetTickCount();
-
+ 
     lpc17xx_if_check_input(netif);
     if (timestamp_expired(ts_etharp, now, ARP_TMR_INTERVAL / portTICK_RATE_MS)) {
         etharp_tmr();
@@ -124,6 +128,8 @@ static void lwip_poll(struct netif * netif) {
         ip_reass_tmr();
         ts_ipreass = now;
     }
+
+    sys_check_timeouts();
 }
 
 static void lwip_task(void * _netif) {
@@ -146,6 +152,7 @@ int main() {
     init_malloc_wrapper();
     net_init();
     httpd_init("/romfs/");
+    echo_init();
     FILE * f1, * f2, * f3;
     char buf[32];
     int c;
