@@ -43,7 +43,7 @@
 
 /** Set this to 1 to support CGI */
 #ifndef LWIP_HTTPD_CGI
-#define LWIP_HTTPD_CGI            1
+#define LWIP_HTTPD_CGI            0
 #endif
 
 /** Set this to 1 to support SSI (Server-Side-Includes) */
@@ -231,6 +231,6 @@ void httpd_post_data_recved(void *connection, u16_t recved_len);
 
 #endif /* LWIP_HTTPD_SUPPORT_POST */
 
-void httpd_init(const char * httpd_root);
+void httpd_init(const u8_t * romfs);
 
 #endif /* __HTTPD_H__ */

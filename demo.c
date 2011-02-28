@@ -94,6 +94,7 @@ static void net_init() {
     inet_aton("192.168.1.1", &gw_ip.addr);
     inet_aton("255.255.255.0", &netmask.addr);
     lwip_init();
+    vSemaphoreCreateBinary(lwip_sem);
     if (netif_add(&board_netif, &board_ip, &netmask, &gw_ip, NULL, lpc17xx_if_init, ethernet_input) == NULL) {
         fprintf(stderr, "net_init: netif_add(lpc17xx_if_init) failed.\r\n");
         return;
@@ -101,7 +102,6 @@ static void net_init() {
     netif_set_default(&board_netif);
     netif_set_up(&board_netif);
     ts_etharp = ts_tcp = ts_ipreass = 0;
-    vSemaphoreCreateBinary(lwip_sem);
 }
 
 static inline int timestamp_expired(portTickType t, portTickType now, portTickType delay) {
@@ -134,6 +134,9 @@ static void lwip_poll(struct netif * netif) {
 
 static void lwip_task(void * _netif) {
     struct netif * netif = (struct netif *) _netif;
+    net_init();
+    httpd_init(_binary_test_romfs_bin_start);
+    echo_init();
     while(1) {
         xSemaphoreTake(lwip_sem, 10 / portTICK_RATE_MS);
         lwip_poll(netif);
@@ -150,9 +153,6 @@ void ENET_IRQHandler() {
 
 int main() {
     init_malloc_wrapper();
-    net_init();
-    httpd_init("/romfs/");
-    echo_init();
     FILE * f1, * f2, * f3;
     char buf[32];
     int c;

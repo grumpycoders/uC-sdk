@@ -64,6 +64,7 @@ static __attribute__ ((aligned (8))) RX_Stat Rx_Stat[EMAC_NUM_RX_FRAG];
 
 /** Tx Descriptor data array */
 static TX_Desc Tx_Desc[EMAC_NUM_TX_FRAG];
+static uint32_t Tx_Len[EMAC_NUM_TX_FRAG];
 /** Tx Status data array */
 static TX_Stat Tx_Stat[EMAC_NUM_TX_FRAG];
 
@@ -129,6 +130,7 @@ static void tx_descr_init (void) {
 		Tx_Desc[i].Packet = (uint32_t)&tx_buf[i];
 		Tx_Desc[i].Ctrl   = 0;
 		Tx_Stat[i].Info   = 0;
+		Tx_Len[i]         = 0;
 	}
 
 	/* Set EMAC Transmit Descriptor Registers. */
@@ -727,19 +729,23 @@ FlagStatus EMAC_GetWoLStatus(uint32_t ulWoLMode)
  * 							Packet data buffer.
  * @return		None
  **********************************************************************/
-void EMAC_WritePacketBuffer(EMAC_PACKETBUF_Type *pDataStruct)
+void EMAC_WritePacketBuffer(EMAC_PACKETBUF_Type *pDataStruct, Bool Finalize)
 {
 	uint32_t idx,len;
-	uint32_t *sp,*dp;
+	uint8_t *sp,*dp;
 
 	idx = LPC_EMAC->TxProduceIndex;
-	sp  = (uint32_t *)pDataStruct->pbDataBuf;
-	dp  = (uint32_t *)Tx_Desc[idx].Packet;
+	sp  = (uint8_t *)pDataStruct->pbDataBuf;
+	dp  = ((uint8_t *)Tx_Desc[idx].Packet) + Tx_Len[idx];
 	/* Copy frame data to EMAC packet buffers. */
-	for (len = (pDataStruct->ulDataLen + 3) >> 2; len; len--) {
+	for (len = pDataStruct->ulDataLen; len; len--) {
 		*dp++ = *sp++;
 	}
-	Tx_Desc[idx].Ctrl = (pDataStruct->ulDataLen - 1) | (EMAC_TCTRL_INT | EMAC_TCTRL_LAST);
+	Tx_Len[idx] += pDataStruct->ulDataLen;
+	if (Finalize) {
+		Tx_Desc[idx].Ctrl = (Tx_Len[idx] - 1) | (EMAC_TCTRL_INT | EMAC_TCTRL_LAST);
+		Tx_Len[idx] = 0;
+	}
 }
 
 /*********************************************************************//**

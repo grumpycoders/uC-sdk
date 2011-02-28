@@ -95,24 +95,27 @@ static err_t
 low_level_output(struct netif *netif, struct pbuf *p)
 {
   struct pbuf *q;
+  EMAC_PACKETBUF_Type TxPack;
 
 #if ETH_PAD_SIZE
   pbuf_header(p, -ETH_PAD_SIZE); /* drop the padding word */
 #endif
 
-  if (EMAC_CheckTransmitIndex() == FALSE)
+  if (EMAC_CheckTransmitIndex() == FALSE) {
     wait_DMA_slot();
+  }
 
   for(q = p; q != NULL; q = q->next) {
     /* Send the data from the pbuf to the interface, one pbuf at a
        time. The size of the data in each pbuf is kept in the ->len
        variable. */
-    EMAC_PACKETBUF_Type TxPack;
     TxPack.ulDataLen = q->len;
     TxPack.pbDataBuf = q->payload;
-    EMAC_WritePacketBuffer(&TxPack);
+    EMAC_WritePacketBuffer(&TxPack, FALSE);
   }
-
+  TxPack.ulDataLen = 0;
+  TxPack.pbDataBuf = NULL;
+  EMAC_WritePacketBuffer(&TxPack, TRUE);
   EMAC_UpdateTxProduceIndex();
 
 #if ETH_PAD_SIZE

@@ -665,7 +665,7 @@ void EMAC_SetHashFilter(uint8_t dstMAC_addr[], FunctionalState NewState);
 void EMAC_SetFilterMode(uint32_t ulFilterMode, FunctionalState NewState);
 
 /* EMAC Packet Buffer functions */
-void EMAC_WritePacketBuffer(EMAC_PACKETBUF_Type *pDataStruct);
+void EMAC_WritePacketBuffer(EMAC_PACKETBUF_Type *pDataStruct, Bool Finalize);
 void EMAC_ReadPacketBuffer(EMAC_PACKETBUF_Type *pDataStruct);
 
 /* EMAC Interrupt functions -------*/

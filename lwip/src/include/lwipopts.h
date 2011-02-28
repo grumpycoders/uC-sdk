@@ -46,7 +46,7 @@ extern uint8_t lwip_ram_heap[];
 #define LWIP_DEBUG
 
 #define LWIP_HTTPD_DYNAMIC_HEADERS 1
-
+#define LWIP_HTTPD_CGI 1
 
 #define ETHARP_DEBUG                    LWIP_DBG_OFF
 #define NETIF_DEBUG                     LWIP_DBG_OFF

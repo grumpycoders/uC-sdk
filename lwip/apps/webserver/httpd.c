@@ -82,14 +82,10 @@
 #include "httpd.h"
 #include "httpd_structs.h"
 #include "lwip/tcp.h"
+#include "fs.h"
 
 #include <string.h>
 #include <stdlib.h>
-#include <stdio.h>
-
-#undef LWIP_DEBUGF
-#define LWIP_DEBUGF(d,x) printf x
-#include "lwip/err.h"
 
 #if LWIP_TCP
 
@@ -218,14 +214,13 @@
 
 /** This was TI's check whether to let TCP copy data or not
 #define HTTP_IS_DATA_VOLATILE(hs) ((hs->file < (char *)0x20000000) ? 0 : TCP_WRITE_FLAG_COPY)*/
-#define HTTP_IS_DATA_VOLATILE(hs) TCP_WRITE_FLAG_COPY
 #ifndef HTTP_IS_DATA_VOLATILE
 #if LWIP_HTTPD_SSI
 /* Copy for SSI files, no copy for non-SSI files */
 #define HTTP_IS_DATA_VOLATILE(hs)   ((hs)->tag_check ? TCP_WRITE_FLAG_COPY : 0)
 #else /* LWIP_HTTPD_SSI */
 /** Default: don't copy if the data is sent from file-system directly */
-#define HTTP_IS_DATA_VOLATILE(hs) (((hs->file != NULL) && (hs->handle >= 0) && (hs->file == \
+#define HTTP_IS_DATA_VOLATILE(hs) (((hs->file != NULL) && (hs->handle != NULL) && (hs->file == \
                                    (char*)hs->handle->data + hs->handle->len - hs->left)) \
                                    ? 0 : TCP_WRITE_FLAG_COPY)
 #endif /* LWIP_HTTPD_SSI */
@@ -297,7 +292,7 @@ enum tag_check_state {
 #endif /* LWIP_HTTPD_SSI */
 
 struct http_state {
-  int handle;
+  struct webfs_file *handle;
   char *file;       /* Pointer to first unsent byte in buf. */
 
 #if LWIP_HTTPD_SUPPORT_REQUESTLIST
@@ -352,7 +347,7 @@ struct http_state {
 };
 
 static err_t http_find_file(struct http_state *hs, const char *uri, int is_09);
-static err_t http_init_file(struct http_state *hs, int file, int is_09, const char *uri);
+static err_t http_init_file(struct http_state *hs, struct webfs_file *file, int is_09, const char *uri);
 static err_t http_poll(void *arg, struct tcp_pcb *pcb);
 
 #if LWIP_HTTPD_SSI
@@ -370,32 +365,9 @@ const char * const g_pcTagLeadOut = "-->";
 
 #if LWIP_HTTPD_CGI
 /* CGI handler information */
-static const tCGI *g_pCGIs = NULL;
-static int g_iNumCGIs = 0;
+const tCGI *g_pCGIs = NULL;
+int g_iNumCGIs = 0;
 #endif /* LWIP_HTTPD_CGI */
-
-static const char * g_httpd_root = NULL;
-
-static inline int fs_close(int f) { return close(f); }
-
-static int fs_open(const char * path) {
-    char fullpath[64];
-    if (g_httpd_root) {
-        strcpy(fullpath, g_httpd_root);
-    } else {
-        fullpath[0] = 0;
-    }
-    strcat(fullpath, path);
-    return open(fullpath, O_RDONLY);
-}
-
-static inline size_t fs_bytes_left(int f) {
-    off_t cur = lseek(f, SEEK_CUR, 0), size = lseek(f, SEEK_END, 0);
-    lseek(f, SEEK_SET, cur);
-    return size - cur;
-}
-
-static inline size_t fs_read(int f, void * buf, size_t len) { return read(f, buf, len); }
 
 #if LWIP_HTTPD_STRNSTR_PRIVATE
 /** Like strstr but does not need 'buffer' to be NULL-terminated */
@@ -429,7 +401,6 @@ http_state_alloc(void)
   if (ret != NULL) {
     /* Initialize the structure. */
     memset(ret, 0, sizeof(struct http_state));
-    ret->handle = -1;
 #if LWIP_HTTPD_DYNAMIC_HEADERS
     /* Indicate that the headers are not yet valid */
     ret->hdr_index = NUM_FILE_HDR_STRINGS;
@@ -452,8 +423,8 @@ http_state_free(struct http_state *hs)
       LWIP_DEBUGF(HTTPD_DEBUG_TIMING, ("httpd: needed %"U32_F" ms to send file of %d bytes -> %"U32_F" bytes/sec\n",
         ms_needed, hs->handle->len, ((((u32_t)hs->handle->len) * 10) / needed)));
 #endif /* LWIP_HTTPD_TIMING */
-      fs_close(hs->handle);
-      hs->handle = -1;
+      webfs_close(hs->handle);
+      hs->handle = NULL;
     }
 #if LWIP_HTTPD_SSI || LWIP_HTTPD_DYNAMIC_HEADERS
     if (hs->buf != NULL) {
@@ -486,7 +457,7 @@ http_write(struct tcp_pcb *pcb, const void* ptr, u16_t *length, u8_t apiflags)
    LWIP_ASSERT("length != NULL", length != NULL);
    len = *length;
    do {
-     LWIP_DEBUGF(HTTPD_DEBUG | LWIP_DBG_TRACE, ("Trying go send %d bytes\n", len));
+     LWIP_DEBUGF(HTTPD_DEBUG | LWIP_DBG_TRACE, ("Trying to send %d bytes\n", len));
      err = tcp_write(pcb, ptr, len, apiflags);
      if (err == ERR_MEM) {
        if ((tcp_sndbuf(pcb) == 0) ||
@@ -879,12 +850,12 @@ http_send_data(struct tcp_pcb *pcb, struct http_state *hs)
 #endif /* LWIP_HTTPD_SSI || LWIP_HTTPD_DYNAMIC_HEADERS */
 
     /* Do we have a valid file handle? */
-    if (hs->handle < 0) {
+    if (hs->handle == NULL) {
       /* No - close the connection. */
       http_close_conn(pcb, hs);
       return 0;
     }
-    if (fs_bytes_left(hs->handle) <= 0) {
+    if (webfs_bytes_left(hs->handle) <= 0) {
       /* We reached the end of the file so this request is done.
        * @todo: don't close here for HTTP/1.1? */
       LWIP_DEBUGF(HTTPD_DEBUG, ("End of file.\n"));
@@ -918,7 +889,7 @@ http_send_data(struct tcp_pcb *pcb, struct http_state *hs)
     /* Read a block of data from the file. */
     LWIP_DEBUGF(HTTPD_DEBUG, ("Trying to read %d bytes.\n", count));
 
-    count = fs_read(hs->handle, hs->buf, count);
+    count = webfs_read(hs->handle, hs->buf, count);
     if(count < 0) {
       /* We reached the end of the file so this request is done.
        * @todo: don't close here for HTTP/1.1? */
@@ -1302,7 +1273,7 @@ http_send_data(struct tcp_pcb *pcb, struct http_state *hs)
   }
 #endif /* LWIP_HTTPD_SSI */
 
-  if((hs->left == 0) && (fs_bytes_left(hs->handle) <= 0)) {
+  if((hs->left == 0) && (webfs_bytes_left(hs->handle) <= 0)) {
     /* We reached the end of the file so this request is done.
      * This adds the FIN flag right into the last data segment.
      * @todo: don't close here for HTTP/1.1? */
@@ -1326,7 +1297,7 @@ static err_t
 http_find_error_file(struct http_state *hs, u16_t error_nr)
 {
   const char *uri1, *uri2, *uri3;
-  int file;
+  struct webfs_file *file;
 
   if (error_nr == 501) {
     uri1 = "/501.html";
@@ -1338,11 +1309,11 @@ http_find_error_file(struct http_state *hs, u16_t error_nr)
     uri2 = "/400.htm";
     uri3 = "/400.shtml";
   }
-  file = fs_open(uri1);
+  file = webfs_open(uri1);
   if (file == NULL) {
-    file = fs_open(uri2);
+    file = webfs_open(uri2);
     if (file == NULL) {
-      file = fs_open(uri3);
+      file = webfs_open(uri3);
       if (file == NULL) {
         LWIP_DEBUGF(HTTPD_DEBUG, ("Error page for error %"U16_F" not found\n",
           error_nr));
@@ -1363,22 +1334,22 @@ http_find_error_file(struct http_state *hs, u16_t error_nr)
  * @param uri pointer that receives the actual file name URI
  * @return file struct for the error page or NULL no matching file was found
  */
-static int
+static struct webfs_file *
 http_get_404_file(const char **uri)
 {
-  int file;
+  struct webfs_file *file;
 
   *uri = "/404.html";
-  file = fs_open(*uri);
-  if(file < 0) {
+  file = webfs_open(*uri);
+  if(file == NULL) {
     /* 404.html doesn't exist. Try 404.htm instead. */
     *uri = "/404.htm";
-    file = fs_open(*uri);
-    if(file < 0) {
+    file = webfs_open(*uri);
+    if(file == NULL) {
       /* 404.htm doesn't exist either. Try 404.shtml instead. */
       *uri = "/404.shtml";
-      file = fs_open(*uri);
-      if(file < 0) {
+      file = webfs_open(*uri);
+      if(file == NULL) {
         /* 404.htm doesn't exist either. Indicate to the caller that it should
          * send back a default 404 page.
          */
@@ -1607,7 +1578,7 @@ http_parse_request(struct pbuf **inp, struct http_state *hs, struct tcp_pcb *pcb
   LWIP_ASSERT("p != NULL", p != NULL);
   LWIP_ASSERT("hs != NULL", hs != NULL);
 
-  if ((hs->handle >= 0) || (hs->file != NULL)) {
+  if ((hs->handle != NULL) || (hs->file != NULL)) {
     LWIP_DEBUGF(HTTPD_DEBUG, ("Received data while sending a file\n"));
     /* already sending a file */
     /* @todo: abort? */
@@ -1760,7 +1731,7 @@ static err_t
 http_find_file(struct http_state *hs, const char *uri, int is_09)
 {
   size_t loop;
-  int file = -1;
+  struct webfs_file *file = NULL;
   char *params;
 #if LWIP_HTTPD_CGI
   int i;
@@ -1781,9 +1752,9 @@ http_find_file(struct http_state *hs, const char *uri, int is_09)
        that exists. */
     for (loop = 0; loop < NUM_DEFAULT_FILENAMES; loop++) {
       LWIP_DEBUGF(HTTPD_DEBUG | LWIP_DBG_TRACE, ("Looking for %s...\n", g_psDefaultFilenames[loop].name));
-      file = fs_open((char *)g_psDefaultFilenames[loop].name);
+      file = webfs_open((char *)g_psDefaultFilenames[loop].name);
       uri = (char *)g_psDefaultFilenames[loop].name;
-      if(file >= 0) {
+      if(file != NULL) {
         LWIP_DEBUGF(HTTPD_DEBUG | LWIP_DBG_TRACE, ("Opened.\n"));
 #if LWIP_HTTPD_SSI
         hs->tag_check = g_psDefaultFilenames[loop].shtml;
@@ -1791,7 +1762,7 @@ http_find_file(struct http_state *hs, const char *uri, int is_09)
         break;
       }
     }
-    if (file < 0) {
+    if (file == NULL) {
       /* None of the default filenames exist so send back a 404 page */
       file = http_get_404_file(&uri);
 #if LWIP_HTTPD_SSI
@@ -1828,8 +1799,8 @@ http_find_file(struct http_state *hs, const char *uri, int is_09)
 
     LWIP_DEBUGF(HTTPD_DEBUG | LWIP_DBG_TRACE, ("Opening %s\n", uri));
 
-    file = fs_open(uri);
-    if (file < 0) {
+    file = webfs_open(uri);
+    if (file == NULL) {
       file = http_get_404_file(&uri);
     }
 #if LWIP_HTTPD_SSI
@@ -1862,9 +1833,9 @@ http_find_file(struct http_state *hs, const char *uri, int is_09)
  *         another err_t otherwise
  */
 static err_t
-http_init_file(struct http_state *hs, int file, int is_09, const char *uri)
+http_init_file(struct http_state *hs, struct webfs_file *file, int is_09, const char *uri)
 {
-  if (file >= 0) {
+  if (file != NULL) {
     /* file opened, initialise struct http_state */
 #if LWIP_HTTPD_SSI
     hs->tag_index = 0;
@@ -1874,15 +1845,30 @@ http_init_file(struct http_state *hs, int file, int is_09, const char *uri)
     hs->tag_end = file->data;
 #endif /* LWIP_HTTPD_SSI */
     hs->handle = file;
-    hs->file = NULL; /* (char*)file->data; */
-    /* LWIP_ASSERT("File length must be positive!", (file->len >= 0)); */
-    hs->left = fs_bytes_left(file);
+    hs->file = (char*)file->data;
+    LWIP_ASSERT("File length must be positive!", (file->len >= 0));
+    hs->left = file->len;
     hs->retries = 0;
 #if LWIP_HTTPD_TIMING
     hs->time_started = sys_now();
 #endif /* LWIP_HTTPD_TIMING */
+#if !LWIP_HTTPD_DYNAMIC_HEADERS
+    LWIP_ASSERT("HTTP headers not included in file system", hs->handle->http_header_included);
+#endif /* !LWIP_HTTPD_DYNAMIC_HEADERS */
+#if LWIP_HTTPD_SUPPORT_V09
+    if (hs->handle->http_header_included && is_09) {
+      /* HTTP/0.9 responses are sent without HTTP header,
+         search for the end of the header. */
+      char *file_start = strnstr(hs->file, CRLF CRLF, hs->left);
+      if (file_start != NULL) {
+        size_t diff = file_start + 4 - hs->file;
+        hs->file += diff;
+        hs->left -= (u32_t)diff;
+      }
+    }
+#endif /* LWIP_HTTPD_SUPPORT_V09*/
   } else {
-    hs->handle = -1;
+    hs->handle = NULL;
     hs->file = NULL;
     hs->left = 0;
     hs->retries = 0;
@@ -1890,7 +1876,9 @@ http_init_file(struct http_state *hs, int file, int is_09, const char *uri)
 #if LWIP_HTTPD_DYNAMIC_HEADERS
     /* Determine the HTTP headers to send based on the file extension of
    * the requested URI. */
-  get_http_headers(hs, (char*)uri);
+  if ((hs->handle == NULL) || !hs->handle->http_header_included) {
+    get_http_headers(hs, (char*)uri);
+  }
 #else /* LWIP_HTTPD_DYNAMIC_HEADERS */
   LWIP_UNUSED_ARG(uri);
 #endif /* LWIP_HTTPD_DYNAMIC_HEADERS */
@@ -2041,7 +2029,7 @@ http_recv(void *arg, struct tcp_pcb *pcb, struct pbuf *p, err_t err)
   } else
 #endif /* LWIP_HTTPD_SUPPORT_POST */
   {
-    if (hs->handle < 0) {
+    if (hs->handle == NULL) {
       parsed = http_parse_request(&p, hs, pcb);
       LWIP_ASSERT("http_parse_request: unexpected return value", parsed == ERR_OK
         || parsed == ERR_INPROGRESS ||parsed == ERR_ARG || parsed == ERR_USE);
@@ -2141,7 +2129,7 @@ httpd_init_addr(ip_addr_t *local_addr)
  * Initialize the httpd: set up a listening PCB and bind it to the defined port
  */
 void
-httpd_init(const char * httpd_root)
+httpd_init(const u8_t * romfs)
 {
 #if HTTPD_USE_MEM_POOL
   LWIP_ASSERT("memp_sizes[MEMP_HTTPD_STATE] >= sizeof(http_state)",
@@ -2150,7 +2138,7 @@ httpd_init(const char * httpd_root)
   LWIP_DEBUGF(HTTPD_DEBUG, ("httpd_init\n"));
 
   httpd_init_addr(IP_ADDR_ANY);
-  g_httpd_root = httpd_root;
+  webfs_init(romfs);
 }
 
 #if LWIP_HTTPD_SSI
