@@ -132,14 +132,13 @@ static void lwip_poll(struct netif * netif) {
     sys_check_timeouts();
 }
 
-static void lwip_task(void * _netif) {
-    struct netif * netif = (struct netif *) _netif;
+static void lwip_task(void * p) {
     net_init();
     httpd_init(_binary_test_romfs_bin_start);
     echo_init();
     while(1) {
         xSemaphoreTake(lwip_sem, 10 / portTICK_RATE_MS);
-        lwip_poll(netif);
+        lwip_poll(&board_netif);
     }
 }
 
@@ -188,7 +187,7 @@ int main() {
 #ifdef USE_BAD_TASK
     xTaskCreate(badTask, (signed char *) "bad", configMINIMAL_STACK_SIZE, (void *)NULL, tskIDLE_PRIORITY, NULL);
 #endif
-    xTaskCreate(lwip_task, (signed char *) "lwip", 1024, (void *) &board_netif, tskIDLE_PRIORITY | portPRIVILEGE_BIT, NULL);
+    xTaskCreate(lwip_task, (signed char *) "lwip", 1024, (void *) NULL, tskIDLE_PRIORITY | portPRIVILEGE_BIT, NULL);
     BoardConsolePuts("Scheduler starting.");
     vTaskStartScheduler();
     BoardConsolePuts("Scheduler exitting.");
