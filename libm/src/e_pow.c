@@ -101,11 +101,11 @@ ivln2_l  =  1.92596299112661746887e-08; /* 0x3E54AE0B, 0xF85DDF44 =1/ln2 tail*/
 {
 	double z,ax,z_h,z_l,p_h,p_l;
 	double y1,t1,t2,r,s,t,u,v,w;
-	int i0,i1,i,j,k,yisint,n;
+	int /*i0,i1,*/i,j,k,yisint,n;
 	int hx,hy,ix,iy;
 	unsigned lx,ly;
 
-	i0 = ((*(int*)&one)>>29)^1; i1=1-i0;
+	/*i0 = ((*(int*)&one)>>29)^1; i1=1-i0;*/
 	hx = __HI(x); lx = __LO(x);
 	hy = __HI(y); ly = __LO(y);
 	ix = hx&0x7fffffff;  iy = hy&0x7fffffff;

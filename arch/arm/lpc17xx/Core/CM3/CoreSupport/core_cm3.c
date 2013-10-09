@@ -386,51 +386,6 @@ uint32_t __LDREXW(uint32_t *addr)
   __ASM("bx lr");
 }
 
-/**
- * @brief  STR Exclusive (8 bit)
- *
- * @param  value  value to store
- * @param  *addr  address pointer
- * @return        successful / failed
- *
- * Exclusive STR command for 8 bit values
- */
-uint32_t __STREXB(uint8_t value, uint8_t *addr)
-{
-  __ASM("strexb r0, r0, [r1]");
-  __ASM("bx lr");
-}
-
-/**
- * @brief  STR Exclusive (16 bit)
- *
- * @param  value  value to store
- * @param  *addr  address pointer
- * @return        successful / failed
- *
- * Exclusive STR command for 16 bit values
- */
-uint32_t __STREXH(uint16_t value, uint16_t *addr)
-{
-  __ASM("strexh r0, r0, [r1]");
-  __ASM("bx lr");
-}
-
-/**
- * @brief  STR Exclusive (32 bit)
- *
- * @param  value  value to store
- * @param  *addr  address pointer
- * @return        successful / failed
- *
- * Exclusive STR command for 32 bit values
- */
-uint32_t __STREXW(uint32_t value, uint32_t *addr)
-{
-  __ASM("strex r0, r0, [r1]");
-  __ASM("bx lr");
-}
-
 #pragma diag_default=Pe940
 
 
@@ -724,58 +679,6 @@ uint32_t __LDREXW(uint32_t *addr)
    __ASM volatile ("ldrex %0, [%1]" : "=r" (result) : "r" (addr) );
    return(result);
 }
-
-/**
- * @brief  STR Exclusive (8 bit)
- *
- * @param  value  value to store
- * @param  *addr  address pointer
- * @return        successful / failed
- *
- * Exclusive STR command for 8 bit values
- */
-uint32_t __STREXB(uint8_t value, uint8_t *addr)
-{
-   uint32_t result=0;
-
-   __ASM volatile ("strexb %0, %2, [%1]" : "=r" (result) : "r" (addr), "r" (value) );
-   return(result);
-}
-
-/**
- * @brief  STR Exclusive (16 bit)
- *
- * @param  value  value to store
- * @param  *addr  address pointer
- * @return        successful / failed
- *
- * Exclusive STR command for 16 bit values
- */
-uint32_t __STREXH(uint16_t value, uint16_t *addr)
-{
-   uint32_t result=0;
-
-   __ASM volatile ("strexh %0, %2, [%1]" : "=r" (result) : "r" (addr), "r" (value) );
-   return(result);
-}
-
-/**
- * @brief  STR Exclusive (32 bit)
- *
- * @param  value  value to store
- * @param  *addr  address pointer
- * @return        successful / failed
- *
- * Exclusive STR command for 32 bit values
- */
-uint32_t __STREXW(uint32_t value, uint32_t *addr)
-{
-   uint32_t result=0;
-
-   __ASM volatile ("strex %0, %2, [%1]" : "=r" (result) : "r" (addr), "r" (value) );
-   return(result);
-}
-
 
 #elif (defined (__TASKING__)) /*------------------ TASKING Compiler ---------------------*/
 /* TASKING carm specific functions */

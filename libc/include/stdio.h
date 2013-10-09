@@ -107,6 +107,9 @@ static inline FILE * fopen(const char * fname, const char * mode) {
         r->got_eof = 0;
     }
     
+    if (append)
+        lseek(r->fd, 0, SEEK_END);
+    
     return r;
 }
 
