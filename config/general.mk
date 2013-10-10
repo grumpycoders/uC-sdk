@@ -1,6 +1,14 @@
+-include local.mk
+
+ifeq ($(VERBOSE),)
 VERBOSE = false
+endif
+ifeq ($(DEBUG),)
 DEBUG = true
+endif
+ifeq ($(USE_FLOATINGPOINT),)
 USE_FLOATINGPOINT = true
+endif
 
 ifneq ($(VERBOSE),true)
 MAKE_OPTS = --no-print-directory -s
