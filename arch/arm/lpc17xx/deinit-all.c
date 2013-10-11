@@ -15,7 +15,7 @@
 #include "lpc17xx_timer.h"
 #include "lpc17xx_uart.h"
 
-void lpc17xx_deinit_all() {
+void cpu_deinit_all() {
 //**    ADC_DeInit(LPC_ADC);
     CAN_DeInit(LPC_CAN1);
     CAN_DeInit(LPC_CAN2);

@@ -196,7 +196,7 @@ __cs3_reset_cortex_m:
     LDR     R2, =__bss_ram_len
     BL      startup_memset
     
-    BL      lpc17xx_deinit_all
+    BL      cpu_deinit_all
     BL      SystemInit
     B       _start
     .pool

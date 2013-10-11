@@ -73,23 +73,25 @@ SECTIONS
     ASSERT (. != __cs3_interrupt_vector_cortex_m, "No interrupt vector");
     *(.rom)
     *(.rom.b)
-    *(.hwregistry)
     __registry_space_1 = .;
     *(.registry_space_1)
     . = 0x2fc;
     __registry_space_1_end = .;
     *(.crp)
+    *(.hwregistry)
     __registry_space_2 = .;
     *(.registry_space_2)
     . = 0x43c;
     __registry_space_2_end = .;
     *(.som)
     *(.backdoor)
+
     __registry_space_3 = .;
     *(.registry)
     *(.registry_space_3)
     . = 0xc40;
     __registry_space_3_end = .;
+
 
     *( .privileged_code )
     *( privileged_functions )
