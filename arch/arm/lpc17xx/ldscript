@@ -88,7 +88,7 @@ SECTIONS
     __registry_space_3 = .;
     *(.registry)
     *(.registry_space_3)
-    . = 4K;
+    . = 0xc40;
     __registry_space_3_end = .;
 
     *( .privileged_code )
