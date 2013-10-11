@@ -7,6 +7,8 @@ endif
 ifeq ($(CPU),arm)
 ifeq ($(CPU_FLAVOR),lpc1768)
 TARGET_INCLUDES += $(ROOTDIR)/config/arm/lpc1768
+endif
+ifeq ($(CPU_FAMILY),CM3)
 ifeq ($(USE_MPU),true)
 TARGET_INCLUDES += $(ROOTDIR)/FreeRTOS/Source/portable/GCC/ARM_CM3_MPU
 else
