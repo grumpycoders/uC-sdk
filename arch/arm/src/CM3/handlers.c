@@ -3,7 +3,6 @@
 #include <task.h>
 #include <queue.h>
 #include <osdebug.h>
-#include "LPC17xx.h"
 
 void BoardExceptionHandler(int code);
 
