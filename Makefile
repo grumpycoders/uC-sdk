@@ -89,8 +89,8 @@ deps: ldeps
 	$(E) "[DEPS]   Creating dependency tree for lwip"
 	$(Q)$(MAKE) $(MAKE_OPTS) -C lwip ldeps
 
-include FreeRTOS/config.mk
 include arch/config.mk
+include FreeRTOS/config.mk
 include os/config.mk
 include libc/config.mk
 include libm/config.mk

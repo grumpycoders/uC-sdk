@@ -3,8 +3,8 @@ TARGET_LIB = libFreeRTOS.a
 all: $(TARGET_LIB)
 
 include $(ROOTDIR)/common.mk
-include config.mk
 include $(ROOTDIR)/arch/config.mk
+include config.mk
 include $(ROOTDIR)/os/config.mk
 include $(ROOTDIR)/libc/config.mk
 
