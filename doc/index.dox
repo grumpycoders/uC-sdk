@@ -1,0 +1,38 @@
+/*!
+\mainpage
+
+<h1>Introduction</h1>
+uC-sdk is a very lightweight, embedded sdk to help working with microcontrollers.
+Its current architecture is comprised of:
+
+<h3>FreeRTOS</h3>
+This is basically a code drop of the FreeRTOS project (http://www.freertos.org/)
+It enables you to create very precise tasks, with all of the basic multithreading tools.
+
+<h3>Architectures support</h3>
+The arch directory contains the drivers and board-specific code to handle your hardware.
+
+<h3>Basic OS</h3>
+The os directory handles booting the CPU, setting up the environment, starting your
+software, and then provides a shutdown sequence.
+
+<h3>Minimal libc</h3>
+A super-minimal, yet useful libc is provided.
+
+<h3>IEEE-compatible libm</h3>
+In case you actually need to do some math, Sun's fdlibm is in the libm directory.
+
+<h3>Abstraction library</h3>
+The acorn directory contains various pieces of code to handle abstraction of hardware.
+
+<h1>Contents of this documentation</h1>
+
+Please consult the section \ref quickstart to get an overview on how to use this code,
+as well as the needed tools.
+
+For deeper understanding of the usage of the code, please read the section \ref API.
+
+If you are interested in adding support for a new board or CPU, the section \ref newboard is what you need.
+
+
+*/

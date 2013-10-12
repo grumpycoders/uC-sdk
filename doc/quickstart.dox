@@ -1,0 +1,29 @@
+/*! \page quickstart Quick Start
+\tableofcontents
+
+\section softwaresetup Software setup
+\subsection platforms Platforms
+uC-sdk has been designed to compile and be used from typical unix environments,
+meaning that Linux and MacOS are the main, officially supported platforms.
+However, since very minimal environment is actually used, there shouldn't be
+any reason for it to not work under Windows straight, or under an msys installation.
+\subsection components Components needed
+In order to use uC-sdk, you will need:
+<ol>
+<li>A working gcc for your host machine, with a minimal libc.
+<li>GNU make.
+<li>The gcc-arm-embedded compiler, available at https://launchpad.net/gcc-arm-embedded/
+and placed under your path.
+</ol>
+/subsection ide IDE
+Although not tested in a long while, Eclipse used to be able to be a nice environment
+for uC-sdk. Further research needs to be done in order to properly document the
+installation and setup procedure.
+
+\section yourproject Your project
+The skel directory contains a very minimalistic example of an application that uses
+uC-sdk. All you need to do at that point is place the uC-sdk directory inside such
+a project, and type "make".
+
+
+*/
