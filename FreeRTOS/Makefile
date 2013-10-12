@@ -10,10 +10,9 @@ include $(ROOTDIR)/libc/config.mk
 
 TARGET_SRCS = Source/croutine.c Source/list.c Source/queue.c Source/tasks.c
 
-ifeq ($(CPU),arm)
-ifeq ($(CPU_FLAVOR),lpc1768)
 TARGET_SRCS += Source/portable/MemMang/heap_3.c
-endif
+
+ifeq ($(CPU),arm)
 ifeq ($(CPU_FAMILY),CM3)
 ifeq ($(USE_MPU),true)
 TARGET_SRCS += Source/portable/GCC/ARM_CM3_MPU/port.c

@@ -28,6 +28,16 @@ ifeq ($(BOARD),mbed)
 TARGET_SRCS += arm/lpc17xx/mbed/BoardConsole.c arm/lpc17xx/mbed/BoardInit.c
 endif
 
+ifeq ($(CPU_FLAVOR),stm32f10)
+TARGET_SRCS += arm/stm32f10x/Core/CM3/DeviceSupport/ST/STM32F10x/system_stm32f10x.c
+TARGET_SRCS += $(addprefix arm/stm32f10x/Drivers/source/stm32f10x_, adc.c bkp.c can.c cec.c crc.c dac.c dbgmcu.c dma.c exti.c flash.c fsmc.c gpio.c i2c.c iwdg.c pwr.c rcc.c rtc.c sdio.c spi.c tim.c usart.c wwdg.c)
+TARGET_SRCS += arm/stm32f10x/Drivers/source/misc.c
+TARGET_SRCS += arm/stm32f10x/deinit-all.c
+endif
+
+ifeq ($(BOARD),inemo)
+TARGET_SRCS += arm/stm32f10x/inemo/BoardConsole.c arm/stm32f10x/inemo/BoardInit.c
+endif
 endif
 
 include $(ROOTDIR)/target-rules.mk

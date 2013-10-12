@@ -1,0 +1,272 @@
+/* Linker script for Cortex-M3
+ *
+ * Version:CodeSourcery Sourcery G++ Lite 2007q3-53
+ * BugURL:https://support.codesourcery.com/GNUToolchain/
+ *
+ *  Copyright 2007 CodeSourcery.
+ *
+ * The authors hereby grant permission to use, copy, modify, distribute,
+ * and license this software and its documentation for any purpose, provided
+ * that existing copyright notices are retained in all copies and that this
+ * notice is included verbatim in any distributions. No written agreement,
+ * license, or royalty fee is required for any of the authorized uses.
+ * Modifications to this software may be copyrighted by their authors
+ * and need not follow the licensing terms described here, provided that
+ * the new terms are clearly indicated on the first page of each file where
+ * they apply. */
+
+OUTPUT_FORMAT ("elf32-littlearm")
+SEARCH_DIR(.)
+GROUP(-lgcc)
+
+MEMORY
+{
+  rom (rx)  : ORIGIN = 0x00000000, LENGTH = 512K
+  ram (rwx) : ORIGIN = 0x20000000, LENGTH =  64K
+}
+
+/* These force the linker to search for particular symbols from
+ * the start of the link process and thus ensure the user's
+ * overrides are picked up
+ */
+EXTERN(__cs3_reset_cortex_m)
+EXTERN(__cs3_interrupt_vector_cortex_m)
+EXTERN(__cs3_interrupt_vector_cortex_m_mutable)
+EXTERN(__cs3_start_c main __cs3_stack __cs3_stack_size __cs3_heap_end)
+
+EXTERN(__som)
+EXTERN(crp)
+
+PROVIDE(__cs3_stack = __cs3_region_start_ram + __cs3_region_size_ram);
+PROVIDE(__cs3_stack_size = __cs3_region_start_ram + __cs3_region_size_ram - _end);
+PROVIDE(__cs3_heap_start = _end);
+PROVIDE(__cs3_heap_end = __cs3_region_start_ram + __cs3_region_size_ram);
+
+PROVIDE(__rom_data_len = __rom_data_end - __rom_data_begin);
+
+PROVIDE(__heap_start = __cs3_heap_start);
+PROVIDE(__heap_end = __cs3_heap_end);
+
+PROVIDE(__bss_ram_len = __bss_ram_end - __bss_ram_begin);
+
+SECTIONS
+{
+  .text :
+  {
+    . = ALIGN(32);
+    CREATE_OBJECT_SYMBOLS
+    __cs3_region_start_rom = .;
+    __privileged_code_start__ = . ;
+    
+    *(.cs3.region-head.rom)
+    __cs3_interrupt_vector = __cs3_interrupt_vector_cortex_m;
+    *(.cs3.interrupt_vector)
+    /* Make sure we pulled in an interrupt vector.  */
+    ASSERT (. != __cs3_interrupt_vector_cortex_m, "No interrupt vector");
+    *(.rom)
+    *(.rom.b)
+
+
+    *( .privileged_code )
+    *( privileged_functions )
+    
+    __privileged_code_end___len = . - __privileged_code_start__ - 1 ;
+    __privileged_code_end___len |= __privileged_code_end___len >> 1 ;
+    __privileged_code_end___len |= __privileged_code_end___len >> 2 ;
+    __privileged_code_end___len |= __privileged_code_end___len >> 4 ;
+    __privileged_code_end___len |= __privileged_code_end___len >> 8 ;
+    __privileged_code_end___len |= __privileged_code_end___len >> 16 ;
+    . = ALIGN( MAX( __privileged_code_end___len + 1, 32 ) ) ;
+
+    __privileged_code_end__ = .;
+    __privileged_functions_end__ = .;
+
+    __cs3_reset = __cs3_reset_cortex_m;
+    *(.cs3.reset)
+    /* Make sure we pulled in some reset code.  */
+    ASSERT (. != __cs3_reset, "No reset code");
+    
+    *(.handlers)
+    
+    *(.text .text.* .gnu.linkonce.t.*)
+    *(.plt)
+    *(.gnu.warning)
+    *(.glue_7t) *(.glue_7) *(.vfp11_veneer)
+
+    *(.rodata .rodata.* .gnu.linkonce.r.*)
+
+    *(.ARM.extab* .gnu.linkonce.armextab.*)
+    *(.gcc_except_table)
+    *(.eh_frame_hdr)
+    *(.eh_frame)
+
+    . = ALIGN(16);
+    KEEP(*(.init))
+
+    . = ALIGN(16);
+    __preinit_array_start = .;
+    KEEP (*(.preinit_array))
+    __preinit_array_end = .;
+
+    . = ALIGN(16);
+    __init_array_start = .;
+    KEEP (*(SORT(.init_array.*)))
+    KEEP (*(.init_array))
+    __init_array_end = .;
+
+    . = ALIGN(16);
+    KEEP (*crtbegin.o(.ctors))
+    KEEP (*(EXCLUDE_FILE (*crtend.o) .ctors))
+    KEEP (*(SORT(.ctors.*)))
+    KEEP (*crtend.o(.ctors))
+
+    . = ALIGN(16);
+    KEEP(*(.fini))
+
+    . = ALIGN(16);
+    __fini_array_start = .;
+    KEEP (*(.fini_array))
+    KEEP (*(SORT(.fini_array.*)))
+    __fini_array_end = .;
+
+    KEEP (*crtbegin.o(.dtors))
+    KEEP (*(EXCLUDE_FILE (*crtend.o) .dtors))
+    KEEP (*(SORT(.dtors.*)))
+    KEEP (*crtend.o(.dtors))
+
+    . = ALIGN(16);
+    __cs3_regions = .;
+    LONG (0)
+    LONG (__cs3_region_init_ram)
+    LONG (__cs3_region_start_ram)
+    LONG (__cs3_region_init_size_ram)
+    LONG (__cs3_region_zero_size_ram)
+
+    . = ALIGN(16);
+    *(.romfs.data)
+  }
+
+  /* .ARM.exidx is sorted, so has to go in its own output section.  */
+  __exidx_start = .;
+  .ARM.exidx :
+  {
+    *(.ARM.exidx* .gnu.linkonce.armexidx.*)
+  } >rom
+  __exidx_end = .;
+  .text.align :
+  {
+    . = ALIGN(8);
+    _etext = .;
+  } >rom
+  __cs3_region_size_rom = LENGTH(rom);
+  __cs3_region_num = 1;
+  
+  .data_begin :
+  {
+    . = ALIGN(32);
+    __rom_data_begin = .;
+  } > rom
+
+  .data :
+  {
+    __cs3_region_start_ram = .;
+    __ram_data_begin = .;
+    __privileged_data_start__ = .;
+    __cs3_interrupt_vector_mutable = __cs3_interrupt_vector_cortex_m_mutable;
+    *(.cs3.interrupt_vector_mutable)
+    /* Make sure we pulled in an interrupt vector.  */
+    ASSERT (. != __cs3_interrupt_vector_cortex_m_mutable, "No interrupt vector mutable table");
+    *( privileged_data )
+
+    __privileged_data_end___len = . - __privileged_data_start__ - 1 ;
+    __privileged_data_end___len |= __privileged_data_end___len >> 1 ;
+    __privileged_data_end___len |= __privileged_data_end___len >> 2 ;
+    __privileged_data_end___len |= __privileged_data_end___len >> 4 ;
+    __privileged_data_end___len |= __privileged_data_end___len >> 8 ;
+    __privileged_data_end___len |= __privileged_data_end___len >> 16 ;
+    . = ALIGN( MAX( __privileged_data_end___len + 1, 32 ) ) ;
+
+    __privileged_data_end__ = .;
+    *(.cs3.region-head.ram)
+    KEEP(*(.jcr))
+    *(.got.plt) *(.got)
+    *(.shdata)
+    *(.data .data.* .gnu.linkonce.d.*)
+    *(.ram)
+    . = ALIGN (32);
+    _edata = .;
+  } >ram AT>rom
+  .data_end :
+  {
+    . = ALIGN(32);
+    __rom_data_end = .;
+  } > rom
+
+  .bss :
+  {
+    . = ALIGN(32);
+    __bss_ram_begin = .;
+    *(.shbss)
+    *(.bss .bss.* .gnu.linkonce.b.*)
+    *(COMMON)
+    *(.ram.b)
+    . = ALIGN(32);
+    __bss_ram_end = .;
+    _end = .;
+    __end = .;
+  } >ram
+
+  .heap (NOLOAD) :
+  {
+    *(.heap)
+  } >ram
+  .stack (__cs3_stack - __cs3_stack_size) (NOLOAD):
+  {
+    *(.stack)
+    _estack = .;
+    PROVIDE(estack = .);
+  } >ram
+
+  __cs3_region_init_ram = LOADADDR (.data);
+  __cs3_region_init_size_ram = _edata - __cs3_region_start_ram;
+  __cs3_region_zero_size_ram = _end - _edata;
+  __cs3_region_size_ram = LENGTH(ram);
+  __cs3_region_num = 1;
+  
+  __FLASH_segment_start__ = ORIGIN(rom);
+  __FLASH_segment_end__ = __FLASH_segment_start__ + LENGTH(rom);
+  __SRAM_segment_start__ = ORIGIN(ram);
+  __SRAM_segment_end__ = __SRAM_segment_start__ + LENGTH(ram);
+
+  .stab 0 (NOLOAD) : { *(.stab) }
+  .stabstr 0 (NOLOAD) : { *(.stabstr) }
+  /* DWARF debug sections.
+   * Symbols in the DWARF debugging sections are relative to the beginning
+   * of the section so we begin them at 0.  */
+  /* DWARF 1 */
+  .debug          0 : { *(.debug) }
+  .line           0 : { *(.line) }
+  /* GNU DWARF 1 extensions */
+  .debug_srcinfo  0 : { *(.debug_srcinfo) }
+  .debug_sfnames  0 : { *(.debug_sfnames) }
+  /* DWARF 1.1 and DWARF 2 */
+  .debug_aranges  0 : { *(.debug_aranges) }
+  .debug_pubnames 0 : { *(.debug_pubnames) }
+  /* DWARF 2 */
+  .debug_info     0 : { *(.debug_info .gnu.linkonce.wi.*) }
+  .debug_abbrev   0 : { *(.debug_abbrev) }
+  .debug_line     0 : { *(.debug_line) }
+  .debug_frame    0 : { *(.debug_frame) }
+  .debug_str      0 : { *(.debug_str) }
+  .debug_loc      0 : { *(.debug_loc) }
+  .debug_macinfo  0 : { *(.debug_macinfo) }
+  /* SGI/MIPS DWARF 2 extensions */
+  .debug_weaknames 0 : { *(.debug_weaknames) }
+  .debug_funcnames 0 : { *(.debug_funcnames) }
+  .debug_typenames 0 : { *(.debug_typenames) }
+  .debug_varnames  0 : { *(.debug_varnames) }
+
+  .note.gnu.arm.ident 0 : { KEEP (*(.note.gnu.arm.ident)) }
+  .ARM.attributes 0 : { KEEP (*(.ARM.attributes)) }
+  /DISCARD/ : { *(.note.GNU-stack) }
+}

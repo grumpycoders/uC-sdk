@@ -3,6 +3,7 @@
 #include <task.h>
 #include <queue.h>
 #include <osdebug.h>
+#include <core_cm3.h>
 
 void BoardExceptionHandler(int code);
 

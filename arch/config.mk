@@ -7,6 +7,13 @@ LDSCRIPT = $(ROOTDIR)/arch/arm/lpc17xx/ldscript
 TARGET_CPPFLAGS += -DTARGET_LITTLE_ENDIAN
 endif
 
+ifeq ($(CPU_FLAVOR),stm32f10)
+TARGET_INCLUDES += $(ROOTDIR)/arch/arm/stm32f10x/Core/CM3/DeviceSupport/ST/STM32F10x $(ROOTDIR)/arch/arm/stm32f10x/Drivers/include
+LDSCRIPT = $(ROOTDIR)/arch/arm/stm32f10x/ldscript
+TARGET_CPPFLAGS += -DTARGET_LITTLE_ENDIAN
+endif
+
+
 ifeq ($(CPU_FAMILY),CM3)
 TARGET_INCLUDES += $(ROOTDIR)/arch/arm/src/CM3/CoreSupport
 SPECS = $(ROOTDIR)/arch/arm/src/specs
@@ -14,6 +21,10 @@ endif
 
 ifeq ($(BOARD),mbed)
 TARGET_INCLUDES += $(ROOTDIR)/arch/arm/lpc17xx/mbed
+endif
+
+ifeq ($(BOARD),inemo)
+TARGET_INCLUDES += $(ROOTDIR)/arch/arm/stm32f10x/inemo
 endif
 
 endif
