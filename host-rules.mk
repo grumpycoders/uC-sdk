@@ -1,17 +1,17 @@
 %.o: %.c
-	$(E) "[TC]     Compiling $<"
+	$(E) "[C]      Compiling $<"
 	$(Q)$(HOST_CC) -Wall -Werror $(addprefix -I, $(HOST_INCLUDES)) $(HOST_CFLAGS) $(HOST_CPPFLAGS) -g -c -o $@ $<
 
 %.o: %.cc
-	$(E) "[TCXX]   Compiling $<"
+	$(E) "[CXX]    Compiling $<"
 	$(Q)$(HOST_CXX) -Wall -Werror $(addprefix -I, $(HOST_INCLUDES)) $(HOST_CFLAGS) $(HOST_CPPFLAGS) -g -c -o $@ $<
 
 %.o: %.cpp
-	$(E) "[TCXX]   Compiling $<"
+	$(E) "[CXX]    Compiling $<"
 	$(Q)$(HOST_CXX) -Wall -Werror $(addprefix -I, $(HOST_INCLUDES)) $(HOST_CFLAGS) $(HOST_CPPFLAGS) -g -c -o $@ $<
 
 %.o: %.s
-	$(E) "[TS]     Compiling $<"
+	$(E) "[S]      Compiling $<"
 	$(Q)$(HOST_AS) $(addprefix -I, $(HOST_INCLUDES)) $(HOST_ASFLAGS) $(HOST_CPPFLAGS) -g -c -o $@ $<
 
 %.dep: %.c
