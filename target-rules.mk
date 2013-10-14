@@ -46,7 +46,7 @@ $(TARGET_ELF): $(TARGET_OBJS) $(LIBDEPS) $(LDSCRIPT) $(SPECS)
 
 $(TARGET_MAP): $(TARGET_ELF)
 
-$(TARGET_BIN): $(TARGET_ELF) tools
+$(TARGET_BIN): $(TARGET_ELF)
 	$(E) "[TB]     Creating $@"
 	$(Q)$(TARGET_OBJCOPY) $< -O binary $@
 ifeq ($(CPU_FAMILY),CM3)

@@ -1,4 +1,4 @@
-NODEMO = true
+export NODEMO = true
 ROOTDIR = $(CURDIR)/uC-sdk
 
 TARGET = test.bin
