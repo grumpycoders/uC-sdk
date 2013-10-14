@@ -31,6 +31,8 @@ int main(int argc, char ** argv) {
 
     v = -checksum;
 
+    fseek(f, 0x1c, SEEK_SET);
+
     fputc(v & 0xff, f); v >>= 8;
     fputc(v & 0xff, f); v >>= 8;
     fputc(v & 0xff, f); v >>= 8;

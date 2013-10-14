@@ -46,9 +46,12 @@ $(TARGET_ELF): $(TARGET_OBJS) $(LIBDEPS) $(LDSCRIPT) $(SPECS)
 
 $(TARGET_MAP): $(TARGET_ELF)
 
-$(TARGET_BIN): $(TARGET_ELF)
+$(TARGET_BIN): $(TARGET_ELF) tools
 	$(E) "[TB]     Creating $@"
 	$(Q)$(TARGET_OBJCOPY) $< -O binary $@
+ifeq ($(CPU_FAMILY),CM3)
+	$(Q)$(ROOTDIR)/tools/cm3-checksum/cm3-checksum $@
+endif
 
 $(TARGET_LIB): $(TARGET_OBJS)
 	$(E) "[TLIB]   Creating $@"
