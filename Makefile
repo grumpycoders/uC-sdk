@@ -69,7 +69,7 @@ tools:
 
 test-romfs.o:
 	$(E) "[ROMFS]  Building test romfs"
-	$(Q) tools/mkromfs -d test-romfs test-romfs.bin
+	$(Q) tools/romfs/mkromfs -d test-romfs test-romfs.bin
 	$(Q) $(TARGET_OBJCOPY_BIN) --prefix-sections '.romfs' test-romfs.bin test-romfs.o
 	$(Q)$(MAKE) $(MAKE_OPTS) -C tools
 
