@@ -14,6 +14,7 @@ all: uC-sdk $(TARGET)
 
 clean: clean-generic
 	$(Q)rm -f romfs.bin
+	$(Q)$(MAKE) $(MAKE_OPTS) -C uC-sdk clean
 
 .PHONY: uC-sdk
 
@@ -30,7 +31,7 @@ uC-sdk:
 
 romfs.o:
 	$(E) "[ROMFS]  Building romfs"
-	$(Q)uC-sdk/tools/mkromfs -d romfs romfs.bin
+	$(Q)uC-sdk/tools/romfs/mkromfs -d romfs romfs.bin
 	$(Q)$(TARGET_OBJCOPY_BIN) --prefix-sections '.romfs' romfs.bin romfs.o
 
 deps: ldeps
