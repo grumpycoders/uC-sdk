@@ -23,9 +23,11 @@ void BoardConsolePrintf(const char * fmt, ...) {
     va_end(ap);
 }
 
+static void xprintfCallback(const char * str, int strsize, void * opaque0) {
+    while (strsize--)
+        BoardConsolePutc(*str++);
+}
+
 void BoardConsoleVPrintf(const char * fmt, va_list ap) {
-    char * str = NULL;
-    vasprintf(&str, fmt, ap);
-    _DBG(str);
-    free(str);
+    vxprintf(xprintfCallback, NULL, fmt, ap);
 }
