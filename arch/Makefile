@@ -20,7 +20,7 @@ endif
 ifeq ($(CPU_FLAVOR),lpc1768)
 TARGET_SRCS += arm/lpc17xx/Core/CM3/DeviceSupport/NXP/LPC17xx/system_LPC17xx.c
 TARGET_SRCS += $(addprefix arm/lpc17xx/Drivers/source/lpc17xx_, spi.c rit.c exti.c wdt.c uart.c dac.c rtc.c i2s.c pwm.c mcpwm.c pinsel.c nvic.c emac.c systick.c ssp.c can.c gpio.c libcfg_default.c i2c.c timer.c gpdma.c clkpwr.c qei.c adc.c)
-TARGET_SRCS += arm/lpc17xx/deinit-all.c arm/lpc17xx/Drivers/source/debug_frmwrk.c
+TARGET_SRCS += arm/lpc17xx/init.c arm/lpc17xx/Drivers/source/debug_frmwrk.c
 TARGET_SRCS += arm/lpc17xx/registry.c
 endif
 
@@ -32,7 +32,8 @@ ifeq ($(CPU_FLAVOR),stm32f10)
 TARGET_SRCS += arm/stm32f10x/Core/CM3/DeviceSupport/ST/STM32F10x/system_stm32f10x.c
 TARGET_SRCS += $(addprefix arm/stm32f10x/Drivers/source/stm32f10x_, adc.c bkp.c can.c cec.c crc.c dac.c dbgmcu.c dma.c exti.c flash.c fsmc.c gpio.c i2c.c iwdg.c pwr.c rcc.c rtc.c sdio.c spi.c tim.c usart.c wwdg.c)
 TARGET_SRCS += arm/stm32f10x/Drivers/source/misc.c
-TARGET_SRCS += arm/stm32f10x/deinit-all.c
+TARGET_SRCS += arm/stm32f10x/init.c
+TARGET_SRCS += arm/stm32f10x/registry.c
 endif
 
 ifeq ($(BOARD),inemo)

@@ -2,6 +2,9 @@
 void BoardEarlyInit() {
 }
 
+void BoardInit() {
+}
+
 void BoardLateInit() {
 }
 

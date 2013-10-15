@@ -6,10 +6,15 @@
 void __libc_init_array();
 void __libc_fini_array();
 int main(int, char **, char **);
+
 void BoardEarlyInit();
+void BoardInit();
 void BoardLateInit();
+
 void BoardExceptionHandler(int);
 void BoardShutdown();
+
+void cpu_init();
 
 void _exit(int return_code) __attribute__((noreturn));
 void _exit(int return_code) {
@@ -25,6 +30,8 @@ void _start() {
     BoardConsolePuts("uC-sdk - booting.");
     __sinit(_impure_ptr);
     __libc_init_array();
+    BoardInit();
+    cpu_init();
     BoardLateInit();
     atexit(__libc_fini_array);
     exit(main(0, NULL, NULL));

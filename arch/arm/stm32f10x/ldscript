@@ -21,7 +21,7 @@ GROUP(-lgcc)
 
 MEMORY
 {
-  rom (rx)  : ORIGIN = 0x00000000, LENGTH = 512K
+  rom (rx)  : ORIGIN = 0x08000000, LENGTH = 512K
   ram (rwx) : ORIGIN = 0x20000000, LENGTH =  64K
 }
 
@@ -35,7 +35,7 @@ EXTERN(__cs3_interrupt_vector_cortex_m_mutable)
 EXTERN(__cs3_start_c main __cs3_stack __cs3_stack_size __cs3_heap_end)
 
 EXTERN(__som)
-EXTERN(crp)
+EXTERN(__bootptr)
 
 PROVIDE(__cs3_stack = __cs3_region_start_ram + __cs3_region_size_ram);
 PROVIDE(__cs3_stack_size = __cs3_region_start_ram + __cs3_region_size_ram - _end);
@@ -48,6 +48,10 @@ PROVIDE(__heap_start = __cs3_heap_start);
 PROVIDE(__heap_end = __cs3_heap_end);
 
 PROVIDE(__bss_ram_len = __bss_ram_end - __bss_ram_begin);
+
+PROVIDE(__registry_space_1_len = __registry_space_1_end - __registry_space_1);
+PROVIDE(__registry_space_2_len = __registry_space_2_end - __registry_space_2);
+PROVIDE(__registry_space_3_len = __registry_space_3_end - __registry_space_3);
 
 SECTIONS
 {
@@ -65,7 +69,23 @@ SECTIONS
     ASSERT (. != __cs3_interrupt_vector_cortex_m, "No interrupt vector");
     *(.rom)
     *(.rom.b)
+    __registry_space_1 = .;
+    *(.registry_space_1)
+    . = 0x1e0;
+    __registry_space_1_end = .;
+    *(.bootptr)
+    *(.hwregistry)
+    __registry_space_2 = .;
+    *(.registry_space_2)
+    . = 0x43c;
+    __registry_space_2_end = .;
+    *(.som)
 
+    __registry_space_3 = .;
+    *(.registry)
+    *(.registry_space_3)
+    . = 0xc40;
+    __registry_space_3_end = .;
 
     *( .privileged_code )
     *( privileged_functions )

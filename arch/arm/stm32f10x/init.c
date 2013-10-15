@@ -14,6 +14,7 @@
 #include "stm32f10x_tim.h"
 #include "stm32f10x_usart.h"
 #include "stm32f10x_wwdg.h"
+#include "misc.h"
 
 void cpu_deinit_all() {
     //ADC_DeInit(ADC_TypeDef* ADCx);
@@ -33,3 +34,12 @@ void cpu_deinit_all() {
     //USART_DeInit(USART_TypeDef* USARTx);
     WWDG_DeInit();
 }
+
+extern uintptr_t __cs3_interrupt_vector_mutable[];
+
+void cpu_init() {
+    NVIC_SetVectorTable(NVIC_VectTab_RAM, ((uintptr_t) __cs3_interrupt_vector_mutable) - NVIC_VectTab_RAM);
+}
+
+__attribute__((section(".bootptr"))) uint32_t __bootptr = 0xf1e0f85f;
+__attribute__((section(".som"))) uint32_t __som = 0xffffffff;

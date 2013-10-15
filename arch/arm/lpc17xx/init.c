@@ -43,3 +43,12 @@ void cpu_deinit_all() {
 //**    TIM_DeInit(LPC_TIM2);
 //**    TIM_DeInit(LPC_TIM3);
 }
+
+extern uintptr_t __cs3_interrupt_vector_mutable[];
+
+void cpu_init() {
+    NVIC_SetVTOR((uintptr_t) __cs3_interrupt_vector_mutable);
+}
+
+__attribute__((section(".crp"),weak)) uint32_t crp = 0xffffffff;
+__attribute__((section(".som"))) uint32_t __som = 0xffffffff;

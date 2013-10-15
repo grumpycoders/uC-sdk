@@ -1,5 +1,4 @@
 #include "lpc17xx_gpio.h"
-#include "lpc17xx_nvic.h"
 #include "lpc17xx_clkpwr.h"
 
 #define LED1_wire 18
@@ -36,7 +35,9 @@ extern uintptr_t __cs3_interrupt_vector_mutable[];
 void BoardEarlyInit() {
     setupLEDs();
     litLED(1, 1);
-    NVIC_SetVTOR((uintptr_t) __cs3_interrupt_vector_mutable);
+}
+
+void BoardInit() {
     litLED(2, 1);
 }
 
