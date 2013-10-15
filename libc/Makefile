@@ -26,7 +26,7 @@ src/qsort.c \
 \
 src/reent.c \
 \
-src/exit.c \
+src/initfini.c \
 \
 src/malloc.c \
 \

@@ -1,4 +1,5 @@
 #include "LPC17xx.h"
+#include "system_LPC17xx.h"
 #include "lpc17xx_adc.h"
 #include "lpc17xx_can.h"
 #include "lpc17xx_emac.h"
@@ -44,10 +45,18 @@ void cpu_deinit_all() {
 //**    TIM_DeInit(LPC_TIM3);
 }
 
+void cpu_early_init() {
+    cpu_deinit_all();
+    SystemInit();
+}
+
 extern uintptr_t __cs3_interrupt_vector_mutable[];
 
 void cpu_init() {
     NVIC_SetVTOR((uintptr_t) __cs3_interrupt_vector_mutable);
+}
+
+void cpu_late_init() {
 }
 
 __attribute__((section(".crp"),weak)) uint32_t crp = 0xffffffff;

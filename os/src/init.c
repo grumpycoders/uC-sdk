@@ -1,10 +1,7 @@
 #include <stdlib.h>
-#include <stdio.h>
 #include <string.h>
 #include <BoardConsole.h>
 
-void __libc_init_array();
-void __libc_fini_array();
 int main(int, char **, char **);
 
 void BoardEarlyInit();
@@ -14,7 +11,11 @@ void BoardLateInit();
 void BoardExceptionHandler(int);
 void BoardShutdown();
 
+void cpu_early_init();
 void cpu_init();
+void cpu_late_init();
+
+void libc_init();
 
 void _exit(int return_code) __attribute__((noreturn));
 void _exit(int return_code) {
@@ -26,14 +27,19 @@ void _exit(int return_code) {
 
 void _start() {
     BoardEarlyInit();
+    cpu_early_init();
+
     BoardConsoleInit();
     BoardConsolePuts("uC-sdk - booting.");
-    __sinit(_impure_ptr);
-    __libc_init_array();
+
+    libc_init();
+
     BoardInit();
     cpu_init();
+
     BoardLateInit();
-    atexit(__libc_fini_array);
+    cpu_late_init();
+
     exit(main(0, NULL, NULL));
 }
 

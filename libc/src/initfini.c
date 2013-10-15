@@ -1,5 +1,6 @@
 #include <stddef.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 extern void (*__preinit_array_start []) (void) __attribute__((weak));
 extern void (*__preinit_array_end []) (void) __attribute__((weak));
@@ -13,28 +14,28 @@ void _fini();
 void _exit(int return_code) __attribute__((noreturn));
 
 
-void __libc_init_array() {
+static void __libc_init_array() {
     size_t count, i;
     
     count = __preinit_array_end - __preinit_array_start;
     for (i = 0; i < count; i++)
         __preinit_array_start[i]();
     
-    _init();
+//    _init();
 
     count = __init_array_end - __init_array_start;
     for (i = 0; i < count; i++)
         __init_array_start[i]();
 }
 
-void __libc_fini_array() {
+static void __libc_fini_array() {
     size_t count, i;
     
     count = __preinit_array_end - __preinit_array_start;
     for (i = count - 1; i >= 0; i--)
         __fini_array_start[i]();
     
-    _fini();
+//    _fini();
 }
 
 #define MAX_ATEXIT 32
@@ -61,5 +62,11 @@ void exit(int return_code) {
         atexit_funcs[i]();
     }
     
+    __libc_fini_array();
     _exit(return_code);
+}
+
+void libc_init() {
+    __sinit(_impure_ptr);
+    __libc_init_array();
 }

@@ -37,8 +37,16 @@ void cpu_deinit_all() {
 
 extern uintptr_t __cs3_interrupt_vector_mutable[];
 
+void cpu_early_init() {
+    cpu_deinit_all();
+    SystemInit();
+}
+
 void cpu_init() {
     NVIC_SetVectorTable(NVIC_VectTab_RAM, ((uintptr_t) __cs3_interrupt_vector_mutable) - NVIC_VectTab_RAM);
+}
+
+void cpu_late_init() {
 }
 
 __attribute__((section(".bootptr"))) uint32_t __bootptr = 0xf1e0f85f;
