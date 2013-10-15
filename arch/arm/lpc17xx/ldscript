@@ -84,7 +84,6 @@ SECTIONS
     . = 0x43c;
     __registry_space_2_end = .;
     *(.som)
-    *(.backdoor)
 
     __registry_space_3 = .;
     *(.registry)
