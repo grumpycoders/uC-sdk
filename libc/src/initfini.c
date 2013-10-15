@@ -21,7 +21,7 @@ static void __libc_init_array() {
     for (i = 0; i < count; i++)
         __preinit_array_start[i]();
     
-//    _init();
+    _init();
 
     count = __init_array_end - __init_array_start;
     for (i = 0; i < count; i++)
@@ -35,7 +35,7 @@ static void __libc_fini_array() {
     for (i = count - 1; i >= 0; i--)
         __fini_array_start[i]();
     
-//    _fini();
+    _fini();
 }
 
 #define MAX_ATEXIT 32
