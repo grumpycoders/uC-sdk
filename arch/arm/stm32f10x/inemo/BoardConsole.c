@@ -68,18 +68,3 @@ static void xprintfCallback(const char * str, int strsize, void * opaque0) {
 void BoardConsoleVPrintf(const char * fmt, va_list ap) {
     vxprintf(xprintfCallback, NULL, fmt, ap);
 }
-
-/*
-void BoardConsolePrintf(const char * fmt, ...) {
-    va_list ap;
-    va_start(ap, fmt);
-    BoardConsoleVPrintf(fmt, ap);
-    va_end(ap);
-}
-
-void BoardConsoleVPrintf(const char * fmt, va_list ap) {
-	char str[512];
-	vsprintf(str, fmt, ap);
-	BoardConsolePuts(str);
-}
-*/
