@@ -34,7 +34,8 @@ void BoardConsoleInit() {
     USART_ClockStructInit(&clockdef);
     USART_ClockInit(USART1, &clockdef);
 
-    USART_Cmd(USART1, ENABLE);}
+    USART_Cmd(USART1, ENABLE);
+}
 
 void BoardConsolePuts(const char * str) {
     while(*str)
