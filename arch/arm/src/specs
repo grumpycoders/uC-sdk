@@ -8,7 +8,7 @@
 
 
 *asm_options:
-%{-target-help:%:print-asm-header()} %a %Y %{c:%W{o*}%{!o*:-o %w%b%O}}%{!c:-o %d%w%u%O}
+%{-target-help:%:print-asm-header()} %{v} %{w:-W} %{I*} %a %Y %{c:%W{o*}%{!o*:-o %w%b%O}}%{!c:-o %d%w%u%O}
 
 *invoke_as:
 %{!fwpa:   %{fcompare-debug=*|fdump-final-insns=*:%:compare-debug-dump-opt()}   %{!S:-o %|.s |
@@ -72,10 +72,10 @@ cc1 -E %{traditional|traditional-cpp:-traditional-cpp}
 1
 
 *version:
-4.7.2
+4.7.4
 
 *multilib:
-. !marm !mthumb !mfloat-abi=hard;arm marm !mthumb !mfloat-abi=hard;thumb !marm mthumb !mfloat-abi=hard;fpu !marm !mthumb mfloat-abi=hard;arm/fpu marm !mthumb mfloat-abi=hard;
+. !mthumb !marm !march=armv6s-m !march=armv7-m !march=armv7e-m !march=armv7 !mfloat-abi=softfp !mfloat-abi=hard !mfpu=fpv4-sp-d16 !mfpu=vfpv3-d16;thumb mthumb !marm !march=armv6s-m !march=armv7-m !march=armv7e-m !march=armv7 !mfloat-abi=softfp !mfloat-abi=hard !mfpu=fpv4-sp-d16 !mfpu=vfpv3-d16;arm !mthumb marm !march=armv6s-m !march=armv7-m !march=armv7e-m !march=armv7 !mfloat-abi=softfp !mfloat-abi=hard !mfpu=fpv4-sp-d16 !mfpu=vfpv3-d16;fpu !mthumb !marm !march=armv6s-m !march=armv7-m !march=armv7e-m !march=armv7 !mfloat-abi=softfp mfloat-abi=hard !mfpu=fpv4-sp-d16 !mfpu=vfpv3-d16;armv6-m mthumb !marm march=armv6s-m !march=armv7-m !march=armv7e-m !march=armv7 !mfloat-abi=softfp !mfloat-abi=hard !mfpu=fpv4-sp-d16 !mfpu=vfpv3-d16;armv7-m mthumb !marm !march=armv6s-m march=armv7-m !march=armv7e-m !march=armv7 !mfloat-abi=softfp !mfloat-abi=hard !mfpu=fpv4-sp-d16 !mfpu=vfpv3-d16;armv7e-m mthumb !marm !march=armv6s-m !march=armv7-m march=armv7e-m !march=armv7 !mfloat-abi=softfp !mfloat-abi=hard !mfpu=fpv4-sp-d16 !mfpu=vfpv3-d16;armv7-ar/thumb mthumb !marm !march=armv6s-m !march=armv7-m !march=armv7e-m march=armv7 !mfloat-abi=softfp !mfloat-abi=hard !mfpu=fpv4-sp-d16 !mfpu=vfpv3-d16;armv7e-m/softfp mthumb !marm !march=armv6s-m !march=armv7-m march=armv7e-m !march=armv7 mfloat-abi=softfp !mfloat-abi=hard mfpu=fpv4-sp-d16 !mfpu=vfpv3-d16;armv7e-m/fpu mthumb !marm !march=armv6s-m !march=armv7-m march=armv7e-m !march=armv7 !mfloat-abi=softfp mfloat-abi=hard mfpu=fpv4-sp-d16 !mfpu=vfpv3-d16;armv7-ar/thumb/softfp mthumb !marm !march=armv6s-m !march=armv7-m !march=armv7e-m march=armv7 mfloat-abi=softfp !mfloat-abi=hard !mfpu=fpv4-sp-d16 mfpu=vfpv3-d16;armv7-ar/thumb/fpu mthumb !marm !march=armv6s-m !march=armv7-m !march=armv7e-m march=armv7 !mfloat-abi=softfp mfloat-abi=hard !mfpu=fpv4-sp-d16 mfpu=vfpv3-d16;
 
 *multilib_defaults:
 marm mlittle-endian mfloat-abi=soft mno-thumb-interwork fno-leading-underscore
@@ -84,13 +84,16 @@ marm mlittle-endian mfloat-abi=soft mno-thumb-interwork fno-leading-underscore
 
 
 *multilib_matches:
-marm marm;mthumb mthumb;mfloat-abi=hard mfloat-abi=hard;
+mcpu=cortex-m0 march=armv6s-m;mcpu=cortex-m0plus march=armv6s-m;mcpu=cortex-m1 march=armv6s-m;march=armv6-m march=armv6s-m;mcpu=cortex-m3 march=armv7-m;mcpu=cortex-m4 march=armv7e-m;march=armv7-r march=armv7;march=armv7-a march=armv7;mcpu=cortex-r4 march=armv7;mcpu=cortex-r4f march=armv7;mcpu=cortex-r5 march=armv7;mcpu=cortex-r7 march=armv7;mcpu=cortex-a5 march=armv7;mcpu=cortex-a7 march=armv7;mcpu=cortex-a8 march=armv7;mcpu=cortex-a9 march=armv7;mcpu=cortex-a15 march=armv7;mfpu=vfpv3 mfpu=vfpv3-d16;mfpu=vfpv3-fp16 mfpu=vfpv3-d16;mfpu=vfpv3-d16-fp16 mfpu=vfpv3-d16;mfpu=vfpv3xd mfpu=vfpv3-d16;mfpu=vfpv3xd-fp16 mfpu=vfpv3-d16;mfpu=vfpv4 mfpu=vfpv3-d16;mfpu=vfpv4-d16 mfpu=vfpv3-d16;mfpu=neon mfpu=vfpv3-d16;mfpu=neon-fp16 mfpu=vfpv3-d16;mfpu=neon-vfpv4 mfpu=vfpv3-d16;mthumb mthumb;marm marm;march=armv6s-m march=armv6s-m;march=armv7-m march=armv7-m;march=armv7e-m march=armv7e-m;march=armv7 march=armv7;mfloat-abi=softfp mfloat-abi=softfp;mfloat-abi=hard mfloat-abi=hard;mfpu=fpv4-sp-d16 mfpu=fpv4-sp-d16;mfpu=vfpv3-d16 mfpu=vfpv3-d16;
 
 *multilib_exclusions:
 
 
 *multilib_options:
-marm/mthumb mfloat-abi=hard
+mthumb/marm march=armv6s-m/march=armv7-m/march=armv7e-m/march=armv7 mfloat-abi=softfp/mfloat-abi=hard mfpu=fpv4-sp-d16/mfpu=vfpv3-d16
+
+*multilib_reuse:
+armv7-ar/thumb !mthumb marm !march=armv6s-m !march=armv7-m !march=armv7e-m march=armv7 !mfloat-abi=softfp !mfloat-abi=hard !mfpu=fpv4-sp-d16 !mfpu=vfpv3-d16;armv7-ar/thumb/softfp !mthumb marm !march=armv6s-m !march=armv7-m !march=armv7e-m march=armv7 mfloat-abi=softfp !mfloat-abi=hard !mfpu=fpv4-sp-d16 mfpu=vfpv3-d16;armv7-ar/thumb/fpu !mthumb marm !march=armv6s-m !march=armv7-m !march=armv7e-m march=armv7 !mfloat-abi=softfp mfloat-abi=hard !mfpu=fpv4-sp-d16 mfpu=vfpv3-d16;
 
 *linker:
 collect2
