@@ -21,6 +21,7 @@
 #include <netif/lpc17xx-if.h>
 #include <webserver/httpd.h>
 #include <echo/echo.h>
+#include <lwip/dhcp.h>
 
 #define LED1_wire 18
 #define LED2_wire 20
@@ -88,19 +89,34 @@ static struct netif board_netif;
 static portTickType ts_etharp, ts_tcp, ts_ipreass;
 static xSemaphoreHandle lwip_sem;
 
+#define USE_DHCP
+
 static void net_init() {
     struct ip_addr gw_ip, netmask;
+#ifdef USE_DHCP
+    IP4_ADDR(&board_ip, 0, 0, 0, 0);
+    IP4_ADDR(&gw_ip, 0, 0, 0, 0);
+    IP4_ADDR(&netmask, 0, 0, 0, 0);
+#else
     inet_aton("192.168.1.2", &board_ip.addr);
     inet_aton("192.168.1.1", &gw_ip.addr);
     inet_aton("255.255.255.0", &netmask.addr);
+#endif
     lwip_init();
     vSemaphoreCreateBinary(lwip_sem);
+    
     if (netif_add(&board_netif, &board_ip, &netmask, &gw_ip, NULL, lpc17xx_if_init, ethernet_input) == NULL) {
         fprintf(stderr, "net_init: netif_add(lpc17xx_if_init) failed.\r\n");
         return;
     }
     netif_set_default(&board_netif);
+
+#ifdef USE_DHCP
+    dhcp_start(&board_netif);
+#else
     netif_set_up(&board_netif);
+#endif
+
     ts_etharp = ts_tcp = ts_ipreass = 0;
 }
 
@@ -112,7 +128,7 @@ uint32_t sys_now() { return xTaskGetTickCount(); }
 
 static void lwip_poll(struct netif * netif) {
     portTickType now = xTaskGetTickCount();
- 
+
     lpc17xx_if_check_input(netif);
     if (timestamp_expired(ts_etharp, now, ARP_TMR_INTERVAL / portTICK_RATE_MS)) {
         etharp_tmr();
@@ -134,6 +150,27 @@ static void lwip_poll(struct netif * netif) {
 
 static void lwip_task(void * p) {
     net_init();
+#ifdef USE_DHCP
+    uint32_t time = 0;
+    printf("Starting DHCP query\n");
+    while (board_netif.ip_addr.addr == 0) {
+        if (time >= DHCP_COARSE_TIMER_SECS * 1000) {
+            dhcp_coarse_tmr();
+            xSemaphoreTake(lwip_sem, DHCP_COARSE_TIMER_SECS * 1000 / portTICK_RATE_MS);
+        } else {
+            dhcp_fine_tmr();
+            xSemaphoreTake(lwip_sem, DHCP_FINE_TIMER_MSECS / portTICK_RATE_MS);
+            time += DHCP_FINE_TIMER_MSECS;
+        }
+        lwip_poll(&board_netif);
+    }
+
+    printf("DHCP query complete; address = %i.%i.%i.%i\n",
+        (board_netif.ip_addr.addr >>  0) & 0xff,
+        (board_netif.ip_addr.addr >>  8) & 0xff,
+        (board_netif.ip_addr.addr >> 16) & 0xff,
+        (board_netif.ip_addr.addr >> 24) & 0xff);
+#endif
     httpd_init(_binary_test_romfs_bin_start);
     echo_init();
     while(1) {

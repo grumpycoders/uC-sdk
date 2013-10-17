@@ -17,7 +17,7 @@
 #define IFNAME0 'e'
 #define IFNAME1 'x'
 
-__attribute__((section(".hwregistry"))) uint8_t mac_address[6] = { 0x10, 0x11, 0x12, 0x13, 0x14, 0x15 };
+extern uint8_t mac_address[6];
 
 /* Forward declarations. */
 static void  lpc17xx_if_input(struct netif *netif);
