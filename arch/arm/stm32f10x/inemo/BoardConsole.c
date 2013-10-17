@@ -40,6 +40,7 @@ void BoardConsoleInit() {
 void BoardConsolePuts(const char * str) {
     while(*str)
         BoardConsolePutc(*(str++));
+    BoardConsolePutc('\n');
 }
 
 void BoardConsolePutc(int c) {
