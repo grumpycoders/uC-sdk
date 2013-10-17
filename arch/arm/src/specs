@@ -51,7 +51,7 @@ cc1 -E %{traditional|traditional-cpp:-traditional-cpp}
 %{mbig-endian:-EB} %{mlittle-endian:-EL} %{static:-Bstatic} %{shared:-shared} %{symbolic:-Bsymbolic} -X %{mcpu=arm8|mcpu=arm810|mcpu=strongarm*|march=armv4|mcpu=fa526|mcpu=fa626:--fix-v4bx} %{mbig-endian:%{march=armv7-a|mcpu=cortex-a5	   |mcpu=cortex-a7					   |mcpu=cortex-a8|mcpu=cortex-a9|mcpu=cortex-a15	   |mcpu=generic-armv7-a				   |march=armv7-m|mcpu=cortex-m3			   |march=armv7e-m|mcpu=cortex-m4			   |march=armv6-m|mcpu=cortex-m0			   :%{!r:--be8}}}
 
 *lib:
-%{!shared:%{g*:-lg} %{!p:%{!pg:-lc}}%{p:-lc_p}%{pg:-lc_p}}
+
 
 *mfwrap:
  %{static: %{fmudflap|fmudflapth:  --wrap=malloc --wrap=free --wrap=calloc --wrap=realloc --wrap=mmap --wrap=mmap64 --wrap=munmap --wrap=alloca} %{fmudflapth: --wrap=pthread_create}} %{fmudflap|fmudflapth: --wrap=main}
