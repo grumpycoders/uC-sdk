@@ -1,7 +1,9 @@
 #include <FreeRTOS.h>
 #include <task.h>
 #include <semphr.h>
+#ifdef BOARD_MBED
 #include <lpc17xx_gpio.h>
+#endif
 #include <BoardConsole.h>
 #include <osdebug.h>
 #include <stdio.h>
@@ -9,6 +11,7 @@
 #include <romfs.h>
 #include <semifs.h>
 #include <malloc_wrapper.h>
+#ifdef HAS_ETHERNET
 #include <lwip/inet.h>
 #include <lwip/tcp.h>
 #include <lwip/ip_frag.h>
@@ -18,10 +21,13 @@
 #include <lwip/tcp_impl.h>
 #include <lwip/timers.h>
 #include <netif/etharp.h>
-#include <netif/lpc17xx-if.h>
+#include <netif/interface.h>
 #include <webserver/httpd.h>
 #include <echo/echo.h>
 #include <lwip/dhcp.h>
+#endif
+
+#ifdef BOARD_MBED
 
 #define LED1_wire 18
 #define LED2_wire 20
@@ -49,6 +55,8 @@ static void litLED(int led, int value) {
         GPIO_ClearValue(1, led);
     }
 }
+
+#endif
 
 xSemaphoreHandle handle;
 
@@ -84,6 +92,7 @@ static const char msg[] = "Hello world - from fwrite!\r\n";
 
 extern uint8_t _binary_test_romfs_bin_start[];
 
+#ifdef HAS_ETHERNET
 struct ip_addr board_ip;
 static struct netif board_netif;
 static xSemaphoreHandle lwip_sem;
@@ -104,7 +113,7 @@ static void net_init() {
     lwip_init();
     vSemaphoreCreateBinary(lwip_sem);
     
-    if (netif_add(&board_netif, &board_ip, &netmask, &gw_ip, NULL, lpc17xx_if_init, ethernet_input) == NULL) {
+    if (netif_add(&board_netif, &board_ip, &netmask, &gw_ip, NULL, interface_init, ethernet_input) == NULL) {
         fprintf(stderr, "net_init: netif_add(lpc17xx_if_init) failed.\r\n");
         return;
     }
@@ -133,7 +142,7 @@ static void lwip_task(void * p) {
     uint32_t currentIP = board_netif.ip_addr.addr;
     while (1) {
         xSemaphoreTake(lwip_sem, 10 / portTICK_RATE_MS);
-        lpc17xx_if_check_input(&board_netif);
+        interface_check_input(&board_netif);
         sys_check_timeouts();
         if (board_netif.ip_addr.addr != currentIP) {
             currentIP = board_netif.ip_addr.addr;
@@ -153,14 +162,17 @@ void ENET_IRQHandler() {
     xSemaphoreGiveFromISR(lwip_sem, &woken);
     portEND_SWITCHING_ISR(woken);
 }
+#endif
 
 int main() {
     init_malloc_wrapper();
-    FILE * f1, * f2, * f3;
+    FILE * f1, * f2;
     char buf[32];
     int c;
     register_devfs();
+#ifdef HAS_SEMIFS
     register_semifs();
+#endif
     register_romfs("romfs", _binary_test_romfs_bin_start);
     handle = xSemaphoreCreateMutex();
     printf("Hello world - from stdio!\r\n");
@@ -171,18 +183,22 @@ int main() {
     f2 = fopen("/romfs/test.txt", "r");
     c = fread(buf, 1, 32, f2);
     fwrite(buf, 1, c, f1);
-    f3 = fopen("/host/TEST.TXT", "r");
+#ifdef HAS_SEMIFS
+    FILE * f3 = fopen("/host/TEST.TXT", "r");
     c = fread(buf, 1, 32, f3);
     fwrite(buf, 1, c, f1);
+    fclose(f3);
+#endif
     fflush(f1);
     fclose(f1);
     fclose(f2);
-    fclose(f3);
+#ifdef BOARD_MBED
     setupLEDs();
     litLED(1, 0);
     litLED(2, 0);
     litLED(3, 0);
     litLED(4, 0);
+#endif
     BoardConsolePuts("Creating simple tasks.");
 #ifdef SHOW_SIMPLE_TASKS
     xTaskCreate(simpleTask1, (signed char *) "st1", configMINIMAL_STACK_SIZE, (void *)NULL, tskIDLE_PRIORITY, NULL);
@@ -191,7 +207,9 @@ int main() {
 #ifdef USE_BAD_TASK
     xTaskCreate(badTask, (signed char *) "bad", configMINIMAL_STACK_SIZE, (void *)NULL, tskIDLE_PRIORITY, NULL);
 #endif
+#ifdef HAS_ETHERNET
     xTaskCreate(lwip_task, (signed char *) "lwip", 1024, (void *) NULL, tskIDLE_PRIORITY | portPRIVILEGE_BIT, NULL);
+#endif
     BoardConsolePuts("Scheduler starting.");
     vTaskStartScheduler();
     BoardConsolePuts("Scheduler exitting.");

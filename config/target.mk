@@ -11,6 +11,8 @@ ifeq ($(BOARD),mbed)
 CPU = arm
 CPU_FLAVOR = lpc1768
 CPU_FAMILY = CM3
+
+TARGET_CPPFLAGS += -DHAS_ETHERNET -DHAS_SEMIFS -DBOARD_MBED
 endif
 
 ifeq ($(BOARD),inemo)

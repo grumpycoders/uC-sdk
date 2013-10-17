@@ -304,3 +304,6 @@ void lpc17xx_if_check_input(struct netif * netif) {
 }
 
 __attribute__((section(".eth_ram"))) uint8_t lwip_ram_heap[5632];
+
+err_t interface_init(struct netif *netif) __attribute__((weak, alias ("lpc17xx_if_init")));
+void interface_check_input(struct netif * netif) __attribute__((weak, alias ("lpc17xx_if_check_input")));
