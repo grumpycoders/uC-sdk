@@ -86,7 +86,6 @@ extern uint8_t _binary_test_romfs_bin_start[];
 
 struct ip_addr board_ip;
 static struct netif board_netif;
-static portTickType ts_etharp, ts_tcp, ts_ipreass;
 static xSemaphoreHandle lwip_sem;
 
 #define USE_DHCP
@@ -112,70 +111,38 @@ static void net_init() {
     netif_set_default(&board_netif);
 
 #ifdef USE_DHCP
+    printf("Starting DHCP query\n");
     dhcp_start(&board_netif);
 #else
     netif_set_up(&board_netif);
 #endif
-
-    ts_etharp = ts_tcp = ts_ipreass = 0;
 }
 
 static inline int timestamp_expired(portTickType t, portTickType now, portTickType delay) {
     return (int)(now - (t + delay)) >= 0;
 }
 
-uint32_t sys_now() { return xTaskGetTickCount(); }
-
-static void lwip_poll(struct netif * netif) {
-    portTickType now = xTaskGetTickCount();
-
-    lpc17xx_if_check_input(netif);
-    if (timestamp_expired(ts_etharp, now, ARP_TMR_INTERVAL / portTICK_RATE_MS)) {
-        etharp_tmr();
-        ts_etharp = now;
-    }
-    
-    if (timestamp_expired(ts_tcp, now, TCP_TMR_INTERVAL / portTICK_RATE_MS)) {
-        tcp_tmr();
-        ts_tcp = now;
-    }
-    
-    if (timestamp_expired(ts_ipreass, now, IP_TMR_INTERVAL / portTICK_RATE_MS)) {
-        ip_reass_tmr();
-        ts_ipreass = now;
-    }
-
-    sys_check_timeouts();
-}
+// for lwip
+uint32_t sys_now() { return xTaskGetTickCount() * portTICK_RATE_MS; }
 
 static void lwip_task(void * p) {
     net_init();
-#ifdef USE_DHCP
-    uint32_t time = 0;
-    printf("Starting DHCP query\n");
-    while (board_netif.ip_addr.addr == 0) {
-        if (time >= DHCP_COARSE_TIMER_SECS * 1000) {
-            dhcp_coarse_tmr();
-            xSemaphoreTake(lwip_sem, DHCP_COARSE_TIMER_SECS * 1000 / portTICK_RATE_MS);
-        } else {
-            dhcp_fine_tmr();
-            xSemaphoreTake(lwip_sem, DHCP_FINE_TIMER_MSECS / portTICK_RATE_MS);
-            time += DHCP_FINE_TIMER_MSECS;
-        }
-        lwip_poll(&board_netif);
-    }
-
-    printf("DHCP query complete; address = %i.%i.%i.%i\n",
-        (board_netif.ip_addr.addr >>  0) & 0xff,
-        (board_netif.ip_addr.addr >>  8) & 0xff,
-        (board_netif.ip_addr.addr >> 16) & 0xff,
-        (board_netif.ip_addr.addr >> 24) & 0xff);
-#endif
     httpd_init(_binary_test_romfs_bin_start);
     echo_init();
-    while(1) {
+
+    uint32_t currentIP = board_netif.ip_addr.addr;
+    while (1) {
         xSemaphoreTake(lwip_sem, 10 / portTICK_RATE_MS);
-        lwip_poll(&board_netif);
+        lpc17xx_if_check_input(&board_netif);
+        sys_check_timeouts();
+        if (board_netif.ip_addr.addr != currentIP) {
+            currentIP = board_netif.ip_addr.addr;
+            printf("got an IP address: %i.%i.%i.%i\n",
+                (board_netif.ip_addr.addr >>  0) & 0xff,
+                (board_netif.ip_addr.addr >>  8) & 0xff,
+                (board_netif.ip_addr.addr >> 16) & 0xff,
+                (board_netif.ip_addr.addr >> 24) & 0xff);
+        }
     }
 }
 
