@@ -44,7 +44,7 @@ apps/webserver/fs.c \
 apps/echo/echo.c \
 
 ifeq ($(CPU),arm)
-ifeq ($(CPU_FLAVOR),lpc1768)
+ifeq ($(CPU_FLAVOR),lpc17xx)
 TARGET_SRCS += src/netif/lpc17xx-if.c
 endif
 endif

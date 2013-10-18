@@ -2,14 +2,9 @@ ifeq ($(BOARD),)
 BOARD = mbed
 endif
 
-ifeq ($(USE_MPU),)
-USE_MPU = true
-endif
-
-
 ifeq ($(BOARD),mbed)
 CPU = arm
-CPU_FLAVOR = lpc1768
+CPU_FLAVOR = lpc17xx
 CPU_FAMILY = CM3
 
 TARGET_CPPFLAGS += -DHAS_ETHERNET -DHAS_SEMIFS -DBOARD_MBED
@@ -25,3 +20,5 @@ ifeq ($(BOARD),pic32)
 CPU = mips
 CPU_FLAVOR = mips4
 endif
+
+TARGET_CPPFLAGS += -DPORT_CPU=$(CPU) -DPORT_CPU_FLAVOR=$(CPU_FLAVOR) -DPORT_CPU_FAMILY=$(CPU_FAMILY)

@@ -39,7 +39,7 @@ static void setupLEDs() {
 }
 
 static void litLED(int led, int value) {
-    if ((led > 4) || (led < 0))
+    if ((led > 4) || (led < 1))
         return;
     
     switch (led) {
@@ -56,6 +56,18 @@ static void litLED(int led, int value) {
     }
 }
 
+static void ledTask(void *p) {
+    int n = 0;
+    while (1) {
+        switch ((n++) & 3) {
+            case 0: litLED(1, 1); litLED(2, 0); litLED(3, 0); litLED(4, 0); break;
+            case 1: litLED(1, 0); litLED(2, 1); litLED(3, 0); litLED(4, 0); break;
+            case 2: litLED(1, 0); litLED(2, 0); litLED(3, 1); litLED(4, 0); break;
+            case 3: litLED(1, 0); litLED(2, 0); litLED(3, 0); litLED(4, 1); break;
+        }
+        vTaskDelay(1000);
+    }
+}
 #endif
 
 xSemaphoreHandle handle;
@@ -127,10 +139,6 @@ static void net_init() {
 #endif
 }
 
-static inline int timestamp_expired(portTickType t, portTickType now, portTickType delay) {
-    return (int)(now - (t + delay)) >= 0;
-}
-
 // for lwip
 uint32_t sys_now() { return xTaskGetTickCount() * portTICK_RATE_MS; }
 
@@ -199,6 +207,7 @@ int main() {
     litLED(3, 0);
     litLED(4, 0);
 #endif
+    printf("Test: %f\n", 12.3456f);
     BoardConsolePuts("Creating simple tasks.");
 #ifdef SHOW_SIMPLE_TASKS
     xTaskCreate(simpleTask1, (signed char *) "st1", configMINIMAL_STACK_SIZE, (void *)NULL, tskIDLE_PRIORITY, NULL);
@@ -206,6 +215,9 @@ int main() {
 #endif
 #ifdef USE_BAD_TASK
     xTaskCreate(badTask, (signed char *) "bad", configMINIMAL_STACK_SIZE, (void *)NULL, tskIDLE_PRIORITY, NULL);
+#endif
+#ifdef BOARD_MBED
+    xTaskCreate(ledTask, (signed char *) "led", configMINIMAL_STACK_SIZE, (void *)NULL, tskIDLE_PRIORITY, NULL);
 #endif
 #ifdef HAS_ETHERNET
     xTaskCreate(lwip_task, (signed char *) "lwip", 1024, (void *) NULL, tskIDLE_PRIORITY | portPRIVILEGE_BIT, NULL);

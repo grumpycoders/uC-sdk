@@ -4,7 +4,7 @@ All the demos have been removed.
 
 Almost all the ports have been removed, except the following:
     ARM-CM3
-    ARM-CM3-MPU
+    MIPS4
 
 The following modifications have been made:
 
