@@ -27,6 +27,10 @@ ifeq ($(BOARD),inemo)
 TARGET_INCLUDES += $(ROOTDIR)/arch/arm/stm32f10x/inemo
 endif
 
+ifeq ($(BOARD),stm32f4discovery)
+TARGET_INCLUDES += $(ROOTDIR)/arch/arm/stm32f4/stm32f4discovery
+endif
+
 endif
 
 ifeq ($(CPU),mips)

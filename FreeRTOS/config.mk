@@ -6,6 +6,9 @@ ifeq ($(CPU),arm)
 ifeq ($(CPU_FAMILY),CM3)
 TARGET_INCLUDES += $(ROOTDIR)/FreeRTOS/Source/portable/GCC/ARM_CM3
 endif
+ifeq ($(CPU_FAMILY),CM4F)
+TARGET_INCLUDES += $(ROOTDIR)/FreeRTOS/Source/portable/GCC/ARM_CM4F
+endif
 endif
 
 ifeq ($(CPU),mips)

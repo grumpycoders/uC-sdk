@@ -16,6 +16,9 @@ ifeq ($(CPU),arm)
 ifeq ($(CPU_FAMILY),CM3)
 TARGET_SRCS += Source/portable/GCC/ARM_CM3/port.c
 endif
+ifeq ($(CPU_FAMILY),CM4F)
+TARGET_SRCS += Source/portable/GCC/ARM_CM4F/port.c
+endif
 endif
 
 include $(ROOTDIR)/target-rules.mk

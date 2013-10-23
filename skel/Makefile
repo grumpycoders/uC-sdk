@@ -1,4 +1,5 @@
 export NODEMO = true
+export BOARD = stm32f4discovery
 ROOTDIR = $(CURDIR)/uC-sdk
 
 TARGET = test.bin
