@@ -64,18 +64,15 @@
 */
 
 /*-----------------------------------------------------------
- * Implementation of functions defined in portable.h for the ARM CM3 port.
+ * Implementation of functions defined in portable.h for the ARM CM4F port.
  *----------------------------------------------------------*/
 
 /* Scheduler includes. */
 #include "FreeRTOS.h"
 #include "task.h"
 
-/* For backward compatibility, ensure configKERNEL_INTERRUPT_PRIORITY is
-defined.  The value should also ensure backward compatibility.
-FreeRTOS.org versions prior to V4.4.0 did not include this definition. */
-#ifndef configKERNEL_INTERRUPT_PRIORITY
-	#define configKERNEL_INTERRUPT_PRIORITY 255
+#ifndef __VFP_FP__
+	#error This port can only be used when the project options are configured to enable hardware floating point support.
 #endif
 
 #ifndef configSYSTICK_CLOCK_HZ
@@ -108,8 +105,13 @@ FreeRTOS.org versions prior to V4.4.0 did not include this definition. */
 #define portPRIORITY_GROUP_MASK				( 0x07UL << 8UL )
 #define portPRIGROUP_SHIFT					( 8UL )
 
+/* Constants required to manipulate the VFP. */
+#define portFPCCR					( ( volatile unsigned long * ) 0xe000ef34 ) /* Floating point context control register. */
+#define portASPEN_AND_LSPEN_BITS	( 0x3UL << 30UL )
+
 /* Constants required to set up the initial stack. */
-#define portINITIAL_XPSR					( 0x01000000UL )
+#define portINITIAL_XPSR			( 0x01000000 )
+#define portINITIAL_EXEC_RETURN		( 0xfffffffd )
 
 /* The systick is a 24-bit counter. */
 #define portMAX_24_BIT_NUMBER				( 0xffffffUL )
@@ -150,6 +152,11 @@ void vPortSVCHandler( void ) __attribute__ (( naked ));
  * Start first task is a separate function so it can be tested in isolation.
  */
 static void prvPortStartFirstTask( void ) __attribute__ (( naked ));
+
+/*
+ * Function to enable the VFP.
+ */
+ static void vPortEnableVFP( void ) __attribute__ (( naked ));
 
 /*
  * Used to catch tasks that attempt to return from their implementing function.
@@ -201,14 +208,26 @@ portSTACK_TYPE *pxPortInitialiseStack( portSTACK_TYPE *pxTopOfStack, pdTASK_CODE
 {
 	/* Simulate the stack frame as it would be created by a context switch
 	interrupt. */
-	pxTopOfStack--; /* Offset added to account for the way the MCU uses the stack on entry/exit of interrupts. */
+
+	/* Offset added to account for the way the MCU uses the stack on entry/exit
+	of interrupts, and to ensure alignment. */
+	pxTopOfStack--;
+
 	*pxTopOfStack = portINITIAL_XPSR;	/* xPSR */
 	pxTopOfStack--;
 	*pxTopOfStack = ( portSTACK_TYPE ) pxCode;	/* PC */
 	pxTopOfStack--;
 	*pxTopOfStack = ( portSTACK_TYPE ) portTASK_RETURN_ADDRESS;	/* LR */
+
+	/* Save code space by skipping register initialisation. */
 	pxTopOfStack -= 5;	/* R12, R3, R2 and R1. */
 	*pxTopOfStack = ( portSTACK_TYPE ) pvParameters;	/* R0 */
+
+	/* A save method is being used that requires each task to maintain its
+	own exec return value. */
+	pxTopOfStack--;
+	*pxTopOfStack = portINITIAL_EXEC_RETURN;
+
 	pxTopOfStack -= 8;	/* R11, R10, R9, R8, R7, R6, R5 and R4. */
 
 	return pxTopOfStack;
@@ -218,13 +237,13 @@ portSTACK_TYPE *pxPortInitialiseStack( portSTACK_TYPE *pxTopOfStack, pdTASK_CODE
 static void prvTaskExitError( void )
 {
 	/* A function that implements a task must not exit or attempt to return to
-	its caller as there is nothing to return to.  If a task wants to exit it 
+	its caller as there is nothing to return to.  If a task wants to exit it
 	should instead call vTaskDelete( NULL ).
-	
-	Artificially force an assert() to be triggered if configASSERT() is 
+
+	Artificially force an assert() to be triggered if configASSERT() is
 	defined, then stop here so application writers can catch the error. */
 	configASSERT( uxCriticalNesting == ~0UL );
-	portDISABLE_INTERRUPTS();	
+	portDISABLE_INTERRUPTS();
 	for( ;; );
 }
 /*-----------------------------------------------------------*/
@@ -235,11 +254,10 @@ void vPortSVCHandler( void )
 					"	ldr	r3, pxCurrentTCBConst2		\n" /* Restore the context. */
 					"	ldr r1, [r3]					\n" /* Use pxCurrentTCBConst to get the pxCurrentTCB address. */
 					"	ldr r0, [r1]					\n" /* The first item in pxCurrentTCB is the task top of stack. */
-					"	ldmia r0!, {r4-r11}				\n" /* Pop the registers that are not automatically saved on exception entry and the critical nesting count. */
+					"	ldmia r0!, {r4-r11, r14}		\n" /* Pop the registers that are not automatically saved on exception entry and the critical nesting count. */
 					"	msr psp, r0						\n" /* Restore the task stack pointer. */
 					"	mov r0, #0 						\n"
 					"	msr	basepri, r0					\n"
-					"	orr r14, #0xd					\n"
 					"	bx r14							\n"
 					"									\n"
 					"	.align 2						\n"
@@ -326,6 +344,12 @@ portBASE_TYPE xPortStartScheduler( void )
 	/* Initialise the critical nesting count ready for the first task. */
 	uxCriticalNesting = 0;
 
+	/* Ensure the VFP is enabled - it should be anyway. */
+	vPortEnableVFP();
+
+	/* Lazy save always. */
+	*( portFPCCR ) |= portASPEN_AND_LSPEN_BITS;
+
 	/* Start the first task. */
 	prvPortStartFirstTask();
 
@@ -336,7 +360,7 @@ portBASE_TYPE xPortStartScheduler( void )
 
 void vPortEndScheduler( void )
 {
-	/* It is unlikely that the CM3 port will require this function as there
+	/* It is unlikely that the CM4F port will require this function as there
 	is nothing to return to.  */
 }
 /*-----------------------------------------------------------*/
@@ -414,21 +438,40 @@ void xPortPendSVHandler( void )
 	"	ldr	r3, pxCurrentTCBConst			\n" /* Get the location of the current TCB. */
 	"	ldr	r2, [r3]						\n"
 	"										\n"
-	"	stmdb r0!, {r4-r11}					\n" /* Save the remaining registers. */
+	"	tst r14, #0x10						\n" /* Is the task using the FPU context?  If so, push high vfp registers. */
+	"	it eq								\n"
+	"	vstmdbeq r0!, {s16-s31}				\n"
+	"										\n"
+	"	stmdb r0!, {r4-r11, r14}			\n" /* Save the core registers. */
+	"										\n"
 	"	str r0, [r2]						\n" /* Save the new top of stack into the first member of the TCB. */
 	"										\n"
 	"	stmdb sp!, {r3, r14}				\n"
-	"	mov r0, %0							\n"
+	"	mov r0, %0 							\n"
 	"	msr basepri, r0						\n"
 	"	bl vTaskSwitchContext				\n"
 	"	mov r0, #0							\n"
 	"	msr basepri, r0						\n"
 	"	ldmia sp!, {r3, r14}				\n"
-	"										\n"	/* Restore the context, including the critical nesting count. */
-	"	ldr r1, [r3]						\n"
-	"	ldr r0, [r1]						\n" /* The first item in pxCurrentTCB is the task top of stack. */
-	"	ldmia r0!, {r4-r11}					\n" /* Pop the registers. */
+	"										\n"
+	"	ldr r1, [r3]						\n" /* The first item in pxCurrentTCB is the task top of stack. */
+	"	ldr r0, [r1]						\n"
+	"										\n"
+	"	ldmia r0!, {r4-r11, r14}			\n" /* Pop the core registers. */
+	"										\n"
+	"	tst r14, #0x10						\n" /* Is the task using the FPU context?  If so, pop the high vfp registers too. */
+	"	it eq								\n"
+	"	vldmiaeq r0!, {s16-s31}				\n"
+	"										\n"
 	"	msr psp, r0							\n"
+	"										\n"
+	#ifdef WORKAROUND_PMU_CM001 /* XMC4000 specific errata workaround. */
+		#if WORKAROUND_PMU_CM001 == 1
+	"			push { r14 }				\n"
+	"			pop { pc }					\n"
+		#endif
+	#endif
+	"										\n"
 	"	bx r14								\n"
 	"										\n"
 	"	.align 2							\n"
@@ -497,10 +540,10 @@ void xPortSysTickHandler( void )
 			/* Restart from whatever is left in the count register to complete
 			this tick period. */
 			portNVIC_SYSTICK_LOAD_REG = portNVIC_SYSTICK_CURRENT_VALUE_REG;
-			
+
 			/* Restart SysTick. */
 			portNVIC_SYSTICK_CTRL_REG = portNVIC_SYSTICK_CLK_BIT | portNVIC_SYSTICK_INT_BIT | portNVIC_SYSTICK_ENABLE_BIT;
-			
+
 			/* Reset the reload register to the value required for normal tick
 			periods. */
 			portNVIC_SYSTICK_LOAD_REG = ulTimerCountsForOneTick - 1UL;
@@ -630,6 +673,21 @@ __attribute__(( weak )) void vPortSetupTimerInterrupt( void )
 }
 /*-----------------------------------------------------------*/
 
+/* This is a naked function. */
+static void vPortEnableVFP( void )
+{
+	__asm volatile
+	(
+		"	ldr.w r0, =0xE000ED88		\n" /* The FPU enable bits are in the CPACR. */
+		"	ldr r1, [r0]				\n"
+		"								\n"
+		"	orr r1, r1, #( 0xf << 20 )	\n" /* Enable CP10 and CP11 coprocessors, then save back. */
+		"	str r1, [r0]				\n"
+		"	bx r14						"
+	);
+}
+/*-----------------------------------------------------------*/
+
 #if( configASSERT_DEFINED == 1 )
 
 	void vPortValidateInterruptPriority( void )
@@ -689,24 +747,5 @@ __attribute__(( weak )) void vPortSetupTimerInterrupt( void )
 	}
 
 #endif /* configASSERT_DEFINED */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

@@ -63,18 +63,16 @@
     1 tab == 4 spaces!
 */
 
+
 #ifndef PORTMACRO_H
 #define PORTMACRO_H
-
-/* System include files */
-#include <xc.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /*-----------------------------------------------------------
- * Port specific definitions.  
+ * Port specific definitions.
  *
  * The settings in this file configure FreeRTOS correctly for the
  * given hardware and compiler.
@@ -89,87 +87,73 @@ extern "C" {
 #define portDOUBLE		double
 #define portLONG		long
 #define portSHORT		short
-#define portSTACK_TYPE	unsigned long
+#define portSTACK_TYPE	unsigned portLONG
 #define portBASE_TYPE	long
 
 #if( configUSE_16_BIT_TICKS == 1 )
 	typedef unsigned portSHORT portTickType;
 	#define portMAX_DELAY ( portTickType ) 0xffff
 #else
-	typedef unsigned long portTickType;
+	typedef unsigned portLONG portTickType;
 	#define portMAX_DELAY ( portTickType ) 0xffffffff
 #endif
 /*-----------------------------------------------------------*/
 
-/* Hardware specifics. */
+/* Architecture specifics. */
+#define portSTACK_GROWTH			( -1 )
+#define portTICK_RATE_MS			( ( portTickType ) 1000 / configTICK_RATE_HZ )
 #define portBYTE_ALIGNMENT			8
-#define portSTACK_GROWTH			-1
-#define portTICK_RATE_MS			( ( portTickType ) 1000 / configTICK_RATE_HZ )		
+/*-----------------------------------------------------------*/
+
+
+/* Scheduler utilities. */
+extern void vPortYield( void );
+#define portNVIC_INT_CTRL_REG		( * ( ( volatile unsigned long * ) 0xe000ed04 ) )
+#define portNVIC_PENDSVSET_BIT		( 1UL << 28UL )
+#define portYIELD()					vPortYield()
+#define portEND_SWITCHING_ISR( xSwitchRequired ) if( xSwitchRequired ) portNVIC_INT_CTRL_REG = portNVIC_PENDSVSET_BIT
+#define portYIELD_FROM_ISR( x ) portEND_SWITCHING_ISR( x )
 /*-----------------------------------------------------------*/
 
 /* Critical section management. */
-#define portIPL_SHIFT				( 10UL )
-#define portALL_IPL_BITS			( 0x3fUL << portIPL_SHIFT )
-#define portSW0_BIT					( 0x01 << 8 )
+extern void vPortEnterCritical( void );
+extern void vPortExitCritical( void );
+extern unsigned long ulPortSetInterruptMask( void );
+extern void vPortClearInterruptMask( unsigned long ulNewMaskValue );
+#define portSET_INTERRUPT_MASK_FROM_ISR()		ulPortSetInterruptMask()
+#define portCLEAR_INTERRUPT_MASK_FROM_ISR(x)	vPortClearInterruptMask(x)
+#define portDISABLE_INTERRUPTS()				ulPortSetInterruptMask()
+#define portENABLE_INTERRUPTS()					vPortClearInterruptMask(0)
+#define portENTER_CRITICAL()					vPortEnterCritical()
+#define portEXIT_CRITICAL()						vPortExitCritical()
 
-/* This clears the IPL bits, then sets them to 
-configMAX_SYSCALL_INTERRUPT_PRIORITY.  	An extra check is performed if 
-configASSERT() is defined to ensure an assertion handler does not inadvertently 
-attempt to lower the IPL when the call to assert was triggered because the IPL 
-value was found to be above	configMAX_SYSCALL_INTERRUPT_PRIORITY when an ISR
-safe FreeRTOS API function was executed.  ISR safe FreeRTOS API functions are
-those that end in FromISR.  FreeRTOS maintains a separate interrupt API to
-ensure API function and interrupt entry is as fast and as simple as possible. */
-#ifdef configASSERT
-	#define portDISABLE_INTERRUPTS()											\
-	{																			\
-	unsigned long ulStatus;														\
-																				\
-		/* Mask interrupts at and below the kernel interrupt priority. */		\
-		ulStatus = _CP0_GET_STATUS();											\
-																				\
-		/* Is the current IPL below configMAX_SYSCALL_INTERRUPT_PRIORITY? */	\
-		if( ( ( ulStatus & portALL_IPL_BITS ) >> portIPL_SHIFT ) < configMAX_SYSCALL_INTERRUPT_PRIORITY )	\
-		{																		\
-			ulStatus &= ~portALL_IPL_BITS;										\
-			_CP0_SET_STATUS( ( ulStatus | ( configMAX_SYSCALL_INTERRUPT_PRIORITY << portIPL_SHIFT ) ) ); \
-		}																		\
-	}
-#else /* configASSERT */
-	#define portDISABLE_INTERRUPTS()										\
-	{																		\
-	unsigned long ulStatus;													\
-																			\
-		/* Mask interrupts at and below the kernel interrupt priority. */	\
-		ulStatus = _CP0_GET_STATUS();										\
-		ulStatus &= ~portALL_IPL_BITS;										\
-		_CP0_SET_STATUS( ( ulStatus | ( configMAX_SYSCALL_INTERRUPT_PRIORITY << portIPL_SHIFT ) ) ); \
-	}
-#endif /* configASSERT */
+/*-----------------------------------------------------------*/
 
-#define portENABLE_INTERRUPTS()											\
-{																		\
-unsigned long ulStatus;													\
-																		\
-	/* Unmask all interrupts. */										\
-	ulStatus = _CP0_GET_STATUS();										\
-	ulStatus &= ~portALL_IPL_BITS;										\
-	_CP0_SET_STATUS( ulStatus );										\
-}
+/* Task function macros as described on the FreeRTOS.org WEB site.  These are
+not necessary for to use this port.  They are defined so the common demo files
+(which build with all the ports) will build. */
+#define portTASK_FUNCTION_PROTO( vFunction, pvParameters ) void vFunction( void *pvParameters )
+#define portTASK_FUNCTION( vFunction, pvParameters ) void vFunction( void *pvParameters )
+/*-----------------------------------------------------------*/
 
+/* Tickless idle/low power functionality. */
+#ifndef portSUPPRESS_TICKS_AND_SLEEP
+	extern void vPortSuppressTicksAndSleep( portTickType xExpectedIdleTime );
+	#define portSUPPRESS_TICKS_AND_SLEEP( xExpectedIdleTime ) vPortSuppressTicksAndSleep( xExpectedIdleTime )
+#endif
+/*-----------------------------------------------------------*/
 
-extern void vTaskEnterCritical( void );
-extern void vTaskExitCritical( void );
-#define portCRITICAL_NESTING_IN_TCB	1
-#define portENTER_CRITICAL()		vTaskEnterCritical()
-#define portEXIT_CRITICAL()			vTaskExitCritical()
-
-extern unsigned portBASE_TYPE uxPortSetInterruptMaskFromISR();
-extern void vPortClearInterruptMaskFromISR( unsigned portBASE_TYPE );
-#define portSET_INTERRUPT_MASK_FROM_ISR() uxPortSetInterruptMaskFromISR()
-#define portCLEAR_INTERRUPT_MASK_FROM_ISR( uxSavedStatusRegister ) vPortClearInterruptMaskFromISR( uxSavedStatusRegister )
-
+/* Architecture specific optimisations. */
 #if configUSE_PORT_OPTIMISED_TASK_SELECTION == 1
+
+	/* Generic helper function. */
+	__attribute__( ( always_inline ) ) static inline unsigned char ucPortCountLeadingZeros( unsigned long ulBitmap )
+	{
+	unsigned char ucReturn;
+
+		__asm volatile ( "clz %0, %1" : "=r" ( ucReturn ) : "r" ( ulBitmap ) );
+		return ucReturn;
+	}
 
 	/* Check the configuration. */
 	#if( configMAX_PRIORITIES > 32 )
@@ -182,48 +166,19 @@ extern void vPortClearInterruptMaskFromISR( unsigned portBASE_TYPE );
 
 	/*-----------------------------------------------------------*/
 
-	#define portGET_HIGHEST_PRIORITY( uxTopPriority, uxReadyPriorities ) uxTopPriority = ( 31 - _clz( ( uxReadyPriorities ) ) )
+	#define portGET_HIGHEST_PRIORITY( uxTopPriority, uxReadyPriorities ) uxTopPriority = ( 31 - ucPortCountLeadingZeros( ( uxReadyPriorities ) ) )
 
-#endif /* taskRECORD_READY_PRIORITY */
+#endif /* configUSE_PORT_OPTIMISED_TASK_SELECTION */
 
 /*-----------------------------------------------------------*/
-
-/* Task utilities. */
-
-#define portYIELD()								\
-{												\
-unsigned long ulCause;							\
-												\
-	/* Trigger software interrupt. */			\
-	ulCause = _CP0_GET_CAUSE();					\
-	ulCause |= portSW0_BIT;						\
-	_CP0_SET_CAUSE( ulCause );					\
-}
 
 #ifdef configASSERT
-	#define portCURRENT_INTERRUPT_PRIORITY ( ( _CP0_GET_STATUS() & portALL_IPL_BITS ) >> portIPL_SHIFT )
-	#define portASSERT_IF_INTERRUPT_PRIORITY_INVALID() configASSERT( portCURRENT_INTERRUPT_PRIORITY <= configMAX_SYSCALL_INTERRUPT_PRIORITY )
-#endif /* configASSERT */
-
-
-#define portNOP()	asm volatile ( 	"nop" )
-
-/*-----------------------------------------------------------*/
-
-/* Task function macros as described on the FreeRTOS.org WEB site. */
-#define portTASK_FUNCTION_PROTO( vFunction, pvParameters ) void vFunction( void *pvParameters ) __attribute__((noreturn))
-#define portTASK_FUNCTION( vFunction, pvParameters ) void vFunction( void *pvParameters )
-/*-----------------------------------------------------------*/
-
-#define portEND_SWITCHING_ISR( xSwitchRequired )	if( xSwitchRequired )	\
-													{						\
-														portYIELD();		\
-													}
-
-/* Required by the kernel aware debugger. */
-#ifdef __DEBUG
-	#define portREMOVE_STATIC_QUALIFIER
+	void vPortValidateInterruptPriority( void );
+	#define portASSERT_IF_INTERRUPT_PRIORITY_INVALID() 	vPortValidateInterruptPriority()
 #endif
+
+/* portNOP() is not required by this port. */
+#define portNOP()
 
 #ifdef __cplusplus
 }
