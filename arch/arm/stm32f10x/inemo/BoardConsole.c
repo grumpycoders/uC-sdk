@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <malloc.h>
 #include <stdarg.h>
+#include <FreeRTOS.h>
+#include <task.h>
 
 #include <stm32f10x_gpio.h>
 #include <stm32f10x_rcc.h>
@@ -38,9 +40,11 @@ void BoardConsoleInit() {
 }
 
 void BoardConsolePuts(const char * str) {
+    taskENTER_CRITICAL();
     while(*str)
         BoardConsolePutc(*(str++));
     BoardConsolePutc('\n');
+    taskEXIT_CRITICAL();
 }
 
 void BoardConsolePutc(int c) {
@@ -63,8 +67,10 @@ void BoardConsolePrintf(const char * fmt, ...) {
 }
 
 static void xprintfCallback(const char * str, int strsize, void * opaque0) {
+    taskENTER_CRITICAL();
     while (strsize--)
         BoardConsolePutc(*str++);
+    taskEXIT_CRITICAL();
 }
 
 void BoardConsoleVPrintf(const char * fmt, va_list ap) {

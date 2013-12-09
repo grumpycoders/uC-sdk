@@ -12,8 +12,13 @@ endif
 ifeq ($(CPU_FLAVOR),stm32f10)
 TARGET_CPPFLAGS += -DUSE_STDPERIPH_DRIVER
 endif
+ifeq ($(CPU_FLAVOR),stm32f4)
+TARGET_CPPFLAGS += -DUSE_STDPERIPH_DRIVER
+endif
 ifeq ($(BOARD),inemo)
 TARGET_CPPFLAGS += -DSTM32F10X_HD
+endif
+ifeq ($(BOARD),stm32f4discovery)
 endif
 TARGET_CPPFLAGS += -Os -mapcs-frame -mno-sched-prolog -fno-hosted -ffunction-sections -fdata-sections -fshort-wchar -D__LITTLE_ENDIAN
 TARGET_LDFLAGS += -Wl,--no-wchar-size-warning
