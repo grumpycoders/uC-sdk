@@ -20,7 +20,7 @@ endif
 ifeq ($(CPU_FAMILY),CM4F)
 #TARGET_SRCS += arm/src/CM4F/angel.s
 #TARGET_SRCS += arm/src/CM4F/CoreSupport/core_cm4.c
-#TARGET_SRCS += arm/src/CM4F/setjmp.s arm/src/CM3/startup.s
+TARGET_SRCS += arm/src/CM4F/startup.s
 #TARGET_SRCS += arm/src/CM4F/handlers.c
 endif
 
