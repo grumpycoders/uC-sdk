@@ -21,7 +21,7 @@ ifeq ($(CPU_FAMILY),CM4F)
 #TARGET_SRCS += arm/src/CM4F/angel.s
 #TARGET_SRCS += arm/src/CM4F/CoreSupport/core_cm4.c
 TARGET_SRCS += arm/src/CM4F/startup.s
-#TARGET_SRCS += arm/src/CM4F/handlers.c
+TARGET_SRCS += arm/src/CM4F/handlers.c
 endif
 
 ifeq ($(CPU_FLAVOR),lpc17xx)
@@ -56,7 +56,7 @@ TARGET_SRCS += arm/stm32f10x/inemo/BoardConsole.c arm/stm32f10x/inemo/BoardInit.
 endif
 
 ifeq ($(BOARD),stm32f4discovery)
-TARGET_SRCS += arm/stm32f4xx/stm32f4discovery/BoardConsole.c
+TARGET_SRCS += arm/stm32f4xx/stm32f4discovery/BoardConsole.c arm/stm32f4xx/stm32f4discovery/BoardInit.c
 endif
 endif
 
