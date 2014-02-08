@@ -59,59 +59,106 @@ __cs3_heap_end:
     .type   __cs3_interrupt_vector_cortex_m_mutable, %object
 
 __cs3_interrupt_vector_cortex_m_mutable:
-    .long   __cs3_stack                 /* Top of Stack                 */
-    .long   __cs3_reset_cortex_m        /* Reset Handler                */
-    .long   NMI_Handler                 /* NMI Handler                  */
-    .long   HardFault_Handler           /* Hard Fault Handler           */
-    .long   MemManage_Handler           /* MPU Fault Handler            */
-    .long   BusFault_Handler            /* Bus Fault Handler            */
-    .long   UsageFault_Handler          /* Usage Fault Handler          */
-    .long   0                           /* Reserved                     */
-    .long   0                           /* Reserved                     */
-    .long   0                           /* Reserved                     */
-    .long   0                           /* Reserved                     */
-    .long   SVC_Handler                 /* SVCall Handler               */
-    .long   DebugMon_Handler            /* Debug Monitor Handler        */
-    .long   0                           /* Reserved                     */
-    .long   PendSV_Handler              /* PendSV Handler               */
-    .long   SysTick_Handler             /* SysTick Handler              */
+    .long   __cs3_stack                   /* 0x0000 0000 Top of Stack                                          */
+    .long   __cs3_reset_cortex_m          /* 0x0000 0004 Reset Handler                                         */
+    .long   NMI_Handler                   /* 0x0000 0008 NMI Handler                                           */
+    .long   HardFault_Handler             /* 0x0000 000C Hard Fault Handler                                    */
+    .long   MemManage_Handler             /* 0x0000 0010 MPU Fault Handler                                     */
+    .long   BusFault_Handler              /* 0x0000 0014 Bus Fault Handler                                     */
+    .long   UsageFault_Handler            /* 0x0000 0018 Usage Fault Handler                                   */
+    .long   0                             /* 0x0000 001C Reserved                                              */
+    .long   0                             /* 0x0000 0020 Reserved                                              */
+    .long   0                             /* 0x0000 0024 Reserved                                              */
+    .long   0                             /* 0x0000 0028 Reserved                                              */
+    .long   SVC_Handler                   /* 0x0000 002C SVCall Handler                                        */
+    .long   DebugMon_Handler              /* 0x0000 0030 Debug Monitor Handler                                 */
+    .long   0                             /* 0x0000 0034 Reserved                                              */
+    .long   PendSV_Handler                /* 0x0000 0038 PendSV Handler                                        */
+    .long   SysTick_Handler               /* 0x0000 003C SysTick Handler                                       */
 
     /* External Interrupts */
-    .long   WDT_IRQHandler              /* 16: Watchdog Timer               */
-    .long   TIMER0_IRQHandler           /* 17: Timer0                       */
-    .long   TIMER1_IRQHandler           /* 18: Timer1                       */
-    .long   TIMER2_IRQHandler           /* 19: Timer2                       */
-    .long   TIMER3_IRQHandler           /* 20: Timer3                       */
-    .long   UART0_IRQHandler            /* 21: UART0                        */
-    .long   UART1_IRQHandler            /* 22: UART1                        */
-    .long   UART2_IRQHandler            /* 23: UART2                        */
-    .long   UART3_IRQHandler            /* 24: UART3                        */
-    .long   PWM1_IRQHandler             /* 25: PWM1                         */
-    .long   I2C0_IRQHandler             /* 26: I2C0                         */
-    .long   I2C1_IRQHandler             /* 27: I2C1                         */
-    .long   I2C2_IRQHandler             /* 28: I2C2                         */
-    .long   SPI_IRQHandler              /* 29: SPI                          */
-    .long   SSP0_IRQHandler             /* 30: SSP0                         */
-    .long   SSP1_IRQHandler             /* 31: SSP1                         */
-    .long   PLL0_IRQHandler             /* 32: PLL0 Lock (Main PLL)         */
-    .long   RTC_IRQHandler              /* 33: Real Time Clock              */
-    .long   EINT0_IRQHandler            /* 34: External Interrupt 0         */
-    .long   EINT1_IRQHandler            /* 35: External Interrupt 1         */
-    .long   EINT2_IRQHandler            /* 36: External Interrupt 2         */
-    .long   EINT3_IRQHandler            /* 37: External Interrupt 3         */
-    .long   ADC_IRQHandler              /* 38: A/D Converter                */
-    .long   BOD_IRQHandler              /* 39: Brown-Out Detect             */
-    .long   USB_IRQHandler              /* 40: USB                          */
-    .long   CAN_IRQHandler              /* 41: CAN                          */
-    .long   DMA_IRQHandler              /* 42: General Purpose DMA          */
-    .long   I2S_IRQHandler              /* 43: I2S                          */
-    .long   ENET_IRQHandler             /* 44: Ethernet                     */
-    .long   RIT_IRQHandler              /* 45: Repetitive Interrupt Timer   */
-    .long   MCPWM_IRQHandler            /* 46: Motor Control PWM            */
-    .long   QEI_IRQHandler              /* 47: Quadrature Encoder Interface */
-    .long   PLL1_IRQHandler             /* 48: PLL1 Lock (USB PLL)          */
-    .long   USBActivity_IRQHandler      /* 49: USB Activity                 */
-    .long   CANActivity_IRQHandler      /* 50: CAN Activity                 */
+    .long   WDT_IRQHandler                /* 0x0000 0040 Watchdog Timer                                        */
+    .long   PVD_IRQHandler                /* 0x0000 0044 PVD through EXTI line detection                       */
+    .long   TAMP_STAMP_IRQHandler         /* 0x0000 0048 Tamper and TimeStamp interrupts through the EXTI line */
+    .long   RTC_WKUP_IRQHandler           /* 0x0000 004C RTC Wakeup interrupt through the EXTI line            */
+    .long   FLASH_IRQHandler              /* 0x0000 0050 FLASH                                                          */       
+    .long   RCC_IRQHandler                /* 0x0000 0054 RCC                                                   */
+    .long   EXTI0_IRQHandler              /* 0x0000 0058 EXTI Line0                                            */
+    .long   EXTI1_IRQHandler              /* 0x0000 005C EXTI Line1                                            */
+    .long   EXTI2_IRQHandler              /* 0x0000 0060 EXTI Line2                                            */
+    .long   EXTI3_IRQHandler              /* 0x0000 0064 EXTI Line3                                            */
+    .long   EXTI4_IRQHandler              /* 0x0000 0068 EXTI Line4                                            */
+    .long   DMA1_Stream0_IRQHandler       /* 0x0000 006C DMA1 Stream 0                                         */
+    .long   DMA1_Stream1_IRQHandler       /* 0x0000 0070 DMA1 Stream 1                                         */ 
+    .long   DMA1_Stream2_IRQHandler       /* 0x0000 0074 DMA1 Stream 2                                         */ 
+    .long   DMA1_Stream3_IRQHandler       /* 0x0000 0078 DMA1 Stream 3                                         */ 
+    .long   DMA1_Stream4_IRQHandler       /* 0x0000 007C DMA1 Stream 4                                         */ 
+    .long   DMA1_Stream5_IRQHandler       /* 0x0000 0080 DMA1 Stream 5                                         */ 
+    .long   DMA1_Stream6_IRQHandler       /* 0x0000 0084 DMA1 Stream 6                                         */ 
+    .long   ADC_IRQHandler                /* 0x0000 0088 ADC1, ADC2 and ADC3s                                  */ 
+    .long   CAN1_TX_IRQHandler            /* 0x0000 008C CAN1 TX                                               */       
+    .long   CAN1_RX0_IRQHandler           /* 0x0000 0090 CAN1 RX0                                              */
+    .long   CAN1_RX1_IRQHandler           /* 0x0000 0094 CAN1 RX1                                              */
+    .long   CAN1_SCE_IRQHandler           /* 0x0000 0098 CAN1 SCE                                              */
+    .long   EXTI9_5_IRQHandler            /* 0x0000 009C External Line[9:5]s                                   */
+    .long   TIM1_BRK_TIM9_IRQHandler      /* 0x0000 00A0 TIM1 Break and TIM9                                   */
+    .long   TIM1_UP_TIM10_IRQHandler      /* 0x0000 00A4 TIM1 Update and TIM10                                 */
+    .long   TIM1_TRG_COM_TIM11_IRQHandler /* 0x0000 00A8 TIM1 Trigger and Commutation and TIM11                */
+    .long   TIM1_CC_IRQHandler            /* 0x0000 00AC TIM1 Capture Compare                                  */
+    .long   TIM2_IRQHandler               /* 0x0000 00B0 TIM2                                                  */ 
+    .long   TIM3_IRQHandler               /* 0x0000 00B4 TIM3                                                  */ 
+    .long   TIM4_IRQHandler               /* 0x0000 00B8 TIM4                                                  */ 
+    .long   I2C1_EV_IRQHandler            /* 0x0000 00BC I2C1 Event                                            */
+    .long   I2C1_ER_IRQHandler            /* 0x0000 00C0 I2C1 Error                                            */
+    .long   I2C2_EV_IRQHandler            /* 0x0000 00C4 I2C2 Event                                            */
+    .long   I2C2_ER_IRQHandler            /* 0x0000 00C8 I2C2 Error                                            */  
+    .long   SPI1_IRQHandler               /* 0x0000 00CC SPI1                                                  */ 
+    .long   SPI2_IRQHandler               /* 0x0000 00D0 SPI2                                                  */ 
+    .long   USART1_IRQHandler             /* 0x0000 00D4 USART1                                                */ 
+    .long   USART2_IRQHandler             /* 0x0000 00D8 USART2                                                */ 
+    .long   USART3_IRQHandler             /* 0x0000 00DC USART3                                                */ 
+    .long   EXTI15_10_IRQHandler          /* 0x0000 00E0 External Line[15:10]s                                 */
+    .long   RTC_Alarm_IRQHandler          /* 0x0000 00E4 RTC Alarm (A and B) through EXTI Line                 */
+    .long   OTG_FS_WKUP_IRQHandler        /* 0x0000 00E8 USB OTG FS Wakeup through EXTI line                   */     
+    .long   TIM8_BRK_TIM12_IRQHandler     /* 0x0000 00EC TIM8 Break and TIM12                                  */
+    .long   TIM8_UP_TIM13_IRQHandler      /* 0x0000 00F0 TIM8 Update and TIM13                                 */
+    .long   TIM8_TRG_COM_TIM14_IRQHandler /* 0x0000 00F4 TIM8 Trigger and Commutation and TIM14                */
+    .long   TIM8_CC_IRQHandler            /* 0x0000 00F8 TIM8 Capture Compare                                  */
+    .long   DMA1_Stream7_IRQHandler       /* 0x0000 00FC DMA1 Stream7                                          */
+    .long   FSMC_IRQHandler               /* 0x0000 0100 FSMC                                                  */ 
+    .long   SDIO_IRQHandler               /* 0x0000 0104 SDIO                                                  */ 
+    .long   TIM5_IRQHandler               /* 0x0000 0108 TIM5                                                  */ 
+    .long   SPI3_IRQHandler               /* 0x0000 010C SPI3                                                  */ 
+    .long   UART4_IRQHandler              /* 0x0000 0110 UART4                                                 */ 
+    .long   UART5_IRQHandler              /* 0x0000 0114 UART5                                                 */ 
+    .long   TIM6_DAC_IRQHandler           /* 0x0000 0118 TIM6 and DAC1&2 underrun errors                       */ 
+    .long   TIM7_IRQHandler               /* 0x0000 011C TIM7                                                  */
+    .long   DMA2_Stream0_IRQHandler       /* 0x0000 0120 DMA2 Stream 0                                         */ 
+    .long   DMA2_Stream1_IRQHandler       /* 0x0000 0124 DMA2 Stream 1                                         */ 
+    .long   DMA2_Stream2_IRQHandler       /* 0x0000 0128 DMA2 Stream 2                                         */ 
+    .long   DMA2_Stream3_IRQHandler       /* 0x0000 012C DMA2 Stream 3                                         */ 
+    .long   DMA2_Stream4_IRQHandler       /* 0x0000 0130 DMA2 Stream 4                                         */ 
+    .long   ETH_IRQHandler                /* 0x0000 0134 Ethernet                                              */ 
+    .long   ETH_WKUP_IRQHandler           /* 0x0000 0138 Ethernet Wakeup through EXTI line                     */   
+    .long   CAN2_TX_IRQHandler            /* 0x0000 013C CAN2 TX                                               */
+    .long   CAN2_RX0_IRQHandler           /* 0x0000 0140 CAN2 RX0                                              */
+    .long   CAN2_RX1_IRQHandler           /* 0x0000 0144 CAN2 RX1                                              */
+    .long   CAN2_SCE_IRQHandler           /* 0x0000 0148 CAN2 SCE                                              */
+    .long   OTG_FS_IRQHandler             /* 0x0000 014C USB OTG FS                                            */
+    .long   DMA2_Stream5_IRQHandler       /* 0x0000 0150 DMA2 Stream 5                                         */ 
+    .long   DMA2_Stream6_IRQHandler       /* 0x0000 0154 DMA2 Stream 6                                         */ 
+    .long   DMA2_Stream7_IRQHandler       /* 0x0000 0158 DMA2 Stream 7                                         */ 
+    .long   USART6_IRQHandler             /* 0x0000 015C USART6                                                */  
+    .long   I2C3_EV_IRQHandler            /* 0x0000 0160 I2C3 event                                            */
+    .long   I2C3_ER_IRQHandler            /* 0x0000 0164 I2C3 error                                            */
+    .long   OTG_HS_EP1_OUT_IRQHandler     /* 0x0000 0168 USB OTG HS End Point 1 Out                            */ 
+    .long   OTG_HS_EP1_IN_IRQHandler      /* 0x0000 016C USB OTG HS End Point 1 In                             */ 
+    .long   OTG_HS_WKUP_IRQHandler        /* 0x0000 0170 USB OTG HS Wakeup through EXTI                        */       
+    .long   OTG_HS_IRQHandler             /* 0x0000 0174 USB OTG HS                                            */ 
+    .long   DCMI_IRQHandler               /* 0x0000 0178 DCMI                                                  */ 
+    .long   CRYP_IRQHandler               /* 0x0000 017C CRYP crypto                                           */ 
+    .long   HASH_RNG_IRQHandler           /* 0x0000 0180 Hash and Rng                                          */
+    .long   FPU_IRQHandler                /* 0x0000 0184 FPU                                                   */
 
     .size   __cs3_interrupt_vector_cortex_m_mutable, . - __cs3_interrupt_vector_cortex_m_mutable
 
@@ -121,14 +168,14 @@ __cs3_interrupt_vector_cortex_m_mutable:
     .type   __cs3_interrupt_vector_cortex_m, %object
 
 __cs3_interrupt_vector_cortex_m:
-    .long   __cs3_stack                 /* Top of Stack                 */
-    .long   __cs3_reset_cortex_m        /* Reset Handler                */
-    .long   NMI_Handler                 /* NMI Handler                  */
-    .long   HardFault_Handler           /* Hard Fault Handler           */
-    .long   MemManage_Handler           /* MPU Fault Handler            */
-    .long   BusFault_Handler            /* Bus Fault Handler            */
-    .long   UsageFault_Handler          /* Usage Fault Handler          */
-    .long   0                           /* Reserved - ROM CRC check ?   */
+    .long   __cs3_stack                   /* Top of Stack                 */
+    .long   __cs3_reset_cortex_m          /* Reset Handler                */
+    .long   NMI_Handler                   /* NMI Handler                  */
+    .long   HardFault_Handler             /* Hard Fault Handler           */
+    .long   MemManage_Handler             /* MPU Fault Handler            */
+    .long   BusFault_Handler              /* Bus Fault Handler            */
+    .long   UsageFault_Handler            /* Usage Fault Handler          */
+    .long   0                             /* Reserved - ROM CRC check ?   */
 
 
     .size   __cs3_interrupt_vector_cortex_m, . - __cs3_interrupt_vector_cortex_m
@@ -225,40 +272,89 @@ Default_Handler:
     .set    \handler, Default_Handler
     .endm
 
-    IRQ     WDT_IRQHandler
-    IRQ     TIMER0_IRQHandler
-    IRQ     TIMER1_IRQHandler
-    IRQ     TIMER2_IRQHandler
-    IRQ     TIMER3_IRQHandler
-    IRQ     UART0_IRQHandler
-    IRQ     UART1_IRQHandler
-    IRQ     UART2_IRQHandler
-    IRQ     UART3_IRQHandler
-    IRQ     PWM1_IRQHandler
-    IRQ     I2C0_IRQHandler
-    IRQ     I2C1_IRQHandler
-    IRQ     I2C2_IRQHandler
-    IRQ     SPI_IRQHandler
-    IRQ     SSP0_IRQHandler
-    IRQ     SSP1_IRQHandler
-    IRQ     PLL0_IRQHandler
-    IRQ     RTC_IRQHandler
-    IRQ     EINT0_IRQHandler
-    IRQ     EINT1_IRQHandler
-    IRQ     EINT2_IRQHandler
-    IRQ     EINT3_IRQHandler
-    IRQ     ADC_IRQHandler
-    IRQ     BOD_IRQHandler
-    IRQ     USB_IRQHandler
-    IRQ     CAN_IRQHandler
-    IRQ     DMA_IRQHandler
-    IRQ     I2S_IRQHandler
-    IRQ     ENET_IRQHandler
-    IRQ     RIT_IRQHandler
-    IRQ     MCPWM_IRQHandler
-    IRQ     QEI_IRQHandler
-    IRQ     PLL1_IRQHandler
-    IRQ     USBActivity_IRQHandler
-    IRQ     CANActivity_IRQHandler
+
+    IRQ   WDT_IRQHandler
+    IRQ   PVD_IRQHandler
+    IRQ   TAMP_STAMP_IRQHandler
+    IRQ   RTC_WKUP_IRQHandler
+    IRQ   FLASH_IRQHandler
+    IRQ   RCC_IRQHandler
+    IRQ   EXTI0_IRQHandler
+    IRQ   EXTI1_IRQHandler
+    IRQ   EXTI2_IRQHandler
+    IRQ   EXTI3_IRQHandler
+    IRQ   EXTI4_IRQHandler
+    IRQ   DMA1_Stream0_IRQHandler
+    IRQ   DMA1_Stream1_IRQHandler
+    IRQ   DMA1_Stream2_IRQHandler
+    IRQ   DMA1_Stream3_IRQHandler
+    IRQ   DMA1_Stream4_IRQHandler
+    IRQ   DMA1_Stream5_IRQHandler
+    IRQ   DMA1_Stream6_IRQHandler
+    IRQ   ADC_IRQHandler
+    IRQ   CAN1_TX_IRQHandler
+    IRQ   CAN1_RX0_IRQHandler
+    IRQ   CAN1_RX1_IRQHandler
+    IRQ   CAN1_SCE_IRQHandler
+    IRQ   EXTI9_5_IRQHandler
+    IRQ   TIM1_BRK_TIM9_IRQHandler
+    IRQ   TIM1_UP_TIM10_IRQHandler
+    IRQ   TIM1_TRG_COM_TIM11_IRQHandler
+    IRQ   TIM1_CC_IRQHandler
+    IRQ   TIM2_IRQHandler
+    IRQ   TIM3_IRQHandler
+    IRQ   TIM4_IRQHandler
+    IRQ   I2C1_EV_IRQHandler
+    IRQ   I2C1_ER_IRQHandler
+    IRQ   I2C2_EV_IRQHandler
+    IRQ   I2C2_ER_IRQHandler
+    IRQ   SPI1_IRQHandler
+    IRQ   SPI2_IRQHandler
+    IRQ   USART1_IRQHandler
+    IRQ   USART2_IRQHandler
+    IRQ   USART3_IRQHandler
+    IRQ   EXTI15_10_IRQHandler
+    IRQ   RTC_Alarm_IRQHandler
+    IRQ   OTG_FS_WKUP_IRQHandler
+    IRQ   TIM8_BRK_TIM12_IRQHandler
+    IRQ   TIM8_UP_TIM13_IRQHandler
+    IRQ   TIM8_TRG_COM_TIM14_IRQHandler
+    IRQ   TIM8_CC_IRQHandler
+    IRQ   DMA1_Stream7_IRQHandler
+    IRQ   FSMC_IRQHandler
+    IRQ   SDIO_IRQHandler
+    IRQ   TIM5_IRQHandler
+    IRQ   SPI3_IRQHandler
+    IRQ   UART4_IRQHandler
+    IRQ   UART5_IRQHandler
+    IRQ   TIM6_DAC_IRQHandler
+    IRQ   TIM7_IRQHandler
+    IRQ   DMA2_Stream0_IRQHandler
+    IRQ   DMA2_Stream1_IRQHandler
+    IRQ   DMA2_Stream2_IRQHandler
+    IRQ   DMA2_Stream3_IRQHandler
+    IRQ   DMA2_Stream4_IRQHandler
+    IRQ   ETH_IRQHandler
+    IRQ   ETH_WKUP_IRQHandler
+    IRQ   CAN2_TX_IRQHandler
+    IRQ   CAN2_RX0_IRQHandler
+    IRQ   CAN2_RX1_IRQHandler
+    IRQ   CAN2_SCE_IRQHandler
+    IRQ   OTG_FS_IRQHandler
+    IRQ   DMA2_Stream5_IRQHandler
+    IRQ   DMA2_Stream6_IRQHandler
+    IRQ   DMA2_Stream7_IRQHandler
+    IRQ   USART6_IRQHandler
+    IRQ   I2C3_EV_IRQHandler
+    IRQ   I2C3_ER_IRQHandler
+    IRQ   OTG_HS_EP1_OUT_IRQHandler
+    IRQ   OTG_HS_EP1_IN_IRQHandler
+    IRQ   OTG_HS_WKUP_IRQHandler
+    IRQ   OTG_HS_IRQHandler
+    IRQ   DCMI_IRQHandler
+    IRQ   CRYP_IRQHandler
+    IRQ   HASH_RNG_IRQHandler
+    IRQ   FPU_IRQHandler
+
 
     .end
