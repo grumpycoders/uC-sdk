@@ -45,7 +45,9 @@ endif
 
 ifeq ($(CPU_FLAVOR),stm32f4)
 TARGET_SRCS += arm/stm32f4xx/Core/CM4F/DeviceSupport/ST/STM32F4xx/system_stm32f4xx.c
-TARGET_SRCS += $(addprefix arm/stm32f4xx/Drivers/source/stm32f4xx_, adc.c can.c crc.c cryp_aes.c cryp_des.c cryp_tdes.c cryp.c dac.c dbgmcu.c dcmi.c dma.c exti.c flash.c fsmc.c gpio.c hash_md5.c hash_sha1.c hash.c i2c.c iwdg.c pwr.c rcc.c rng.c rtc.c sdio.c spi.c tim.c usart.c wwdg.c)
+TARGET_SRCS += $(addprefix arm/stm32f4xx/Drivers/source/stm32f4xx_, adc.c can.c crc.c cryp_aes.c cryp_des.c cryp_tdes.c cryp.c dac.c dbgmcu.c dcmi.c dma.c dma2d.c exti.c flash.c gpio.c hash_md5.c hash_sha1.c hash.c i2c.c iwdg.c ltdc.c pwr.c rcc.c rng.c rtc.c sai.c sdio.c spi.c syscfg.c tim.c usart.c wwdg.c)
+#STM32F427_437xx, STM32F429_439xx: fmc.c 
+#STM32F40_41xxx: fsmc.c
 TARGET_SRCS += arm/stm32f4xx/Drivers/source/misc.c
 TARGET_SRCS += arm/stm32f4xx/init.c
 TARGET_SRCS += arm/stm32f4xx/registry.c
@@ -56,6 +58,7 @@ TARGET_SRCS += arm/stm32f10x/inemo/BoardConsole.c arm/stm32f10x/inemo/BoardInit.
 endif
 
 ifeq ($(BOARD),stm32f4discovery)
+TARGET_SRCS += $(addprefix arm/stm32f4xx/Drivers/source/stm32f4xx_, fsmc.c)
 TARGET_SRCS += arm/stm32f4xx/stm32f4discovery/BoardConsole.c arm/stm32f4xx/stm32f4discovery/BoardInit.c
 endif
 endif

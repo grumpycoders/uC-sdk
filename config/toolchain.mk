@@ -19,6 +19,7 @@ ifeq ($(BOARD),inemo)
 TARGET_CPPFLAGS += -DSTM32F10X_HD
 endif
 ifeq ($(BOARD),stm32f4discovery)
+TARGET_CPPFLAGS += -DSTM32F40_41xxx
 endif
 TARGET_CPPFLAGS += -Os -mapcs-frame -mno-sched-prolog -fno-hosted -ffunction-sections -fdata-sections -fshort-wchar -D__LITTLE_ENDIAN
 TARGET_LDFLAGS += -Wl,--no-wchar-size-warning
