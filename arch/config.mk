@@ -40,6 +40,7 @@ endif
 
 ifeq ($(BOARD),stm32f4discovery)
 TARGET_INCLUDES += $(ROOTDIR)/arch/arm/stm32f4xx/stm32f4discovery
+TARGET_CPPFLAGS += -DHSE_VALUE=8000000
 endif
 
 endif
