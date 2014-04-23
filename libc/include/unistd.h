@@ -1,5 +1,6 @@
 #pragma once
 
+#include <decl.h>
 #include <reent.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -22,8 +23,12 @@ enum seek_wheels_t {
     SEEK_END = 2,
 };
 
+BEGIN_DECL
+
 int open(const char *pathname, int flags);
 int close(int fd);
 ssize_t read(int fd, void *buf, size_t count);
 ssize_t write(int fd, const void *buf, size_t count);
 off_t lseek(int fd, off_t seek, int wheel);
+
+END_DECL

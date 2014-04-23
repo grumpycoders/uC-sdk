@@ -1,8 +1,11 @@
 #pragma once
 
+#include <decl.h>
 #include <stdio.h>
 
 #define MAX_FDS 32
+
+BEGIN_DECL
 
 typedef ssize_t (*fdread_t)(void * opaque, void * buf, size_t count);
 typedef ssize_t (*fdwrite_t)(void * opaque, const void * buf, size_t count);
@@ -26,3 +29,5 @@ int fio_close(int fd);
 void fio_set_opaque(int fd, void * opaque);
 
 void register_devfs();
+
+END_DECL

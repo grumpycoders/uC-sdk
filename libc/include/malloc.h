@@ -1,8 +1,11 @@
 #pragma once
 
+#include <decl.h>
 #include <reent.h>
 #include <stddef.h>
 #include <stdint.h>
+
+BEGIN_DECL
 
 typedef void * (*malloc_t)(size_t size);
 typedef void (*free_t)(void * ptr);
@@ -23,3 +26,5 @@ static inline void * calloc(size_t nmemb, size_t size) {
         r[i] = 0;
     return r;
 }
+
+END_DECL

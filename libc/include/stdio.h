@@ -1,5 +1,6 @@
 #pragma once
 
+#include <decl.h>
 #include <reent.h>
 #include <stdarg.h>
 #include <stddef.h>
@@ -12,6 +13,8 @@ struct _FILE {
     int fd;
     int got_eof;
 };
+
+BEGIN_DECL
 
 typedef struct _FILE FILE;
 extern FILE * stdin, * stdout, * stderr;
@@ -44,9 +47,9 @@ static inline int xscanf(int (*xgetc)(void *), void (*xungetc)(void *, int), voi
 static inline int fscanf(FILE * stream, const char * format, ...) { va_list ap; int r; va_start(ap, format); r = vfscanf(stream, format, ap); va_end(ap); return r; }
 static inline int scanf(const char * format, ...) { va_list ap; int r; va_start(ap, format); r = vscanf(format, ap); va_end(ap); return r; }
 
-
-
 void __sinit(struct _reent *);
+
+END_DECL
 
 // We don't even buffer, so...
 static inline int fflush(FILE *stream) { return 0; }
