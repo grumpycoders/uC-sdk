@@ -3,7 +3,7 @@ TARGET = demo.bin
 TARGET_OBJS = test-romfs.o
 endif
 
-LIBDEPS = FreeRTOS/libFreeRTOS.a arch/libarch.a os/libos.a libc/libc.a libm/libm.a acorn/libacorn.a lwip/liblwip.a
+LIBDEPS = FreeRTOS/libFreeRTOS.a arch/libarch.a hardware/libhardware.a os/libos.a libc/libc.a libm/libm.a acorn/libacorn.a lwip/liblwip.a
 LIBS = -Wl,--start-group $(LIBDEPS) -Wl,--end-group
 
 export ROOTDIR = $(CURDIR)
@@ -15,6 +15,7 @@ all: tools libs $(TARGET)
 clean: clean-generic
 	$(Q)$(MAKE) $(MAKE_OPTS) -C FreeRTOS clean
 	$(Q)$(MAKE) $(MAKE_OPTS) -C arch clean
+	$(Q)$(MAKE) $(MAKE_OPTS) -C hardware clean
 	$(Q)$(MAKE) $(MAKE_OPTS) -C os clean
 	$(Q)$(MAKE) $(MAKE_OPTS) -C libc clean
 	$(Q)$(MAKE) $(MAKE_OPTS) -C libm clean
@@ -23,10 +24,11 @@ clean: clean-generic
 	$(Q)$(MAKE) $(MAKE_OPTS) -C tools clean
 	$(Q)rm -f test-romfs.bin
 
-.PHONY: libs FreeRTOS arch os libc libm acorn lwip tools deps
+.PHONY: libs FreeRTOS arch hardware os libc libm acorn lwip tools deps
 
 FreeRTOS/libFreeRTOS.a: FreeRTOS
 arch/libarch.a: arch
+hardware/libhardware.a: hardware
 os/libos.a: os
 libc/libc.a: libc
 libm/libm.a: libm
@@ -42,6 +44,10 @@ FreeRTOS:
 arch:
 	$(E) "[MAKE]   Entering arch"
 	$(Q)$(MAKE) $(MAKE_OPTS) -C arch
+
+hardware:
+	$(E) "[MAKE]   Entering hardware"
+	$(Q)$(MAKE) $(MAKE_OPTS) -C hardware
 
 os:
 	$(E) "[MAKE]   Entering os"
@@ -78,6 +84,8 @@ deps: ldeps
 	$(Q)$(MAKE) $(MAKE_OPTS) -C FreeRTOS ldeps
 	$(E) "[DEPS]   Creating dependency tree for arch"
 	$(Q)$(MAKE) $(MAKE_OPTS) -C arch ldeps
+	$(E) "[DEPS]   Creating dependency tree for hardware"
+	$(Q)$(MAKE) $(MAKE_OPTS) -C hardware ldeps
 	$(E) "[DEPS]   Creating dependency tree for os"
 	$(Q)$(MAKE) $(MAKE_OPTS) -C os ldeps
 	$(E) "[DEPS]   Creating dependency tree for libc"
@@ -91,6 +99,7 @@ deps: ldeps
 
 include arch/config.mk
 include FreeRTOS/config.mk
+include hardware/config.mk
 include os/config.mk
 include libc/config.mk
 include libm/config.mk

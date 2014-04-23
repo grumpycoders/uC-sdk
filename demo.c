@@ -1,9 +1,7 @@
 #include <FreeRTOS.h>
 #include <task.h>
 #include <semphr.h>
-#ifdef BOARD_MBED
-#include <lpc17xx_gpio.h>
-#endif
+#include <gpio.h>
 #include <BoardConsole.h>
 #include <osdebug.h>
 #include <stdio.h>
@@ -29,13 +27,16 @@
 
 #ifdef BOARD_MBED
 
-#define LED1_wire 18
-#define LED2_wire 20
-#define LED3_wire 21
-#define LED4_wire 23
+#define LED1_wire MAKE_PIN(1, 18)
+#define LED2_wire MAKE_PIN(1, 20)
+#define LED3_wire MAKE_PIN(1, 21)
+#define LED4_wire MAKE_PIN(1, 23)
 
 static void setupLEDs() {
-    GPIO_SetDir(1, (1 << LED1_wire) | (1 << LED2_wire) | (1 << LED3_wire) | (1 << LED4_wire), 1);
+    gpio_config(LED1_wire, pin_dir_write);
+    gpio_config(LED2_wire, pin_dir_write);
+    gpio_config(LED3_wire, pin_dir_write);
+    gpio_config(LED4_wire, pin_dir_write);
 }
 
 static void litLED(int led, int value) {
@@ -43,29 +44,27 @@ static void litLED(int led, int value) {
         return;
     
     switch (led) {
-        case 1: led = 1 << LED1_wire; break;
-        case 2: led = 1 << LED2_wire; break;
-        case 3: led = 1 << LED3_wire; break;
-        case 4: led = 1 << LED4_wire; break;
+        case 1: led = LED1_wire; break;
+        case 2: led = LED2_wire; break;
+        case 3: led = LED3_wire; break;
+        case 4: led = LED4_wire; break;
     }
     
-    if (value) {
-        GPIO_SetValue(1, led);
-    } else {
-        GPIO_ClearValue(1, led);
-    }
+    gpio_set(led, value);
 }
 
 static void ledTask(void *p) {
     int n = 0;
     while (1) {
-        switch ((n++) & 3) {
+        switch (n++) {
             case 0: litLED(1, 1); litLED(2, 0); litLED(3, 0); litLED(4, 0); break;
             case 1: litLED(1, 0); litLED(2, 1); litLED(3, 0); litLED(4, 0); break;
             case 2: litLED(1, 0); litLED(2, 0); litLED(3, 1); litLED(4, 0); break;
             case 3: litLED(1, 0); litLED(2, 0); litLED(3, 0); litLED(4, 1); break;
+            case 4: litLED(1, 0); litLED(2, 0); litLED(3, 1); litLED(4, 0); break;
+            case 5: litLED(1, 0); litLED(2, 1); litLED(3, 0); litLED(4, 0); n = 0; break;
         }
-        vTaskDelay(1000);
+        vTaskDelay(200);
     }
 }
 #endif
@@ -188,18 +187,28 @@ int main() {
     f1 = fopen("/dev/stdout", "w");
     fprintf(stderr, "f1 = %p\r\n", f1);
     fwrite(msg, 1, sizeof(msg), f1);
-    f2 = fopen("/romfs/test.txt", "r");
-    c = fread(buf, 1, 32, f2);
-    fwrite(buf, 1, c, f1);
-#ifdef HAS_SEMIFS
-    FILE * f3 = fopen("/host/TEST.TXT", "r");
-    c = fread(buf, 1, 32, f3);
-    fwrite(buf, 1, c, f1);
-    fclose(f3);
-#endif
     fflush(f1);
     fclose(f1);
-    fclose(f2);
+    f2 = fopen("/romfs/test.txt", "r");
+    if (f2) {
+        c = fread(buf, 1, 32, f2);
+        if (c > 0)
+            fwrite(buf, 1, c, f1);
+        fclose(f2);
+    } else {
+        printf("Unable to open /romfs/test.txt.\n");
+    }
+#ifdef HAS_SEMIFS
+    FILE * f3 = fopen("/host/TEST.TXT", "r");
+    if (f3) {
+        c = fread(buf, 1, 32, f3);
+        if (c > 0)
+            fwrite(buf, 1, c, f1);
+        fclose(f3);
+    } else {
+        printf("Unable to open /host/TEST.TXT.\n");
+    }
+#endif
 #ifdef BOARD_MBED
     setupLEDs();
     litLED(1, 0);
