@@ -1,5 +1,4 @@
-#ifndef __UNISTD_H__
-#define __UNISTD_H__
+#pragma once
 
 #include <reent.h>
 #include <stddef.h>
@@ -28,5 +27,3 @@ int close(int fd);
 ssize_t read(int fd, void *buf, size_t count);
 ssize_t write(int fd, const void *buf, size_t count);
 off_t lseek(int fd, off_t seek, int wheel);
-
-#endif

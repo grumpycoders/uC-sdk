@@ -1,5 +1,4 @@
-#ifndef __CTYPE_H__
-#define __CTYPE_H__
+#pragma once
 
 static inline int isascii(int c) { return (c & 0x80) == 0; }
 static inline int isblank(int c) { return c == ' ' || c == '\t'; }
@@ -18,5 +17,3 @@ static inline int ispunct(int c) { return !iscntrl(c) && !isspace(c) && !isalnum
 
 static inline int toupper(int c) { return islower(c) ? c & ~0x20 : c; }
 static inline int tolower(int c) { return isupper(c) ? c | 0x20 : c; }
-
-#endif

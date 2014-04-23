@@ -1,5 +1,4 @@
-#ifndef __STDIO_H__
-#define __STDIO_H__
+#pragma once
 
 #include <reent.h>
 #include <stdarg.h>
@@ -252,5 +251,3 @@ static inline off_t ftell(FILE * stream) { return lseek(stream->fd, 0, SEEK_CUR)
 static inline int feof(FILE * stream) { return stream->got_eof; }
 static inline int fileno(FILE * stream) { return stream->fd; }
 static inline void rewind(FILE * stream) { fseek(stream, 0, SEEK_SET); }
-
-#endif

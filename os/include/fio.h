@@ -1,5 +1,4 @@
-#ifndef __FIO_H__
-#define __FIO_H__
+#pragma once
 
 #include <stdio.h>
 
@@ -27,5 +26,3 @@ int fio_close(int fd);
 void fio_set_opaque(int fd, void * opaque);
 
 void register_devfs();
-
-#endif

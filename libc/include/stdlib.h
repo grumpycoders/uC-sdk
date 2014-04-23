@@ -1,5 +1,4 @@
-#ifndef __STDLIB_H__
-#define __STDLIB_H__
+#pragma once
 
 #include <reent.h>
 #include <malloc.h>
@@ -15,5 +14,3 @@ void qsort(void *base, size_t nel, size_t width, int (*compar)(const void *, con
 static inline double atof(const char * str) { double r = 0; sscanf(str, "%lf", &r); return r; }
 static inline int atoi(const char * str) { int i; sscanf(str, "%i", &i); return i; }
 static inline int atol(const char * str) { long l; sscanf(str, "%li", &l); return l; }
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef __MALLOC_H__
-#define __MALLOC_H__
+#pragma once
 
 #include <reent.h>
 #include <stddef.h>
@@ -24,5 +23,3 @@ static inline void * calloc(size_t nmemb, size_t size) {
         r[i] = 0;
     return r;
 }
-
-#endif

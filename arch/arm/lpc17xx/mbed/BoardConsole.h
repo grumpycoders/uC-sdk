@@ -1,5 +1,4 @@
-#ifndef __MBED_CONSOLE_H__
-#define __MBED_CONSOLE_H__
+#pragma once
 
 #include <stdarg.h>
 
@@ -8,5 +7,3 @@ void BoardConsolePuts(const char * str);
 void BoardConsolePutc(int);
 void BoardConsolePrintf(const char * fmt, ...) __attribute__ ((format(printf, 1, 2)));
 void BoardConsoleVPrintf(const char * fmt, va_list ap);
-
-#endif

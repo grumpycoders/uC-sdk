@@ -1,5 +1,4 @@
-#ifndef __RENT_H__
-#define __RENT_H__
+#pragma once
 
 #include <errno.h>
 
@@ -10,5 +9,3 @@ struct _reent {
 static inline void _REENT_INIT_PTR(struct _reent * reent) { reent->_errno = ENOERROR; }
 extern struct _reent * _impure_ptr;
 static inline void set_errno(enum errno_t _errno) { _impure_ptr->_errno = errno = _errno; }
-
-#endif

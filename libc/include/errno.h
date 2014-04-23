@@ -1,5 +1,4 @@
-#ifndef __ERRNO_H__
-#define __ERRNO_H__
+#pragma once
 
 enum errno_t {
     ENOERROR = 0,
@@ -138,5 +137,3 @@ enum errno_t {
 };
 
 volatile extern enum errno_t errno;
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef __SETJMP_H__
-#define __SETJMP_H__
+#pragma once
 
 #include <stdint.h>
 
@@ -9,5 +8,3 @@ typedef struct {
 
 int setjmp(jmp_buf env);
 void longjmp(jmp_buf env, int val);
-
-#endif

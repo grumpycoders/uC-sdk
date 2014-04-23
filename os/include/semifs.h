@@ -1,6 +1,3 @@
-#ifndef __SEMIFS_H__
-#define __SEMIFS_H__
+#pragma once
 
 void register_semifs();
-
-#endif
