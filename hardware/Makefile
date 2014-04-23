@@ -12,7 +12,10 @@ TARGET_SRCS = \
 src/sdcard.c \
 
 ifeq ($(CPU_FAMILY),CM3)
-TARGET_SRCS += src/gpio-cm3.c
+ifeq ($(CPU_FLAVOR),lpc17xx)
+TARGET_SRCS += src/gpio-lpc17xx.c
+TARGET_SRCS += src/ssp-lpc17xx.c
+endif
 endif
 
 include $(ROOTDIR)/target-rules.mk
