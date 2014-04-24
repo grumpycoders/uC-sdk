@@ -30,7 +30,7 @@ void _start() {
     cpu_early_init();
 
     BoardConsoleInit();
-    BoardConsolePuts("uC-sdk - booting.");
+    BoardConsolePuts("\n\n================\nuC-sdk - booting\n================\n");
 
     libc_init();
 
