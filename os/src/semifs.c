@@ -22,9 +22,6 @@
 #include <string.h>
 #include <errno.h>
 #include <stdint.h>
-#ifdef USE_NEWLIB
-#include <fcntl.h>
-#endif
 
 #include <angel.h>
 
