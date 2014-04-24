@@ -72,15 +72,20 @@ static off_t romfs_seek(void * opaque, off_t offset, int whence) {
 
 const uint8_t * romfs_get_file_by_hash(const uint8_t * romfs, uint32_t h, uint32_t * len) {
     const uint8_t * meta;
+    uint32_t hash;
+    uint32_t flen;
 
-    for (meta = romfs; get_unaligned(meta) && get_unaligned(meta + 4); meta += get_unaligned(meta + 4) + 8) {
-        if (get_unaligned(meta) == h) {
-            if (len) {
+    meta = romfs;
+    do {
+        hash = get_unaligned(meta);
+        flen = get_unaligned(meta + 4);
+        if (hash == h) {
+            if (len)
                 *len = get_unaligned(meta + 4);
-            }
             return meta + 8;
         }
-    }
+        meta += flen + 8;
+    } while ((hash != 0) || (flen != 0));
 
     return NULL;
 }

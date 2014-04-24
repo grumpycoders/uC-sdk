@@ -188,11 +188,10 @@ int main() {
     f1 = fopen("/dev/stdout", "w");
     fprintf(stderr, "f1 = %p\r\n", f1);
     fwrite(msg, 1, sizeof(msg), f1);
-    fflush(f1);
-    fclose(f1);
     f2 = fopen("/romfs/test.txt", "r");
     if (f2) {
         c = fread(buf, 1, 32, f2);
+        printf("read %i bytes.\n", c);
         if (c > 0)
             fwrite(buf, 1, c, f1);
         fclose(f2);
@@ -210,6 +209,8 @@ int main() {
         printf("Unable to open /host/TEST.TXT.\n");
     }
 #endif
+    fflush(f1);
+    fclose(f1);
 #ifdef BOARD_MBED
     setupLEDs();
     litLED(1, 0);
@@ -218,7 +219,7 @@ int main() {
     litLED(4, 0);
 #endif
     sdcard_t sdcard;
-    sdcard.ssp = ssp_port_0;
+    sdcard.ssp = ssp_port_1;
     sdcard.cs = MAKE_PIN(0, 16);
     sdcard_init(&sdcard);
     printf("Test: %f\n", 12.3456f);
