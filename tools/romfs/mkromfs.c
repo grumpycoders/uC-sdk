@@ -1,5 +1,8 @@
 #ifdef _WIN32
 #include <windows.h>
+#else
+#include <sys/types.h>
+#include <sys/stat.h>
 #endif
 #include <stdio.h>
 #include <stdlib.h>
@@ -39,11 +42,13 @@ void processdir(DIR * dirp, const char * curpath, FILE * outfile, const char * p
         strcat(fullpath, "/");
         strcat(fullpath, curpath);
         strcat(fullpath, ent->d_name);
-    #ifdef _WIN32
+#ifdef _WIN32
         if (GetFileAttributes(fullpath) & FILE_ATTRIBUTE_DIRECTORY) {
-    #else
-        if (ent->d_type == DT_DIR) {
-    #endif
+#else
+        struct stat st;
+        stat(fullpath, &st);
+        if (S_ISDIR(st.st_mode)) {
+#endif
             if (strcmp(ent->d_name, ".") == 0)
                 continue;
             if (strcmp(ent->d_name, "..") == 0)
