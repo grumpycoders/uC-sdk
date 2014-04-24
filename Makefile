@@ -35,7 +35,7 @@ libm/libm.a: libm
 acorn/libacorn.a: acorn
 lwip/liblwip.a: lwip
 
-libs: FreeRTOS arch os libc libm acorn lwip
+libs: FreeRTOS arch hardware os libc libm acorn lwip
 
 FreeRTOS:
 	$(E) "[MAKE]   Entering FreeRTOS"

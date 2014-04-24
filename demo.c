@@ -2,6 +2,7 @@
 #include <task.h>
 #include <semphr.h>
 #include <gpio.h>
+#include <sdcard.h>
 #include <BoardConsole.h>
 #include <osdebug.h>
 #include <stdio.h>
@@ -216,6 +217,10 @@ int main() {
     litLED(3, 0);
     litLED(4, 0);
 #endif
+    sdcard_t sdcard;
+    sdcard.ssp = ssp_port_0;
+    sdcard.cs = MAKE_PIN(0, 16);
+    sdcard_init(&sdcard);
     printf("Test: %f\n", 12.3456f);
     BoardConsolePuts("Creating simple tasks.");
 #ifdef SHOW_SIMPLE_TASKS
