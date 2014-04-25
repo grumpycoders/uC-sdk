@@ -221,7 +221,21 @@ int main() {
     sdcard_t sdcard;
     sdcard.ssp = ssp_port_1;
     sdcard.cs = MAKE_PIN(0, 6);
-    sdcard_init(&sdcard);
+    if (sdcard_init(&sdcard)) {
+        printf("Successfully initialized sdcard - reading first sector\n");
+        uint8_t data[512];
+        if (sdcard_read(&sdcard, data, 0)) {
+            int i;
+            for (i = 0; i < 512; i++) {
+                printf("%02x ", data[i]);
+                if ((i & 15) == 15)
+                    printf("\n");
+            }
+            printf("\n");
+        } else {
+            printf("read error\n");
+        }
+    }
     printf("Test: %f\n", 12.3456f);
     BoardConsolePuts("Creating simple tasks.");
 #ifdef SHOW_SIMPLE_TASKS

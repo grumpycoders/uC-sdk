@@ -17,5 +17,6 @@ typedef struct {
 BEGIN_DECL
 
 int sdcard_init(sdcard_t * sdcard);
+int sdcard_read(sdcard_t * sdcard, uint8_t * data, unsigned int block);
 
 END_DECL
