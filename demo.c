@@ -7,6 +7,7 @@
 #include <osdebug.h>
 #include <stdio.h>
 #include <fio.h>
+#include <devfs.h>
 #include <romfs.h>
 #include <semifs.h>
 #include <malloc_wrapper.h>
@@ -178,6 +179,7 @@ int main() {
     char buf[32];
     int c;
     register_devfs();
+    register_stdio();
 #ifdef HAS_SEMIFS
     register_semifs();
 #endif

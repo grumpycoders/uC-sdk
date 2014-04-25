@@ -13,6 +13,7 @@ src/init.c \
 src/hooks.c \
 \
 src/filesystem.c \
+src/devfs.c \
 src/fio.c \
 src/hash-djb2.c \
 src/osdebug.c \
