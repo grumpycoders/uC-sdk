@@ -169,7 +169,7 @@ int sdcard_init(sdcard_t * sdcard) {
     sdcard->got_timeout = 0;
     sdcard->error_state = 0;
     sdcard->v2 = 0;
-    sdcard->ccs = 0;
+    sdcard->sdhc = 0;
 
     SDPUTS("Configuring SSP.");
     ssp_config(sdcard->ssp, 400000); // standard says we can ping the card at 400khz first.
@@ -252,10 +252,10 @@ int sdcard_init(sdcard_t * sdcard) {
             return 0;
         }
         SDPRINTF("  --> %02x %02x %02x %02x %02x %02x\n", response[0], response[1], response[2], response[3], response[4], response[5]);
-        argument[0] = 0;
+        argument[0] = sdcard->v2 ? 0x40 : 0;
         argument[1] = 0;
         argument[2] = 0;
-        argument[3] = sdcard->v2 ? 0x40 : 0;
+        argument[3] = 0;
         SDPUTS("Sending APP_SEND_OP_COND.");
         if (!sdcard_cmd(sdcard, APP_SEND_OP_COND, argument, 0, 0, response)) {
             SDPUTS("  --> timeouted.");
@@ -322,10 +322,10 @@ int sdcard_init(sdcard_t * sdcard) {
             return 0;
         }
 
-        sdcard->ccs = response[1] & 0x40 ? 1 : 0;
+        sdcard->sdhc = response[1] & 0x40 ? 1 : 0;
     }
 
-    if (!sdcard->ccs) {
+    if (!sdcard->sdhc) {
         SDPUTS("Sending SET_BLOCKLEN with arg = 512");
         argument[0] = 0;
         argument[1] = 0;
@@ -345,7 +345,7 @@ int sdcard_init(sdcard_t * sdcard) {
         }
     }
 
-    SDPRINTF("SDCard init success. v2 = %s, ccs = %s\n", sdcard->v2 ? "true" : "false", sdcard->ccs ? "true" : "false");
+    SDPRINTF("SDCard init success. v2 = %s, sdhc = %s\n", sdcard->v2 ? "true" : "false", sdcard->sdhc ? "true" : "false");
 
     return 1;
 }
@@ -354,7 +354,8 @@ int sdcard_read(sdcard_t * sdcard, uint8_t * data, unsigned int block) {
     uint8_t argument[4] = { 0, 0, 0, 0 };
     uint8_t response[6];
     uint32_t offset = block;
-    offset *= 512;
+    if (sdcard->sdhc)
+        offset *= 512;
 
     argument[3] = offset & 0xff; offset >>= 8;
     argument[2] = offset & 0xff; offset >>= 8;

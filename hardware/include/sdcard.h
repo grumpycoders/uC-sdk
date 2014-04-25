@@ -11,7 +11,7 @@ typedef struct {
     // these are read-only publics
     int got_timeout:1, error_state:1;
     // these should remain opaque
-    int v2:1, ccs:1;
+    int v2:1, sdhc:1;
 } sdcard_t;
 
 BEGIN_DECL
