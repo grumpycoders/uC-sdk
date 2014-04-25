@@ -13,6 +13,7 @@
  * http://users.ece.utexas.edu/~valvano/EE345M/SD_Physical_Layer_Spec.pdf
  * http://alumni.cs.ucr.edu/~amitra/sdcard/Additional/sdcard_appnote_foust.pdf
  * http://elm-chan.org/docs/mmc/mmc_e.html
+ * http://wiki.seabright.co.nz/wiki/SdCardProtocol.html
  *
  * Now, funnily enough, most of these informations (plus various other sources codes I've read)
  * contain contradictory information. So at the end, I'm not really sure that code fully works
@@ -24,6 +25,8 @@
 enum {
     GO_IDLE_STATE = 0,
     SEND_OP_COND = 1,
+    ALL_SEND_CID = 2,
+    SEND_RELATIVE_ADDR,
     SEND_IF_COND = 8,
     SEND_CSD = 9,
     SEND_CID = 10,
@@ -35,6 +38,7 @@ enum {
     WRITE_BLOCK = 24,
     WRITE_MULTIPLE_BLOCK = 25,
     READ_OCR = 58,
+    CRC_ON_OFF = 59,
 
     APP_CMD = 55,
 
@@ -55,18 +59,35 @@ enum {
     PARAMETER_ERROR = 1 << 6,
 };
 
-static int sdcard_cmd(sdcard_t * sdcard, int cmd, uint8_t arg[4], int response_type, uint8_t response[5]) {
-    // from http://elm-chan.org/docs/mmc/mmc_e.html
-    // and http://elm-chan.org/docs/mmc/gx1/cmd.png
+static uint8_t update_cmd_crc(uint8_t crc, uint8_t val) {
+    unsigned int i;
+    int bit;
+
+    for (i = 0x80; i > 0; i >>= 1) {
+        bit = (crc & 0x40);
+        if (val & i)
+            bit ^= 0x40;
+        crc <<= 1;
+        if (bit)
+            crc ^= 9;
+    }
+
+    return crc & 0x7f;
+}
+
+static int sdcard_cmd(sdcard_t * sdcard, uint8_t cmd, uint8_t arg[4], int big_response, int wait, uint8_t response[17]) {
     BoardConsolePrintf("  sending cmd %02x\n", cmd);
+    cmd &= 0x3f;
+    cmd |= 0x40;
     gpio_set(sdcard->cs, 0);
-    ssp_write(sdcard->ssp, (cmd & 0x3f) | 0x40);
+    ssp_write(sdcard->ssp, cmd);
+    uint8_t crc = update_cmd_crc(0, cmd);
     int i;
-    for (i = 0; i < 4; i++)
+    for (i = 0; i < 4; i++) {
+        crc = update_cmd_crc(crc, arg[i]);
         ssp_write(sdcard->ssp, arg[i]);
-    ssp_write(sdcard->ssp, 0x95); // supposed to be dummy CRC; but not during the very first command.
-    // The first command is GO_IDLE_STATE (CMD0) with arg = 0. 0x95 is the CRC for such command.
-    // See page 6 of http://alumni.cs.ucr.edu/~amitra/sdcard/Additional/sdcard_appnote_foust.pdf
+    }
+    ssp_write(sdcard->ssp, (crc << 1) | 1);
 
     int retries = MAX_RETRIES;
     while (--retries) {
@@ -84,10 +105,15 @@ static int sdcard_cmd(sdcard_t * sdcard, int cmd, uint8_t arg[4], int response_t
         return 0;
     }
 
-    for (i = 1; i < response_type - 1; i++)
+    if (big_response)
+        big_response = 17;
+    else
+        big_response = 6;
+
+    for (i = 1; i < big_response; i++)
         response[i] = ssp_read(sdcard->ssp);
 
-    if (response_type == R1B) {
+    if (wait) {
         BoardConsolePuts("Waiting...");
         retries = MAX_RETRIES;
         while (--retries)
@@ -126,8 +152,6 @@ int sdcard_init(sdcard_t * sdcard) {
     gpio_config(sdcard->cs, pin_dir_write);
     gpio_set(sdcard->cs, 1);
 
-    // from http://elm-chan.org/docs/mmc/gx1/sdinit.png
-    // and http://alumni.cs.ucr.edu/~amitra/sdcard/Additional/sdcard_appnote_foust.pdf
     // first, let's send 74 dummy clocks, with MOSI = 1 and CS = 1; that's about 10 bytes equal to 0xff.
     BoardConsolePuts("Waiting 74+ cycles.");
     for (i = 0; i < 10; i++)
@@ -140,36 +164,43 @@ int sdcard_init(sdcard_t * sdcard) {
         ssp_write(sdcard->ssp, 0xff);
 
     uint8_t argument[4] = { 0, 0, 0, 0 };
-    uint8_t response[5];
+    uint8_t response[17];
 
     // the card ought to be ready for us to send things now; let's start with tuning on SPI mode
     BoardConsolePuts("Sending GO_IDLE_STATE command.");
-    if (!sdcard_cmd(sdcard, GO_IDLE_STATE, argument, R1, response)) {
+    if (!sdcard_cmd(sdcard, GO_IDLE_STATE, argument, 0, 0, response)) {
         BoardConsolePuts("  --> timeouted.");
         error_out(sdcard);
         return 0;
     }
-    BoardConsolePrintf("  --> %02x\n", response[0]);
+    BoardConsolePrintf("  --> %02x %02x %02x %02x %02x %02x\n", response[0], response[1], response[2], response[3], response[4], response[5]);
     if (response[0] != IDLE_STATE) {
         BoardConsolePuts("Not in idle state...\n");
         error_out(sdcard);
         return 0;
     }
 
+    // sending that will a) tell us if this is a v2 card and b) enable the card for getting the special SDHC commands, if supported.
     BoardConsolePuts("Sending SEND_IF_COND command to see if this is a v2 card.");
     argument[0] = 0;
     argument[1] = 0;
     argument[2] = 1;
     argument[3] = 0xaa;
-    if (!sdcard_cmd(sdcard, SEND_IF_COND, argument, R3, response)) {
+    if (!sdcard_cmd(sdcard, SEND_IF_COND, argument, 0, 0, response)) {
         BoardConsolePuts("  --> timeouted.");
         error_out(sdcard);
         return 0;
     }
 
-    BoardConsolePrintf("  --> %02x\n", response[0]);
+    BoardConsolePrintf("  --> %02x %02x %02x %02x %02x %02x\n", response[0], response[1], response[2], response[3], response[4], response[5]);
     if ((response[0] & IDLE_STATE) != IDLE_STATE) {
         BoardConsolePuts("Not in idle state...\n");
+        error_out(sdcard);
+        return 0;
+    }
+
+    if ((response[0] & ~ILLEGAL_COMMAND) != IDLE_STATE) {
+        BoardConsolePuts("Got an unknown error...\n");
         error_out(sdcard);
         return 0;
     }
@@ -190,25 +221,25 @@ int sdcard_init(sdcard_t * sdcard) {
         argument[3] = 0;
         // We need to send APP_SEND_OP_COND, which needs APP_CMD before.
         BoardConsolePuts("Sending APP_CMD.");
-        if (!sdcard_cmd(sdcard, APP_CMD, argument, R1, response)) {
+        if (!sdcard_cmd(sdcard, APP_CMD, argument, 0, 0, response)) {
             BoardConsolePuts("  --> timeouted.");
             error_out(sdcard);
             return 0;
         }
-        BoardConsolePrintf("  --> %02x\n", response[0]);
+        BoardConsolePrintf("  --> %02x %02x %02x %02x %02x %02x\n", response[0], response[1], response[2], response[3], response[4], response[5]);
         argument[0] = 0;
         argument[1] = 0;
         argument[2] = 0;
         argument[3] = sdcard->v2 ? 0x40 : 0;
         BoardConsolePuts("Sending APP_SEND_OP_COND.");
-        if (!sdcard_cmd(sdcard, APP_SEND_OP_COND, argument, R3, response)) {
+        if (!sdcard_cmd(sdcard, APP_SEND_OP_COND, argument, 0, 0, response)) {
             BoardConsolePuts("  --> timeouted.");
             error_out(sdcard);
             return 0;
         }
-        BoardConsolePrintf("  --> %02x %02x %02x %02x %02x\n", response[0], response[1], response[2], response[3], response[4]);
+        BoardConsolePrintf("  --> %02x %02x %02x %02x %02x %02x\n", response[0], response[1], response[2], response[3], response[4], response[5]);
         // if bit 0 is set, card is busy, so we need to loop again
-        if (((response[0] & IDLE_STATE) == 0) && (response[1] & 0x80)) // this is supposed to mean the power up routine is done
+        if ((response[0] & IDLE_STATE) == 0)
             break;
     }
 
@@ -229,28 +260,37 @@ int sdcard_init(sdcard_t * sdcard) {
     // like to get an actual sdcard with these requirements to properly test it. In the meantime, I'll
     // just error out. It seems to be the "MMC V3" sdcard btw.
 
-    if (sdcard->v2) {
-        int retries = MAX_RETRIES;
+    BoardConsolePuts("Turning on CRC checks");
+    // since we're computing them, might as well require the card to check them...
+    if (!sdcard_cmd(sdcard, CRC_ON_OFF, argument, 0, 0, response)) {
+        BoardConsolePuts("  --> timeouted.");
+        error_out(sdcard);
+        return 0;
+    }
+    BoardConsolePrintf("  --> %02x %02x %02x %02x %02x %02x\n", response[0], response[1], response[2], response[3], response[4], response[5]);
+
+    if (response[0] != 0) {
+        BoardConsolePuts("Bad response to CRC_ON_OFF");
+        error_out(sdcard);
+        return 0;
+    }
+
+    if (sdcard->v2) { // not sure about that one
         // check the OCR information now
         BoardConsolePuts("Sending READ_OCR");
-        while (--retries) {
-            argument[0] = 0;
-            argument[1] = 0;
-            argument[2] = 0;
-            argument[3] = 0;
-            if (!sdcard_cmd(sdcard, READ_OCR, argument, R3, response)) {
-                BoardConsolePuts("  --> timeouted.");
-                error_out(sdcard);
-                return 0;
-            }
-            BoardConsolePrintf("  --> %02x %02x %02x %02x %02x\n", response[0], response[1], response[2], response[3], response[4]);
-            if (((response[0] & IDLE_STATE) == 0) && (response[1] & 0x80)) // same as above
-                break;
+        argument[0] = 0;
+        argument[1] = 0;
+        argument[2] = 0;
+        argument[3] = 0;
+        if (!sdcard_cmd(sdcard, READ_OCR, argument, 0, 0, response)) {
+            BoardConsolePuts("  --> timeouted.");
+            error_out(sdcard);
+            return 0;
         }
+        BoardConsolePrintf("  --> %02x %02x %02x %02x %02x %02x\n", response[0], response[1], response[2], response[3], response[4], response[5]);
 
-        if (retries == 0) {
-            BoardConsolePuts("Gave up initializing the sdcard");
-            sdcard->got_timeout = 1;
+        if (response[0] != 0) {
+            BoardConsolePuts("Bad response to READ_OCR");
             error_out(sdcard);
             return 0;
         }
@@ -262,4 +302,3 @@ int sdcard_init(sdcard_t * sdcard) {
 
     return 1;
 }
- 
