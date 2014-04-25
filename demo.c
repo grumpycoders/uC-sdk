@@ -220,7 +220,7 @@ int main() {
 #endif
     sdcard_t sdcard;
     sdcard.ssp = ssp_port_1;
-    sdcard.cs = MAKE_PIN(0, 16);
+    sdcard.cs = MAKE_PIN(0, 6);
     sdcard_init(&sdcard);
     printf("Test: %f\n", 12.3456f);
     BoardConsolePuts("Creating simple tasks.");

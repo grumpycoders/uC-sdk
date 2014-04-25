@@ -1,5 +1,6 @@
 #pragma once
 
+#include <decl.h>
 #include <stdint.h>
 #include <gpio.h>
 
@@ -9,6 +10,11 @@ typedef enum {
     ssp_port_1,
 } ssp_t;
 
+BEGIN_DECL
+
 void ssp_config(ssp_t ssp, uint32_t clock);
-void ssp_write(ssp_t ssp, uint8_t value);
-uint8_t ssp_read(ssp_t ssp);
+uint8_t ssp_readwrite(ssp_t ssp, uint8_t value);
+static inline void ssp_write(ssp_t ssp, uint8_t value) { (void) ssp_readwrite(ssp, value); }
+static inline uint8_t ssp_read(ssp_t ssp) { return ssp_readwrite(ssp, 0xff); }
+
+END_DECL
