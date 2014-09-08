@@ -4,7 +4,7 @@
 #include "gpio.h"
 
 static inline uint8_t get_port(pin_t pin) {
-    return (pin >> 8) && 0xff;
+    return (pin >> 8) & 0xff;
 }
 
 static inline uint8_t get_pin(pin_t pin) {
@@ -13,19 +13,18 @@ static inline uint8_t get_pin(pin_t pin) {
 
 GPIO_TypeDef *ports[] = {GPIOA, GPIOB, GPIOC, GPIOD, GPIOE, GPIOF, GPIOG, GPIOH, GPIOI, GPIOJ, GPIOK};
 
-void gpio_config(pin_t pin, pin_dir_t dir) {
+void gpio_config(pin_t pin, pin_dir_t dir) { 
     GPIO_InitTypeDef def;
-    def.GPIO_Pin = get_pin(pin);
+    def.GPIO_Pin = 1 << get_pin(pin);
     def.GPIO_Mode = dir;
     def.GPIO_Speed = GPIO_Speed_50MHz;
-    def.GPIO_OType = GPIO_OType_OD;   //Open Drain
+    def.GPIO_OType = GPIO_OType_PP;   //input : Open Drain, output : Push Pull
     def.GPIO_PuPd = GPIO_PuPd_UP;     //Pull up resistor
 
     //Clock the port
     RCC_AHB1PeriphClockCmd(1 << get_port(pin), ENABLE);
 
     GPIO_Init(ports[get_port(pin)], &def);
-
 }
 
 void gpio_set(pin_t pin, int enabled) {

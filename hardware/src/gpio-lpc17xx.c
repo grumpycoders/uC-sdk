@@ -4,7 +4,7 @@
 #include "gpio.h"
 
 static inline uint8_t get_port(pin_t pin) {
-    return (pin >> 8) && 0xff;
+    return (pin >> 8) & 0xff;
 }
 
 static inline uint8_t get_pin(pin_t pin) {
