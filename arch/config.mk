@@ -43,6 +43,12 @@ TARGET_CPPFLAGS += -DHSE_VALUE=8000000
 LDSCRIPT = $(ROOTDIR)/arch/arm/stm32f4xx/stm32f40x.ld
 endif
 
+ifeq ($(BOARD),stm32f4discovery2)
+TARGET_INCLUDES += $(ROOTDIR)/arch/arm/stm32f4xx/stm32f4discovery2
+TARGET_CPPFLAGS += -DHSE_VALUE=8000000
+LDSCRIPT = $(ROOTDIR)/arch/arm/stm32f4xx/stm32f40x.ld
+endif
+
 endif
 
 ifeq ($(CPU),mips)

@@ -18,6 +18,12 @@ TARGET_SRCS += src/ssp-lpc17xx.c
 endif
 endif
 
+ifeq ($(CPU_FAMILY),CM4F)
+ifeq ($(CPU_FLAVOR),stm32f4)
+TARGET_SRCS += src/gpio-stm32f4xx.c
+endif
+endif
+
 include $(ROOTDIR)/target-rules.mk
 
 clean: clean-generic
