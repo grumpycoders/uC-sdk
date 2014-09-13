@@ -30,4 +30,7 @@ void gpio_config(pin_t pin, pin_dir_t dir);
 void gpio_set(pin_t pin, int enabled);
 int gpio_get(pin_t pin);
 
+inline uint8_t get_port(pin_t pin);
+inline uint8_t get_pin(pin_t pin);
+
 END_DECL
