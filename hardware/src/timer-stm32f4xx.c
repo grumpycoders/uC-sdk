@@ -29,6 +29,17 @@ static struct timerInitDef_t timerInitDefs[] = {
 
 extern GPIO_TypeDef *ports[];
 
+uint32_t timer_get_freq(uint8_t timer)
+{
+    RCC_ClocksTypeDef def;
+    RCC_GetClocksFreq(&def);
+
+    if (timer == 1 || (timer >= 8 || timer <= 11))
+        return def.PCLK2_Frequency;
+    else
+        return def.PCLK1_Frequency;
+}
+
 void timer_init(uint8_t timer, uint8_t channel, uint16_t prescale, uint32_t period)
 {
     if (timer < 1 || timer > 14 || channel < 1 || channel > 4)
@@ -54,7 +65,7 @@ void timer_init(uint8_t timer, uint8_t channel, uint16_t prescale, uint32_t peri
     TIM_Cmd(timerInitDef->id, ENABLE);
 }
 
-void timer_init_pwmchannel(uint8_t timer, uint8_t channel, pin_t pin, uint16_t pulse)
+void timer_init_pwmchannel(uint8_t timer, uint8_t channel, pin_t pin, uint32_t pulse)
 {
     if (timer < 1 || timer > 14 || channel < 1 || channel > 4)
         return;

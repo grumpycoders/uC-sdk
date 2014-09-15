@@ -1,7 +1,7 @@
 #include <stm32f4xx.h>
 #include <stm32f4xx_gpio.h>
 
-#include "gpio.h"
+#include <gpio.h>
 
 inline uint8_t get_port(pin_t pin) {
     return (pin >> 8) & 0xff;
