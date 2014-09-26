@@ -24,6 +24,7 @@ TARGET_SRCS += src/adc-stm32f4xx.c
 TARGET_SRCS += src/gpio-stm32f4xx.c
 TARGET_SRCS += src/i2c-stm32f4xx.c
 TARGET_SRCS += src/timer-stm32f4xx.c
+TARGET_SRCS += src/spi-stm32f4xx.c
 endif
 endif
 

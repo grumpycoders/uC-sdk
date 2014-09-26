@@ -64,7 +64,7 @@ endif
 
 ifeq ($(BOARD),stm32f4discovery2)
 TARGET_SRCS += $(addprefix arm/stm32f4xx/Drivers/source/stm32f4xx_, fmc.c)
-TARGET_SRCS += arm/stm32f4xx/stm32f4discovery/BoardConsole.c arm/stm32f4xx/stm32f4discovery/BoardInit.c
+TARGET_SRCS += arm/stm32f4xx/stm32f4discovery2/BoardConsole.c arm/stm32f4xx/stm32f4discovery2/BoardInit.c
 endif
 endif
 

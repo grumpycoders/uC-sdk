@@ -18,7 +18,6 @@ TARGET_INCLUDES += $(ROOTDIR)/arch/arm/stm32f4xx/Core/CM4F/DeviceSupport/ST/STM3
 TARGET_CPPFLAGS += -DTARGET_LITTLE_ENDIAN
 endif
 
-
 ifeq ($(CPU_FAMILY),CM3)
 TARGET_INCLUDES += $(ROOTDIR)/arch/arm/src/CM3/CoreSupport
 SPECS = $(ROOTDIR)/arch/arm/src/specs
