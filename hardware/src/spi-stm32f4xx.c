@@ -133,7 +133,7 @@ void spi_read(uint8_t id, uint8_t *buffer, uint8_t nb)
     {
         taskENTER_CRITICAL();
 
-        spi_start(id);
+//        spi_start(id);
 
         //send, because that's the rule
         while (SPI_I2S_GetFlagStatus(spiInitDef->id, SPI_I2S_FLAG_TXE) == RESET);
@@ -146,7 +146,7 @@ void spi_read(uint8_t id, uint8_t *buffer, uint8_t nb)
         //wait it is ready
         while (SPI_I2S_GetFlagStatus(spiInitDef->id, SPI_I2S_FLAG_BSY) == SET);
 
-        spi_stop(id);
+//        spi_stop(id);
 
         taskEXIT_CRITICAL();
     }
@@ -164,7 +164,7 @@ void spi_write(uint8_t id, uint8_t *buffer, uint8_t nb)
     {
         taskENTER_CRITICAL();
 
-        spi_start(id);
+//        spi_start(id);
 
         //send data
         while (SPI_I2S_GetFlagStatus(spiInitDef->id, SPI_I2S_FLAG_TXE) == RESET);
@@ -177,7 +177,7 @@ void spi_write(uint8_t id, uint8_t *buffer, uint8_t nb)
         //wait it is ready
         while (SPI_I2S_GetFlagStatus(spiInitDef->id, SPI_I2S_FLAG_BSY) == SET);
 
-        spi_stop(id);
+//        spi_stop(id);
 
         taskEXIT_CRITICAL();
     }
