@@ -37,6 +37,6 @@ void gpio_set(pin_t pin, int enabled) {
         GPIO_ResetBits(ports[get_port(pin)], 1 << get_pin(pin));
 }
 
-int gpio_get(pin_t pin) {
+uint8_t gpio_get(pin_t pin) {
     return GPIO_ReadInputDataBit(ports[get_port(pin)], 1 << get_pin(pin));
 }

@@ -7,6 +7,7 @@ include config.mk
 include $(ROOTDIR)/FreeRTOS/config.mk
 include $(ROOTDIR)/os/config.mk
 include $(ROOTDIR)/libc/config.mk
+include $(ROOTDIR)/hardware/config.mk
 
 ifeq ($(CPU),arm)
 
