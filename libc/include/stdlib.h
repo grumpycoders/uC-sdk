@@ -14,6 +14,16 @@ int atexit(atexit_func_t);
 
 void qsort(void *base, size_t nel, size_t width, int (*compar)(const void *, const void *));
 
+extern unsigned int _seed;
+
+static inline int rand_r(unsigned int * seed) {
+    *seed *= 3148259783UL;
+    return (int) *seed;
+}
+
+static inline int rand(void) { return rand_r(&_seed); }
+static inline void srand(unsigned int seed) { _seed = (seed | 1) * 3835238167UL; }
+
 END_DECL
 
 static inline double atof(const char * str) { double r = 0; sscanf(str, "%lf", &r); return r; }

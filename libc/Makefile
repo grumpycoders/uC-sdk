@@ -24,6 +24,8 @@ src/errno.c \
 \
 src/qsort.c \
 \
+src/rand.c \
+\
 src/reent.c \
 \
 src/initfini.c \

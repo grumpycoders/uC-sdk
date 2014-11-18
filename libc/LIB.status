@@ -24,8 +24,9 @@ random    - missing
 srandom   - missing
 initstate - missing
 setstate  - missing
-rand      - missing
-srand     - missing
+rand      - ok
+rand_r    - ok
+srand     - ok
 drand48   - missing
 
 all *rand48 missing
