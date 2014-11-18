@@ -16,13 +16,10 @@ void qsort(void *base, size_t nel, size_t width, int (*compar)(const void *, con
 
 extern unsigned int _seed;
 
-static inline int rand_r(unsigned int * seed) {
-    *seed *= 3148259783UL;
-    return (int) *seed;
-}
+int rand_r(unsigned int * seed); 
 
 static inline int rand(void) { return rand_r(&_seed); }
-static inline void srand(unsigned int seed) { _seed = (seed | 1) * 3835238167UL; }
+static inline void srand(unsigned int seed) { _seed = (seed * 3835238167UL) | 1; }
 
 END_DECL
 
