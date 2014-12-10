@@ -19,7 +19,7 @@ extern unsigned int _seed;
 int rand_r(unsigned int * seed); 
 
 static inline int rand(void) { return rand_r(&_seed); }
-static inline void srand(unsigned int seed) { _seed = (seed * 3835238167UL) | 1; }
+static inline void srand(unsigned int seed) { _seed = seed * 3835238167UL; }
 
 END_DECL
 
