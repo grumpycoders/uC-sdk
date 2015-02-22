@@ -7,10 +7,11 @@
 #include <romfs.h>
 #include <semifs.h>
 #include <malloc_wrapper.h>
+#include <devfs.h>
 
 static const char msg[] = "Hello world - from fwrite!\r\n";
 
-extern uint8_t _binary_romfs_bin_start[];
+extern uint8_t romfs[];
 
 int main() {
     init_malloc_wrapper();
@@ -18,7 +19,7 @@ int main() {
     char buf[32];
     int c;
     register_devfs();
-    register_romfs("romfs", _binary_romfs_bin_start);
+    register_romfs("romfs", romfs);
     printf("Hello world - from stdio!\r\n");
     fflush(stdout);
     f1 = fopen("/dev/stdout", "w");

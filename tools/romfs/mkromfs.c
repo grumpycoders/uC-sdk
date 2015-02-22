@@ -13,7 +13,7 @@
 
 #define hash_init 5381
 
-uint32_t hash_djb2(const uint8_t * str, uint32_t hash) {
+static uint32_t hash_djb2(const uint8_t * str, uint32_t hash) {
     int c;
 
     while ((c = *str++))
@@ -22,14 +22,38 @@ uint32_t hash_djb2(const uint8_t * str, uint32_t hash) {
     return hash;
 }
 
-void usage(const char * binname) {
-    printf("Usage: %s [-d <dir>] [outfile]\n", binname);
+static void usage(const char * binname) {
+    printf("Usage: %s [-d <dir>] [-c <symbol>] [outfile]\n", binname);
     exit(-1);
 }
 
-void processdir(DIR * dirp, const char * curpath, FILE * outfile, const char * prefix) {
+typedef struct OUTFILE {
+    FILE * outfile;
+    size_t size;
+} OUTFILE;
+
+static void output(const uint8_t * buffer, size_t size, OUTFILE * outfile, int c_mode) {
+    if (c_mode) {
+        size_t i;
+        for (i = 0; i < size; i++) {
+            if (outfile->size != 0) {
+                fprintf(outfile->outfile, ", ");
+            }
+            if ((outfile->size % 16) == 0) {
+                fprintf(outfile->outfile, "\n    ");
+            }
+            fprintf(outfile->outfile, "0x%02x", buffer[i]);
+            outfile->size++;
+        }
+    } else {
+        fwrite(buffer, 1, size, outfile->outfile);
+        outfile->size += size;
+    }
+}
+
+static void processdir(DIR * dirp, const char * curpath, OUTFILE * outfile, const char * prefix, int c_mode) {
     char fullpath[1024];
-    char buf[16 * 1024];
+    uint8_t buf[16 * 1024];
     struct dirent * ent;
     DIR * rec_dirp;
     uint32_t cur_hash = hash_djb2((const uint8_t *) curpath, hash_init);
@@ -55,7 +79,7 @@ void processdir(DIR * dirp, const char * curpath, FILE * outfile, const char * p
                 continue;
             strcat(fullpath, "/");
             rec_dirp = opendir(fullpath);
-            processdir(rec_dirp, fullpath + strlen(prefix) + 1, outfile, prefix);
+            processdir(rec_dirp, fullpath + strlen(prefix) + 1, outfile, prefix, c_mode);
             closedir(rec_dirp);
         } else {
             hash = hash_djb2((const uint8_t *) ent->d_name, cur_hash);
@@ -64,21 +88,21 @@ void processdir(DIR * dirp, const char * curpath, FILE * outfile, const char * p
                 perror("opening input file");
                 exit(-1);
             }
-            b = (hash >>  0) & 0xff; fwrite(&b, 1, 1, outfile);
-            b = (hash >>  8) & 0xff; fwrite(&b, 1, 1, outfile);
-            b = (hash >> 16) & 0xff; fwrite(&b, 1, 1, outfile);
-            b = (hash >> 24) & 0xff; fwrite(&b, 1, 1, outfile);
+            b = (hash >>  0) & 0xff; output(&b, 1, outfile, c_mode);
+            b = (hash >>  8) & 0xff; output(&b, 1, outfile, c_mode);
+            b = (hash >> 16) & 0xff; output(&b, 1, outfile, c_mode);
+            b = (hash >> 24) & 0xff; output(&b, 1, outfile, c_mode);
             fseek(infile, 0, SEEK_END);
             size = ftell(infile);
             fseek(infile, 0, SEEK_SET);
-            b = (size >>  0) & 0xff; fwrite(&b, 1, 1, outfile);
-            b = (size >>  8) & 0xff; fwrite(&b, 1, 1, outfile);
-            b = (size >> 16) & 0xff; fwrite(&b, 1, 1, outfile);
-            b = (size >> 24) & 0xff; fwrite(&b, 1, 1, outfile);
+            b = (size >>  0) & 0xff; output(&b, 1, outfile, c_mode);
+            b = (size >>  8) & 0xff; output(&b, 1, outfile, c_mode);
+            b = (size >> 16) & 0xff; output(&b, 1, outfile, c_mode);
+            b = (size >> 24) & 0xff; output(&b, 1, outfile, c_mode);
             while (size) {
                 w = size > 16 * 1024 ? 16 * 1024 : size;
                 w = fread(buf, 1, w, infile);
-                fwrite(buf, 1, w, outfile);
+                output(buf, w, outfile, c_mode);
                 size -= w;
             }
             fclose(infile);
@@ -90,17 +114,34 @@ int main(int argc, char ** argv) {
     char * binname = *argv++;
     char * o;
     char * outname = NULL;
-    char * dirname = ".";
+    const char * dirname = ".";
+    char * symbol;
     uint64_t z = 0;
-    FILE * outfile;
     DIR * dirp;
+    int c_mode = 0;
+    OUTFILE outfile;
 
+    argc--;
     while ((o = *argv++)) {
+        argc--;
         if (*o == '-') {
             o++;
             switch (*o) {
             case 'd':
+                if (argc == 0) {
+                    usage(binname);
+                    break;
+                }
                 dirname = *argv++;
+                argc--;
+                break;
+            case 'c':
+                if (argc == 0) {
+                    usage(binname);
+                    break;
+                }
+                c_mode = 1;
+                symbol = *argv++;
                 break;
             default:
                 usage(binname);
@@ -114,11 +155,11 @@ int main(int argc, char ** argv) {
     }
 
     if (!outname)
-        outfile = stdout;
+        outfile.outfile = stdout;
     else
-        outfile = fopen(outname, "wb");
+        outfile.outfile = fopen(outname, "wb");
 
-    if (!outfile) {
+    if (!outfile.outfile) {
         perror("opening output file");
         exit(-1);
     }
@@ -129,11 +170,19 @@ int main(int argc, char ** argv) {
         exit(-1);
     }
 
-    processdir(dirp, "", outfile, dirname);
-    fwrite(&z, 1, 8, outfile);
-    if (outname)
-        fclose(outfile);
+    if (c_mode) {
+        fprintf(outfile.outfile, "const char %s[] = {", symbol);
+    }
+
+    processdir(dirp, "", &outfile, dirname, c_mode);
+    output((uint8_t *) &z, 8, &outfile, c_mode);
+
+    if (c_mode) {
+        fprintf(outfile.outfile, "\n};\n\nconst unsigned %s_size = %zu;\n", symbol, outfile.size);
+    }
+
+    fclose(outfile.outfile);
     closedir(dirp);
-    
+
     return 0;
 }
