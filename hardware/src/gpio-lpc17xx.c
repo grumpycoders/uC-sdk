@@ -11,12 +11,23 @@ inline uint8_t get_pin(pin_t pin) {
     return pin & 0xff;
 }
 
-void gpio_config(pin_t pin, pin_dir_t dir) {
+void gpio_config(pin_t pin, pin_dir_t dir, pull_t pull) {
     PINSEL_CFG_Type pin_cfg;
     pin_cfg.Portnum = get_port(pin);
     pin_cfg.Pinnum = get_pin(pin);
     pin_cfg.Funcnum = 0;
-    pin_cfg.Pinmode = PINSEL_PINMODE_PULLUP;
+
+    switch (pull) {
+    case pull_none:
+        pin_cfg.Pinmode = PINSEL_PINMODE_TRISTATE;
+        break;
+    case pull_up:
+        pin_cfg.Pinmode = PINSEL_PINMODE_PULLUP;
+        break;
+    case pull_down:
+        pin_cfg.Pinmode = PINSEL_PINMODE_PULLDOWN;
+        break;
+    }
     pin_cfg.OpenDrain = PINSEL_PINMODE_NORMAL;
     PINSEL_ConfigPin(&pin_cfg);
     FIO_SetDir(get_port(pin), 1 << get_pin(pin), dir);

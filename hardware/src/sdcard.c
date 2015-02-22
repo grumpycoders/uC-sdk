@@ -174,7 +174,7 @@ int sdcard_init(sdcard_t * sdcard) {
     SDPUTS("Configuring SSP.");
     ssp_config(sdcard->ssp, 400000); // standard says we can ping the card at 400khz first.
     SDPUTS("Configuring CS.");
-    gpio_config(sdcard->cs, pin_dir_write);
+    gpio_config(sdcard->cs, pin_dir_write, pull_up);
     gpio_set(sdcard->cs, 1);
 
     // first, let's send 74 dummy clocks, with MOSI = 1 and CS = 1; that's about 10 bytes equal to 0xff.

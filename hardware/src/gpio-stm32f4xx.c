@@ -13,7 +13,7 @@ inline uint8_t get_pin(pin_t pin) {
 
 GPIO_TypeDef *ports[] = {GPIOA, GPIOB, GPIOC, GPIOD, GPIOE, GPIOF, GPIOG, GPIOH, GPIOI, GPIOJ, GPIOK};
 
-void gpio_config(pin_t pin, pin_dir_t dir) { 
+void gpio_config(pin_t pin, pin_dir_t dir, pull_t pull) { 
     //Clock the port
     RCC_AHB1PeriphClockCmd(1 << get_port(pin), ENABLE);
 
@@ -25,7 +25,7 @@ void gpio_config(pin_t pin, pin_dir_t dir) {
         def.GPIO_OType = GPIO_OType_PP; //output : Push Pull
     else
         def.GPIO_OType = GPIO_OType_OD; //input : Open Drain
-    def.GPIO_PuPd = GPIO_PuPd_UP;       //Pull up resistor
+    def.GPIO_PuPd = pull;
 
     GPIO_Init(ports[get_port(pin)], &def);
 }

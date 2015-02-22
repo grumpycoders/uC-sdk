@@ -35,10 +35,10 @@
 #define LED4_wire MAKE_PIN(1, 23)
 
 static void setupLEDs() {
-    gpio_config(LED1_wire, pin_dir_write);
-    gpio_config(LED2_wire, pin_dir_write);
-    gpio_config(LED3_wire, pin_dir_write);
-    gpio_config(LED4_wire, pin_dir_write);
+    gpio_config(LED1_wire, pin_dir_write, pull_up);
+    gpio_config(LED2_wire, pin_dir_write, pull_up);
+    gpio_config(LED3_wire, pin_dir_write, pull_up);
+    gpio_config(LED4_wire, pin_dir_write, pull_up);
 }
 
 static void litLED(int led, int value) {

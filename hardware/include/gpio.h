@@ -26,7 +26,13 @@ typedef enum {
     pin_dir_write = 1,
 } pin_dir_t;
 
-void gpio_config(pin_t pin, pin_dir_t dir);
+typedef enum {
+    pull_none = 0,
+    pull_up = 1,
+    pull_down = 2,
+} pull_t;
+
+void gpio_config(pin_t pin, pin_dir_t dir, pull_t pull);
 void gpio_set(pin_t pin, int enabled);
 uint8_t gpio_get(pin_t pin);
 
