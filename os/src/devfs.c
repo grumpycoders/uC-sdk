@@ -15,7 +15,7 @@ struct dev_t {
     void * opaque;
 };
 
-static struct dev_t devs[MAX_FS];
+static struct dev_t devs[MAX_DEVS];
 
 static int devfs_open(void * opaque, const char * path, int flags, int mode) {
     uint32_t hash;

@@ -29,7 +29,7 @@ static void __libc_init_array() {
 }
 
 static void __libc_fini_array() {
-    size_t count, i;
+    ssize_t count, i;
     
     count = __preinit_array_end - __preinit_array_start;
     for (i = count - 1; i >= 0; i--)
