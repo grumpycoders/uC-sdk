@@ -85,6 +85,10 @@ const uint8_t * romfs_get_file_by_hash(const uint8_t * romfs, uint32_t h, uint32
     return NULL;
 }
 
+const uint8_t * romfs_get_file(const uint8_t * romfs, const char * path, uint32_t * len) {
+    return romfs_get_file_by_hash(romfs, hash_djb2((const uint8_t *) path, -1), len);
+}
+
 static int romfs_open(void * opaque, const char * path, int flags, int mode) {
     uint32_t h = hash_djb2((const uint8_t *) path, -1);
     const uint8_t * romfs = (const uint8_t *) opaque;
