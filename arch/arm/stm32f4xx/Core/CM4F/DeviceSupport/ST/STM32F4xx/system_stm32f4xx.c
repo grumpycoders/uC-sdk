@@ -251,26 +251,40 @@
 
 /************************* PLL Parameters *************************************/
 /* PLL_VCO = (HSE_VALUE or HSI_VALUE / PLL_M) * PLL_N */
+#ifndef PLL_M
 #define PLL_M      25
+#endif
 /* USB OTG FS, SDIO and RNG Clock =  PLL_VCO / PLLQ */
+#ifndef PLL_Q
 #define PLL_Q      7
+#define PLL_Q
 
 #if defined (STM32F40_41xxx)
+#ifndef PLL_N
 #define PLL_N      336
+#endif
 /* SYSCLK = PLL_VCO / PLL_P */
+#ifndef PLL_P
 #define PLL_P      2
+#endif
 #endif /* STM32F40_41xxx */
 
 #if defined (STM32F427_437xx) || defined (STM32F429_439xx)
+#ifndef PLL_N
 #define PLL_N      360
 /* SYSCLK = PLL_VCO / PLL_P */
+#ifndef PLL_P
 #define PLL_P      2
+#endif
 #endif /* STM32F427_437x || STM32F429_439xx */
 
 #if defined (STM32F401xx)
+#ifndef PLL_N
 #define PLL_N      336
 /* SYSCLK = PLL_VCO / PLL_P */
+#ifndef PLL_P
 #define PLL_P      4
+#endif
 #endif /* STM32F401xx */
 
 /******************************************************************************/
