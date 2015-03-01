@@ -257,7 +257,7 @@
 /* USB OTG FS, SDIO and RNG Clock =  PLL_VCO / PLLQ */
 #ifndef PLL_Q
 #define PLL_Q      7
-#define PLL_Q
+#endif
 
 #if defined (STM32F40_41xxx)
 #ifndef PLL_N
@@ -272,6 +272,7 @@
 #if defined (STM32F427_437xx) || defined (STM32F429_439xx)
 #ifndef PLL_N
 #define PLL_N      360
+#endif
 /* SYSCLK = PLL_VCO / PLL_P */
 #ifndef PLL_P
 #define PLL_P      2
@@ -281,6 +282,7 @@
 #if defined (STM32F401xx)
 #ifndef PLL_N
 #define PLL_N      336
+#endif
 /* SYSCLK = PLL_VCO / PLL_P */
 #ifndef PLL_P
 #define PLL_P      4

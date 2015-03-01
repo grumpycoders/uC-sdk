@@ -2,12 +2,13 @@
 
 void BoardEarlyInit() {
 	/* Select HSE as system clock source */
-    RCC->CFGR &= (uint32_t)((uint32_t)~(RCC_CFGR_SW));
+/*    RCC->CFGR &= (uint32_t)((uint32_t)~(RCC_CFGR_SW));
     RCC->CFGR |= (uint32_t)RCC_CFGR_SW_HSE;
-    SystemCoreClockUpdate();
+    SystemCoreClockUpdate();*/
 }
 
 void BoardInit() {
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
 }
 
 void BoardLateInit() {
