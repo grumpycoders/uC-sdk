@@ -6,3 +6,4 @@
 *.map
 tools/mkromfs
 *~
+.DS_Store
