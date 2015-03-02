@@ -133,8 +133,6 @@ void spi_read(uint8_t id, uint8_t *buffer, uint8_t nb)
     {
         taskENTER_CRITICAL();
 
-//        spi_start(id);
-
         //send, because that's the rule
         while (SPI_I2S_GetFlagStatus(spiInitDef->id, SPI_I2S_FLAG_TXE) == RESET);
         SPI_I2S_SendData(spiInitDef->id, 0xFF);
@@ -145,8 +143,6 @@ void spi_read(uint8_t id, uint8_t *buffer, uint8_t nb)
 
         //wait it is ready
         while (SPI_I2S_GetFlagStatus(spiInitDef->id, SPI_I2S_FLAG_BSY) == SET);
-
-//        spi_stop(id);
 
         taskEXIT_CRITICAL();
     }
@@ -164,8 +160,6 @@ void spi_write(uint8_t id, uint8_t *buffer, uint8_t nb)
     {
         taskENTER_CRITICAL();
 
-//        spi_start(id);
-
         //send data
         while (SPI_I2S_GetFlagStatus(spiInitDef->id, SPI_I2S_FLAG_TXE) == RESET);
         SPI_I2S_SendData(spiInitDef->id, *buffer++);
@@ -177,8 +171,42 @@ void spi_write(uint8_t id, uint8_t *buffer, uint8_t nb)
         //wait it is ready
         while (SPI_I2S_GetFlagStatus(spiInitDef->id, SPI_I2S_FLAG_BSY) == SET);
 
-//        spi_stop(id);
-
         taskEXIT_CRITICAL();
     }
 }
+
+
+void spi_get_register(uint8_t id, uint8_t address, uint8_t *buffer, uint8_t nb)
+{
+    //set the read bit
+    address |= 0xC0;
+
+    //reset multiple byte bit if necessary
+    if (nb <= 1)
+        address &= 0xBF;
+    spi_start(id);
+    //send the request
+    spi_write(id, &address, 1);
+
+    //get the value
+    spi_read(id, buffer, nb);
+    spi_stop(id);
+}
+
+void spi_set_register(uint8_t id, uint8_t address, uint8_t *buffer, uint8_t nb)
+{
+    //reset the read bit
+    address &= 0x3F;
+
+    //set multiple byte bit if necessary
+    if (nb > 1)
+        address |= 0x40;
+    spi_start(id);
+    //send the request
+    spi_write(id, &address, 1);
+
+    //send the value
+    spi_write(id, buffer, nb);
+    spi_stop(id);
+}
+
