@@ -4,7 +4,7 @@ void BoardEarlyInit() {
 }
 
 void BoardInit() {
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
+    //RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
 }
 
 void BoardLateInit() {
