@@ -10,6 +10,10 @@
 
 #include <stdio.h>
 
+
+#define READ_BYTE 0x80
+#define MULTIBYTE_BYTE 0x40
+
 struct spiInitDef_t {
     // sck / mosi / miso / cs
     SPI_TypeDef * id;
@@ -53,9 +57,9 @@ static struct spiInitDef_t spiInitDefs[6] = {
       }, {GPIO_PinSource2, GPIO_PinSource6, GPIO_PinSource5, GPIO_PinSource4}, 
       {&RCC->APB2ENR, &RCC->AHB1ENR}, {RCC_APB2Periph_SPI4, RCC_AHB1Periph_GPIOE }, GPIO_AF_SPI4 },
     { SPI5, { GPIOF, GPIOF, GPIOF, GPIOF}, {   // SPI5
-        { GPIO_Pin_7, GPIO_Mode_AF, GPIO_Speed_50MHz, GPIO_OType_PP, GPIO_PuPd_NOPULL },  // SCK
-        { GPIO_Pin_9, GPIO_Mode_AF, GPIO_Speed_50MHz, GPIO_OType_PP, GPIO_PuPd_NOPULL },  // MOSI
-        { GPIO_Pin_8, GPIO_Mode_AF, GPIO_Speed_50MHz, GPIO_OType_OD, GPIO_PuPd_NOPULL },  // MISO
+        { GPIO_Pin_7, GPIO_Mode_AF, GPIO_Speed_50MHz, GPIO_OType_PP, GPIO_PuPd_DOWN },  // SCK
+        { GPIO_Pin_9, GPIO_Mode_AF, GPIO_Speed_50MHz, GPIO_OType_PP, GPIO_PuPd_DOWN },  // MOSI
+        { GPIO_Pin_8, GPIO_Mode_AF, GPIO_Speed_50MHz, GPIO_OType_OD, GPIO_PuPd_DOWN },  // MISO
         { GPIO_Pin_6, GPIO_Mode_AF, GPIO_Speed_50MHz, GPIO_OType_PP, GPIO_PuPd_NOPULL }, // CS
       }, {GPIO_PinSource7, GPIO_PinSource9, GPIO_PinSource8, GPIO_PinSource6}, 
       {&RCC->APB2ENR, &RCC->AHB1ENR}, {RCC_APB2Periph_SPI5, RCC_AHB1Periph_GPIOF }, GPIO_AF_SPI5 },
@@ -96,12 +100,15 @@ void spi_init(uint8_t id)
     spidef.SPI_CPOL = SPI_CPOL_Low; 
     spidef.SPI_CPHA = SPI_CPHA_1Edge; 
     spidef.SPI_NSS = SPI_NSS_Soft; 
-    spidef.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_4; 
+    spidef.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_16; 
     spidef.SPI_FirstBit = SPI_FirstBit_MSB; 
     spidef.SPI_CRCPolynomial = 7;
 
     SPI_Init(spiInitDef->id, &spidef); 
     SPI_Cmd(spiInitDef->id, ENABLE);
+    SPI_SSOutputCmd(spiInitDef->id, DISABLE);
+
+    spi_stop(id);
 }
 
 void spi_start(uint8_t id)
@@ -179,34 +186,33 @@ void spi_write(uint8_t id, uint8_t *buffer, uint8_t nb)
 void spi_get_register(uint8_t id, uint8_t address, uint8_t *buffer, uint8_t nb)
 {
     //set the read bit
-    address |= 0xC0;
+    address |= READ_BYTE;
 
     //reset multiple byte bit if necessary
-    if (nb <= 1)
-        address &= 0xBF;
-    spi_start(id);
+//    if (nb <= 1)
+//        address &= 0xBF;
+    //set multiple byte bit if necessary
+    if (nb > 1)
+        address |= MULTIBYTE_BYTE;
     //send the request
     spi_write(id, &address, 1);
 
     //get the value
     spi_read(id, buffer, nb);
-    spi_stop(id);
 }
 
 void spi_set_register(uint8_t id, uint8_t address, uint8_t *buffer, uint8_t nb)
 {
     //reset the read bit
-    address &= 0x3F;
+    address &= (0xff ^ READ_BYTE);
 
     //set multiple byte bit if necessary
     if (nb > 1)
-        address |= 0x40;
-    spi_start(id);
+        address |= MULTIBYTE_BYTE;
     //send the request
     spi_write(id, &address, 1);
 
     //send the value
     spi_write(id, buffer, nb);
-    spi_stop(id);
 }
 
