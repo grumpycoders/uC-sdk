@@ -27,10 +27,10 @@ static ssize_t stdin_read(void * opaque, void * buf, size_t count) {
 static ssize_t stdout_write(void * opaque, const void * buf, size_t count) {
     int i;
     const char * data = (const char *) buf;
-    
+
     for (i = 0; i < count; i++)
         BoardConsolePutc(data[i]);
-    
+
     return count;
 }
 
@@ -57,12 +57,12 @@ static int fio_is_open_int(int fd) {
 
 static int fio_findfd() {
     int i;
-    
+
     for (i = 0; i < MAX_FDS; i++) {
         if (!fio_is_open_int(i))
             return i;
     }
-    
+
     return -1;
 }
 
@@ -79,7 +79,7 @@ int fio_open(fdread_t fdread, fdwrite_t fdwrite, fdseek_t fdseek, fdclose_t fdcl
 //    DBGOUT("fio_open(%p, %p, %p, %p, %p)\r\n", fdread, fdwrite, fdseek, fdclose, opaque);
     xSemaphoreTake(fio_sem, portMAX_DELAY);
     fd = fio_findfd();
-    
+
     if (fd >= 0) {
         fio_fds[fd].fdread = fdread;
         fio_fds[fd].fdwrite = fdwrite;
@@ -89,7 +89,7 @@ int fio_open(fdread_t fdread, fdwrite_t fdwrite, fdseek_t fdseek, fdclose_t fdcl
         fio_fds[fd].opaque = opaque;
     }
     xSemaphoreGive(fio_sem);
-    
+
     return fd;
 }
 
@@ -98,7 +98,7 @@ int dev_open(fdread_t fdread, fdwrite_t fdwrite, fdseek_t fdseek, fdclose_t fdcl
 //    DBGOUT("fio_open(%p, %p, %p, %p, %p)\r\n", fdread, fdwrite, fdseek, fdclose, opaque);
     xSemaphoreTake(fio_sem, portMAX_DELAY);
     fd = fio_findfd();
-    
+
     if (fd >= 0) {
         fio_fds[fd].fdread = fdread;
         fio_fds[fd].fdwrite = fdwrite;
@@ -108,7 +108,7 @@ int dev_open(fdread_t fdread, fdwrite_t fdwrite, fdseek_t fdseek, fdclose_t fdcl
         fio_fds[fd].opaque = opaque;
     }
     xSemaphoreGive(fio_sem);
-    
+
     return fd;
 }
 
@@ -160,7 +160,7 @@ off_t fio_seek(int fd, off_t offset, int whence) {
 int fio_close(int fd) {
     int r = 0;
 //    DBGOUT("fio_close(%i)\r\n", fd);
-    if (fio_is_open_int(fd)) {
+    if (fio_is_open_int(fd) && (fd >= 3)) {
         if (fio_fds[fd].fdclose)
             r = fio_fds[fd].fdclose(fio_fds[fd].opaque);
         xSemaphoreTake(fio_sem, portMAX_DELAY);
@@ -179,22 +179,59 @@ void fio_set_opaque(int fd, void * opaque) {
 
 static int stdio_open(void * opaque, int flags, int mode) {
     uintptr_t fd = (uintptr_t) opaque;
+    int ret = -1;
+    fdread_t stdio_read;
+    fdwrite_t stdio_write;
+    void * opaque_stdin, * opaque_stdout;
+
+    xSemaphoreTake(fio_sem, portMAX_DELAY);
+    stdio_read = fio_fds[0].fdread;
+    stdio_write = fio_fds[1].fdwrite;
+    opaque_stdin = fio_fds[0].opaque;
+    opaque_stdout = fio_fds[1].opaque;
+    xSemaphoreGive(fio_sem);
 
     switch(fd) {
     case 0:
-        return fio_open(stdin_read, NULL, NULL, NULL, NULL);
+        ret = fio_open(stdio_read, NULL, NULL, NULL, opaque_stdin);
+        break;
     case 1:
     case 2:
-        return fio_open(NULL, stdout_write, NULL, NULL, NULL);
+        ret = fio_open(NULL, stdio_write, NULL, NULL, opaque_stdout);
+        break;
     }
 
-    return -1;
+    return ret;
 }
 
 void register_stdio() {
     register_device("stdin", stdio_open, (void *)(uintptr_t) 0);
     register_device("stdout", stdio_open, (void *)(uintptr_t) 1);
     register_device("stderr", stdio_open, (void *)(uintptr_t) 2);
+}
+
+void register_custom_stdin(fdread_t custom_stdin_read, void * opaque) {
+    xSemaphoreTake(fio_sem, portMAX_DELAY);
+    if (custom_stdin_read) {
+        fio_fds[0].fdread = custom_stdin_read;
+        fio_fds[0].opaque = opaque;
+    } else {
+        fio_fds[0].fdread = stdin_read;
+        fio_fds[0].opaque = NULL;
+    }
+    xSemaphoreGive(fio_sem);
+}
+
+void register_custom_stdout(fdwrite_t custom_stdout_write, void * opaque) {
+    xSemaphoreTake(fio_sem, portMAX_DELAY);
+    if (custom_stdout_write) {
+        fio_fds[1].fdwrite = custom_stdout_write;
+        fio_fds[1].opaque = opaque;
+    } else {
+        fio_fds[1].fdwrite = stdout_write;
+        fio_fds[1].opaque = NULL;
+    }
+    xSemaphoreGive(fio_sem);
 }
 
 int dev_setblock(int fd, int enable) {

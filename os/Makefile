@@ -22,7 +22,7 @@ src/romfs.c \
 src/sbrk.c \
 
 ifeq ($(CPU),arm)
-TARGET_SRCS += src/semifs.c
+TARGET_SRCS += src/semifs.c src/semiio.c
 endif
 
 include $(ROOTDIR)/target-rules.mk

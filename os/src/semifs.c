@@ -82,7 +82,7 @@ static ssize_t semifs_write(void * opaque, const void * ptr, size_t len) {
     // Perform write
     int res = Semihost_SYS_WRITE(args);
 //    DBGOUT("semifs_read: Semihost_SYS_WRITE returned %i\r\n", res);
-    if (res == -1 || res == len)
+    if (res == -1 || res != len)
         return -1;
 
     // Update position
