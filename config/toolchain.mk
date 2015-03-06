@@ -6,8 +6,8 @@ TARGET_CPPFLAGS += -mcpu=cortex-m3 -mtune=cortex-m3 -D__thumb2__=1 -march=armv7-
 TARGET_LDFLAGS += -mcpu=cortex-m3 -mtune=cortex-m3 -march=armv7-m -mthumb
 endif
 ifeq ($(CPU_FAMILY),CM4F)
-TARGET_CPPFLAGS += -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=softfp -mtune=cortex-m4 -D__thumb2__=1 -march=armv7e-m -mthumb
-TARGET_LDFLAGS += -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=softfp -mtune=cortex-m4 -march=armv7e-m -mthumb
+TARGET_CPPFLAGS += -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mtune=cortex-m4 -D__thumb2__=1 -march=armv7e-m -mthumb
+TARGET_LDFLAGS += -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mtune=cortex-m4 -march=armv7e-m -mthumb
 endif
 ifeq ($(CPU_FLAVOR),stm32f10)
 TARGET_CPPFLAGS += -DUSE_STDPERIPH_DRIVER
