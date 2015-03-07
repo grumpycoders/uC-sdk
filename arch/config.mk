@@ -12,7 +12,7 @@ SPECS = $(ROOTDIR)/arch/arm/src/specs
 endif
 
 ifeq ($(CPU_FLAVOR),lpc17xx)
-TARGET_INCLUDES += $(ROOTDIR)/arch/arm/Core/CM3/DeviceSupport/NXP/LPC17xx $(ROOTDIR)/arch/arm/lpc17xx/Drivers/include
+TARGET_INCLUDES += $(ROOTDIR)/arch/arm/Core/CM3/DeviceSupport/NXP/lpc17xx $(ROOTDIR)/arch/arm/lpc17xx/Drivers/include
 LDSCRIPT = $(ROOTDIR)/arch/arm/lpc17xx/ldscript
 TARGET_CPPFLAGS += -DTARGET_LITTLE_ENDIAN
 endif

@@ -1,4 +1,4 @@
-export BOARD = mbed-1768
+export BOARD = mbed-lpc1768
 ROOTDIR = $(CURDIR)/uC-sdk
 
 ifeq ($(wildcard $(ROOTDIR)/uC-sdk.root),)
