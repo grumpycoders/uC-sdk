@@ -1,3 +1,4 @@
+#include <alloca.h>
 #include <string.h>
 #include <errno.h>
 #include <stdint.h>
@@ -13,9 +14,9 @@ static ssize_t semi_stdin_read(void * opaque, void * buf, size_t count) {
 }
 
 static ssize_t semi_stdout_write(void * opaque, const void * buf, size_t count) {
-    const uint8_t * buffer = buf;
     size_t ret = count;
 #ifdef SEMIIO_CORRECT
+    const uint8_t * buffer = buf;
     while (count--) {
         if (Semihost_SYS_WRITEC((uint32_t *) buffer++) != 0) {
             return -1;
