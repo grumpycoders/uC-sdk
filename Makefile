@@ -1,6 +1,3 @@
-LIBDEPS = FreeRTOS/libFreeRTOS.a arch/libarch.a hardware/libhardware.a os/libos.a libc/libc.a libm/libm.a acorn/libacorn.a lwip/liblwip.a
-LIBS = -Wl,--start-group $(LIBDEPS) -Wl,--end-group
-
 export ROOTDIR = $(CURDIR)
 
 include common.mk
