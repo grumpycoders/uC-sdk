@@ -230,19 +230,27 @@ __cs3_reset_cortex_m:
     LDR     R0, =__rom_data_begin
     LDR     R1, =__rom_data_end
     LDR     R2, =__ram_data_begin
-    
+
     MOV     R3, R0
     SUBS    R4, R1, R0
     MOV     R1, R3
     MOV     R0, R2
     MOV     R2, R4
     BL      startup_memcpy
-    
+
     LDR     R0, =__bss_ram_begin
     MOV     R1, #0
     LDR     R2, =__bss_ram_len
     BL      startup_memset
-    
+
+/* Enable FPU */
+    LDR.W   R0, =0xE000ED88
+    LDR     R1, [R0]
+    ORR     R1, R1, #(0xF << 20)
+    STR     R1, [R0]
+    DSB
+    ISB
+
     B       _start
     .pool
     .cantunwind
