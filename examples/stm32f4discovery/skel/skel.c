@@ -19,6 +19,7 @@ int main() {
     char buf[32];
     int c;
     register_devfs();
+    register_basic_stdio();
     register_romfs("romfs", romfs);
     printf("Hello world - from stdio!\r\n");
     fflush(stdout);
