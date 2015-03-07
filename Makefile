@@ -1,8 +1,3 @@
-ifeq ($(NODEMO),)
-TARGET = demo.bin
-TARGET_OBJS = test-romfs.o
-endif
-
 LIBDEPS = FreeRTOS/libFreeRTOS.a arch/libarch.a hardware/libhardware.a os/libos.a libc/libc.a libm/libm.a acorn/libacorn.a lwip/liblwip.a
 LIBS = -Wl,--start-group $(LIBDEPS) -Wl,--end-group
 
@@ -22,7 +17,6 @@ clean: clean-generic
 	$(Q)$(MAKE) $(MAKE_OPTS) -C acorn clean
 	$(Q)$(MAKE) $(MAKE_OPTS) -C lwip clean
 	$(Q)$(MAKE) $(MAKE_OPTS) -C tools clean
-	$(Q)rm -f test-romfs.bin
 
 .PHONY: libs FreeRTOS arch hardware os libc libm acorn lwip tools deps
 
@@ -71,12 +65,6 @@ lwip:
 
 tools:
 	$(E) "[MAKE]   Entering tools"
-	$(Q)$(MAKE) $(MAKE_OPTS) -C tools
-
-test-romfs.o:
-	$(E) "[ROMFS]  Building test romfs"
-	$(Q) tools/romfs/mkromfs -d test-romfs test-romfs.bin
-	$(Q) $(TARGET_OBJCOPY_BIN) --prefix-sections '.romfs' test-romfs.bin test-romfs.o
 	$(Q)$(MAKE) $(MAKE_OPTS) -C tools
 
 deps: ldeps
