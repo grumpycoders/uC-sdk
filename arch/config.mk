@@ -24,7 +24,7 @@ TARGET_CPPFLAGS += -DTARGET_LITTLE_ENDIAN
 endif
 
 ifeq ($(CPU_FLAVOR),stm32f4xx)
-TARGET_INCLUDES += $(ROOTDIR)/arch/arm/Core/CM4F/DeviceSupport/ST/STM32F4xx $(ROOTDIR)/arch/arm/stm32f4xx/Drivers/include
+TARGET_INCLUDES += $(ROOTDIR)/arch/arm/Core/CM4F/DeviceSupport/ST/stm32f4xx $(ROOTDIR)/arch/arm/stm32f4xx/Drivers/include
 TARGET_CPPFLAGS += -DTARGET_LITTLE_ENDIAN
 endif
 
