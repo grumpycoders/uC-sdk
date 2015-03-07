@@ -30,7 +30,7 @@
 #include <decl.h>
 
 BEGIN_DECL
-#if PORT_CPU == arm && PORT_CPU_FAMILY == CM4F
+#if PORT_CPU_FAMILY == arm && PORT_CPU_SUBFAMILY == CM4F
 #define SOFTFLOAT_SQRTF
 static inline float sqrtf(float x) {
     float r;

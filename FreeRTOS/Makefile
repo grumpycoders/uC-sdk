@@ -12,11 +12,11 @@ TARGET_SRCS = Source/croutine.c Source/list.c Source/queue.c Source/tasks.c Sour
 
 TARGET_SRCS += Source/portable/MemMang/heap_3.c
 
-ifeq ($(CPU),arm)
-ifeq ($(CPU_FAMILY),CM3)
+ifeq ($(CPU_FAMILY),arm)
+ifeq ($(CPU_SUBFAMILY),CM3)
 TARGET_SRCS += Source/portable/GCC/ARM_CM3/port.c
 endif
-ifeq ($(CPU_FAMILY),CM4F)
+ifeq ($(CPU_SUBFAMILY),CM4F)
 TARGET_SRCS += Source/portable/GCC/ARM_CM4F/port.c
 endif
 endif

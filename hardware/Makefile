@@ -11,15 +11,15 @@ include $(ROOTDIR)/libc/config.mk
 TARGET_SRCS = \
 src/sdcard.c \
 
-ifeq ($(CPU_FAMILY),CM3)
+ifeq ($(CPU_SUBFAMILY),CM3)
 ifeq ($(CPU_FLAVOR),lpc17xx)
 TARGET_SRCS += src/gpio-lpc17xx.c
 TARGET_SRCS += src/ssp-lpc17xx.c
 endif
 endif
 
-ifeq ($(CPU_FAMILY),CM4F)
-ifeq ($(CPU_FLAVOR),stm32f4)
+ifeq ($(CPU_SUBFAMILY),CM4F)
+ifeq ($(CPU_FLAVOR),stm32f4xx)
 TARGET_SRCS += src/adc-stm32f4xx.c
 TARGET_SRCS += src/gpio-stm32f4xx.c
 TARGET_SRCS += src/i2c-stm32f4xx.c

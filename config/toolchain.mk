@@ -1,37 +1,37 @@
-ifeq ($(CPU),arm)
+ifeq ($(CPU_FAMILY),arm)
 TOOLCHAIN = arm-none-eabi
 TARGET_FORMAT = elf32-littlearm
-ifeq ($(CPU_FAMILY),CM3)
+ifeq ($(CPU_SUBFAMILY),CM3)
 TARGET_CPPFLAGS += -mcpu=cortex-m3 -mtune=cortex-m3 -D__thumb2__=1 -march=armv7-m -mfix-cortex-m3-ldrd -mthumb -msoft-float
 TARGET_LDFLAGS += -mcpu=cortex-m3 -mtune=cortex-m3 -march=armv7-m -mthumb
 endif
-ifeq ($(CPU_FAMILY),CM4F)
+ifeq ($(CPU_SUBFAMILY),CM4F)
 TARGET_CPPFLAGS += -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fno-math-errno -mtune=cortex-m4 -D__thumb2__=1 -march=armv7e-m -mthumb
 TARGET_LDFLAGS += -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fno-math-errno -mtune=cortex-m4 -march=armv7e-m -mthumb
 endif
-ifeq ($(CPU_FLAVOR),stm32f10)
+ifeq ($(CPU_FLAVOR),stm32f10x)
 TARGET_CPPFLAGS += -DUSE_STDPERIPH_DRIVER
 endif
-ifeq ($(CPU_FLAVOR),stm32f4)
+ifeq ($(CPU_FLAVOR),stm32f4xx)
 TARGET_CPPFLAGS += -DUSE_STDPERIPH_DRIVER
 endif
-ifeq ($(BOARD),inemo)
+ifeq ($(CPU),stm32f103)
 TARGET_CPPFLAGS += -DSTM32F10X_HD
 endif
-ifeq ($(BOARD),stm32f4discovery)
+ifeq ($(CPU),stm32f407)
 TARGET_CPPFLAGS += -DSTM32F40_41xxx
 endif
-ifeq ($(BOARD),stm32f4discovery2)
+ifeq ($(CPU),stm32f429)
 TARGET_CPPFLAGS += -DSTM32F429_439xx
 endif
 TARGET_CPPFLAGS += -Os -mapcs-frame -mno-sched-prolog -fno-hosted -ffunction-sections -fdata-sections -fshort-wchar -D__LITTLE_ENDIAN
 TARGET_LDFLAGS += -Wl,--no-wchar-size-warning
 endif
 
-ifeq ($(CPU),mips)
+ifeq ($(CPU_FAMILY),mips)
 TOOLCHAIN = mipsel-elf
 TARGET_FORMAT = elf32-littlemips
-ifeq ($(CPU_FLAVOR),mips4)
+ifeq ($(CPU_SUBFAMILY),mips4)
 TARGET_CPPFLAGS += 
 endif
 TARGET_CPPFLAGS += -Os -msoft-float -fno-hosted -ffunction-sections -fdata-sections -fshort-wchar -D__LITTLE_ENDIAN
@@ -45,7 +45,7 @@ TARGET_AR = $(TOOLCHAIN)-ar
 TARGET_AS = $(TOOLCHAIN)-gcc
 TARGET_OBJCOPY = $(TOOLCHAIN)-objcopy
 
-TARGET_OBJCOPY_BIN = $(TARGET_OBJCOPY) -I binary -O $(TARGET_FORMAT) --binary-architecture $(CPU)
+TARGET_OBJCOPY_BIN = $(TARGET_OBJCOPY) -I binary -O $(TARGET_FORMAT) --binary-architecture $(CPU_FAMILY)
 
 
 HOST_CC = gcc
