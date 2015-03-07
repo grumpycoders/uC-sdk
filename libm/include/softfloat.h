@@ -20,7 +20,9 @@ static inline float log10f(float x) { return log10(x); }
 static inline float modff(float x, float * p) { double v = *p; float r = modf(x, &v); *p = v; return r; }
 
 static inline float powf(float x, float y) { return pow(x, y); }
+#ifndef SOFTFLOAT_SQRTF
 static inline float sqrtf(float x) { return sqrt(x); }
+#endif
 
 static inline float ceilf(float x) { return ceil(x); }
 static inline float fabsf(float x) { return fabs(x); }
