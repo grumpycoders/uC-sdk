@@ -13,12 +13,7 @@ TARGET_CPPFLAGS = -DNOFLOATINGPOINT
 endif
 
 TARGET_SRCS = \
-src/close.c \
-src/lseek.c \
-src/open.c \
-src/read.c \
-src/write.c \
-\
+src/unistd.c \
 src/stdio.c \
 src/errno.c \
 \

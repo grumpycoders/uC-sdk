@@ -74,8 +74,8 @@ fclose     - ok, inlined
 fflush     - ok, dummy function
 fcloseall  - missing, won't implement (we don't keep track of the FILE pointers)
 fopen      - ok, inlined
-freopen    - missing
-fdopen     - missing
+freopen    - ok, inlined
+fdopen     - ok, inlined
 setbuf     - missing
 setvbuf    - missing
 

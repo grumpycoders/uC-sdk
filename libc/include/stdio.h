@@ -55,14 +55,13 @@ END_DECL
 static inline int fflush(FILE *stream) { return 0; }
 
 // hopefully, since all of the mode crap is static, gcc will optimize most of it away.
-static inline FILE * fopen(const char * fname, const char * mode) {
-    FILE * r = NULL;
+static inline FILE * freopen(const char * fname, const char * mode, FILE * r) {
     int flags = 0, plus = 0, append = 0, fd;
     if (!mode || !mode[0]) {
         set_errno(EINVAL);
         return NULL;
     }
-    
+
     if (mode[1] == 'b') {
         plus = mode[2] == '+';
     } else if (mode[1]) {
@@ -72,7 +71,7 @@ static inline FILE * fopen(const char * fname, const char * mode) {
         }
         plus = 1;
     }
-    
+
     switch (mode[0]) {
     case 'r':
         if (plus) {
@@ -100,29 +99,45 @@ static inline FILE * fopen(const char * fname, const char * mode) {
         set_errno(EINVAL);
         return NULL;
     }
-    
+
     fd = open(fname, flags);
-    
+
     if (fd >= 0) {
-        r = (FILE *) malloc(sizeof(FILE));
+        if (r) {
+            close(r->fd);
+        } else {
+            r = (FILE *) malloc(sizeof(FILE));
+        }
         r->fd = fd;
         r->got_eof = 0;
     }
-    
+
     if (append)
         lseek(r->fd, 0, SEEK_END);
-    
+
+    return r;
+}
+
+static inline FILE * fopen(const char * fname, const char * mode) {
+    return freopen(fname, mode, NULL);
+}
+
+static inline FILE * fdopen(int fd, const char * mode) {
+    FILE * r = (FILE *) malloc(sizeof(FILE));
+    r->fd = fd;
+    r->got_eof = 0;
+
     return r;
 }
 
 static inline int fclose(FILE * stream) {
     int fd;
-    
+
     if (!stream) {
         set_errno(EINVAL);
         return -1;
     }
-    
+
     fd = stream->fd;
     free(stream);
     return close(fd);
@@ -134,71 +149,78 @@ static inline size_t fread(void * _ptr, size_t size, size_t nmemb, FILE * stream
     int i;
     uint8_t * ptr = (uint8_t *) _ptr;
     size_t r;
-    
+
     if (!stream) {
         set_errno(EINVAL);
         return -1;
     }
-    
+
     if (size == 1) {
         r = read(stream->fd, ptr, nmemb);
         if (r == 0)
             stream->got_eof = 1;
         return r;
     }
-    
+
     if (nmemb == 1) {
         r = read(stream->fd, ptr, size) == size ? 1 : 0;
         if (r == 0)
             stream->got_eof = 1;
         return r;
     }
-    
+
     for (i = 0; i < nmemb; i++) {
         if (read(stream->fd, ptr + size * i, size) != size) {
             stream->got_eof = 1;
             return i;
         }
     }
-    
+
     return nmemb;
 }
 
 static inline size_t fwrite(const void * _ptr, size_t size, size_t nmemb, FILE * stream) {
     int i;
     const uint8_t * ptr = (const uint8_t *) _ptr;
-    
+
     if (!stream) {
         set_errno(EINVAL);
         return -1;
     }
-    
+
     if (size == 1)
         return write(stream->fd, ptr, nmemb);
-    
+
     if (nmemb == 1)
         return write(stream->fd, ptr, size) == size ? 1 : 0;
-    
+
     for (i = 0; i < nmemb; i++) {
         if (write(stream->fd, ptr + size * i, size) != size)
             return i;
     }
-    
+
     return nmemb;
 }
 
 static inline int fgetc(FILE * stream) {
     uint8_t v;
+    int r;
 
     if (!stream) {
         set_errno(EINVAL);
         return -1;
     }
-    
-    if (read(stream->fd, &v, 1) != 1) {
-        stream->got_eof = 1;
+
+    r = read(stream->fd, &v, 1);
+
+    if (r != 1) {
+        if (r == 0) {
+            set_errno(0);
+            stream->got_eof = 1;
+        }
         return EOF;
     }
+
     return v;
 }
 
@@ -208,7 +230,7 @@ static inline int fseek(FILE * stream, off_t offset, int wheel) {
         set_errno(EINVAL);
         return -1;
     }
-    
+
     r = lseek(stream->fd, offset, wheel) != -1 ? 0 : -1;
     if (!r)
         stream->got_eof = 0;
@@ -222,9 +244,9 @@ static inline char * fgets(char * s, int n, FILE * stream) {
         set_errno(EINVAL);
         return NULL;
     }
-    
+
     fd = stream->fd;
-    
+
     while (--n) {
         r = read(fd, &c, 1);
         switch (r) {
@@ -244,7 +266,7 @@ static inline char * fgets(char * s, int n, FILE * stream) {
             break;
         }
     };
-    
+
     *s = 0;
     return copy;
 }
