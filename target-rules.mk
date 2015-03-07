@@ -36,7 +36,6 @@ ifneq ($(TARGET),)
 TARGET_ELF = $(addsuffix .elf, $(basename $(TARGET)))
 TARGET_BIN = $(addsuffix .bin, $(basename $(TARGET)))
 TARGET_MAP = $(addsuffix .map, $(basename $(TARGET)))
-TARGET_OBJS += $(addsuffix .o, $(basename $(TARGET)))
 TARGET_DEPS += $(addsuffix .dep, $(basename $(TARGET)))
 endif
 
@@ -53,9 +52,11 @@ ifeq ($(CPU_FAMILY),CM3)
 	$(Q)$(ROOTDIR)/tools/cm3-checksum/cm3-checksum $@
 endif
 
+ifneq ($(TARGET_LIB),)
 $(TARGET_LIB): $(TARGET_OBJS)
 	$(E) "[TLIB]   Creating $@"
 	$(Q)$(TARGET_AR) rcs $@ $^
+endif
 
 .PHONY: clean-generic ldeps
 
