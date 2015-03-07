@@ -1,4 +1,4 @@
-ifeq ($(BOARD),mbedlpc1768)
+ifeq ($(BOARD),mbed-lpc1768)
 CPU_FAMILY = arm
 CPU_SUBFAMILY = CM3
 CPU_FLAVOR = lpc17xx

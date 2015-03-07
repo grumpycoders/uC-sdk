@@ -28,8 +28,8 @@ TARGET_INCLUDES += $(ROOTDIR)/arch/arm/Core/CM4F/DeviceSupport/ST/stm32f4xx $(RO
 TARGET_CPPFLAGS += -DTARGET_LITTLE_ENDIAN
 endif
 
-ifeq ($(BOARD),mbedlpc1768)
-TARGET_INCLUDES += $(ROOTDIR)/arch/arm/lpc17xx/mbedlpc1768
+ifeq ($(BOARD),mbed-lpc1768)
+TARGET_INCLUDES += $(ROOTDIR)/arch/arm/lpc17xx/mbed-lpc1768
 endif
 
 ifeq ($(BOARD),inemom1)

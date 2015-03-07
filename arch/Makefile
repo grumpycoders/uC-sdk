@@ -32,8 +32,8 @@ TARGET_SRCS += arm/lpc17xx/init.c arm/lpc17xx/Drivers/source/debug_frmwrk.c
 TARGET_SRCS += arm/lpc17xx/registry.c
 endif
 
-ifeq ($(BOARD),mbedlpc1768)
-TARGET_SRCS += arm/lpc17xx/mbedlpc1768/BoardConsole.c arm/lpc17xx/mbedlpc1768/BoardInit.c
+ifeq ($(BOARD),mbed-lpc1768)
+TARGET_SRCS += arm/lpc17xx/mbed-lpc1768/BoardConsole.c arm/lpc17xx/mbed-lpc1768/BoardInit.c
 endif
 
 ifeq ($(CPU_FLAVOR),stm32f10x)
