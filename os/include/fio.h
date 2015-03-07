@@ -20,7 +20,7 @@ off_t fio_seek(int fd, off_t offset, int whence);
 int fio_close(int fd);
 void fio_set_opaque(int fd, void * opaque);
 
-void register_basic_stdio();
+void register_stdio_devices();
 void register_custom_stdin(fdread_t custom_stdin_read, void * opaque);
 void register_custom_stdout(fdwrite_t custom_stdout_write, void * opaque);
 

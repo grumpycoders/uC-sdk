@@ -204,7 +204,7 @@ static int stdio_open(void * opaque, int flags, int mode) {
     return ret;
 }
 
-void register_basic_stdio() {
+void register_stdio_devices() {
     register_device("stdin", stdio_open, (void *)(uintptr_t) 0);
     register_device("stdout", stdio_open, (void *)(uintptr_t) 1);
     register_device("stderr", stdio_open, (void *)(uintptr_t) 2);
