@@ -8,25 +8,26 @@ include config.mk
 include $(ROOTDIR)/FreeRTOS/config.mk
 include $(ROOTDIR)/libc/config.mk
 
-TARGET_SRCS = \
-src/sdcard.c \
-
 ifeq ($(CPU_SUBFAMILY),CM3)
 ifeq ($(CPU_FLAVOR),lpc17xx)
-TARGET_SRCS += src/gpio-lpc17xx.c
-TARGET_SRCS += src/ssp-lpc17xx.c
+TARGET_SRCS += src/lpc17xx/gpio.c
+TARGET_SRCS += src/lpc17xx/ssp.c
+endif
+
+ifeq ($(CPU_FLAVOR),stm32f10x)
+TARGET_SRCS += src/stm32f10x/i2c.c
+TARGET_SRCS += src/stm32f10x/uart.c
 endif
 endif
 
 ifeq ($(CPU_SUBFAMILY),CM4F)
 ifeq ($(CPU_FLAVOR),stm32f4xx)
-TARGET_SRCS += src/adc-stm32f4xx.c
-TARGET_SRCS += src/gpio-stm32f4xx.c
-TARGET_SRCS += src/i2c-stm32f4xx.c
-TARGET_SRCS += src/timer-stm32f4xx.c
-TARGET_SRCS += src/spi-stm32f4xx.c
-TARGET_SRCS += src/ssp-stm32f4xx.c
-TARGET_SRCS += src/uart-stm32f4xx.c
+TARGET_SRCS += src/stm32f4xx/adc.c
+TARGET_SRCS += src/stm32f4xx/gpio.c
+TARGET_SRCS += src/stm32f4xx/i2c.c
+TARGET_SRCS += src/stm32f4xx/ssp.c
+TARGET_SRCS += src/stm32f4xx/timer.c
+TARGET_SRCS += src/stm32f4xx/uart.c
 endif
 endif
 

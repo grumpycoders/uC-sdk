@@ -7,3 +7,4 @@
 tools/mkromfs
 *~
 .DS_Store
+*.pdf
