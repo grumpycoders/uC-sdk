@@ -8,6 +8,26 @@
 
 static SPI_TypeDef * const spis[] = { (void *) 0, SPI1, SPI2, SPI3, SPI4, SPI5, SPI6 };
 
+static inline uint16_t compute_prescaler(uint32_t clock) {
+    if (clock >= SystemCoreClock / 2) {
+        return SPI_BaudRatePrescaler_2;
+    } else if (clock >= SystemCoreClock / 4) {
+        return SPI_BaudRatePrescaler_4;
+    } else if (clock >= SystemCoreClock / 8) {
+        return SPI_BaudRatePrescaler_8;
+    } else if (clock >= SystemCoreClock / 16) {
+        return SPI_BaudRatePrescaler_16;
+    } else if (clock >= SystemCoreClock / 32) {
+        return SPI_BaudRatePrescaler_32;
+    } else if (clock >= SystemCoreClock / 64) {
+        return SPI_BaudRatePrescaler_64;
+    } else if (clock >= SystemCoreClock / 128) {
+        return SPI_BaudRatePrescaler_128;
+    }
+
+    return SPI_BaudRatePrescaler_256;
+}
+
 void ssp_config(ssp_port_t ssp_port, uint32_t clock) {
     ssp_t ssp = get_ssp(ssp_port);
     pin_t sclk = get_sclk(ssp_port);
@@ -81,7 +101,7 @@ void ssp_config(ssp_port_t ssp_port, uint32_t clock) {
     SPI_InitStructure.SPI_CPOL = SPI_CPOL_Low;
     SPI_InitStructure.SPI_CPHA = SPI_CPHA_1Edge;
     SPI_InitStructure.SPI_NSS = SPI_NSS_Soft;
-    SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_4;
+    SPI_InitStructure.SPI_BaudRatePrescaler = compute_prescaler(clock);
     SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB;
     SPI_InitStructure.SPI_CRCPolynomial = 7;
     SPI_InitStructure.SPI_Mode = SPI_Mode_Master;
