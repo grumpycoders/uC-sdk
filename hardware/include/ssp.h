@@ -8,6 +8,11 @@
 typedef enum {
     ssp_port_0,
     ssp_port_1,
+    ssp_port_2,
+    ssp_port_3,
+    ssp_port_4,
+    ssp_port_5,
+    ssp_port_6,
 } ssp_t;
 
 typedef uint64_t ssp_port_t;
@@ -25,7 +30,7 @@ static inline pin_t get_sclk(ssp_port_t ssp_port) { return (ssp_port >> 32) & 0x
 static inline pin_t get_mosi(ssp_port_t ssp_port) { return (ssp_port >> 16) & 0xffff; }
 static inline pin_t get_miso(ssp_port_t ssp_port) { return (ssp_port)       & 0xffff; }
 
-int ssp_config(ssp_port_t ssp_port, uint32_t clock);
+void ssp_config(ssp_port_t ssp_port, uint32_t clock);
 uint8_t ssp_readwrite(ssp_t ssp, uint8_t value);
 static inline void ssp_write(ssp_t ssp, uint8_t value) { (void) ssp_readwrite(ssp, value); }
 static inline uint8_t ssp_read(ssp_t ssp) { return ssp_readwrite(ssp, 0xff); }

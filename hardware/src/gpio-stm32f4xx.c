@@ -1,9 +1,10 @@
 #include <stm32f4xx.h>
 #include <stm32f4xx_gpio.h>
+#include "stm32f4xx-hardware.h"
 
 #include <gpio.h>
 
-GPIO_TypeDef *ports[] = {GPIOA, GPIOB, GPIOC, GPIOD, GPIOE, GPIOF, GPIOG, GPIOH, GPIOI, GPIOJ, GPIOK};
+GPIO_TypeDef * const stm32f4xx_gpio_ports[] = { GPIOA, GPIOB, GPIOC, GPIOD, GPIOE, GPIOF, GPIOG, GPIOH, GPIOI, GPIOJ, GPIOK };
 
 void gpio_config(pin_t pin, pin_dir_t dir, pull_t pull) { 
     //Clock the port
@@ -19,16 +20,16 @@ void gpio_config(pin_t pin, pin_dir_t dir, pull_t pull) {
         def.GPIO_OType = GPIO_OType_OD; //input : Open Drain
     def.GPIO_PuPd = pull;
 
-    GPIO_Init(ports[get_port(pin)], &def);
+    GPIO_Init(stm32f4xx_gpio_ports[get_port(pin)], &def);
 }
 
 void gpio_set(pin_t pin, int enabled) {
     if (enabled)
-        GPIO_SetBits(ports[get_port(pin)], 1 << get_pin(pin));
+        GPIO_SetBits(stm32f4xx_gpio_ports[get_port(pin)], 1 << get_pin(pin));
     else
-        GPIO_ResetBits(ports[get_port(pin)], 1 << get_pin(pin));
+        GPIO_ResetBits(stm32f4xx_gpio_ports[get_port(pin)], 1 << get_pin(pin));
 }
 
 uint8_t gpio_get(pin_t pin) {
-    return GPIO_ReadInputDataBit(ports[get_port(pin)], 1 << get_pin(pin));
+    return GPIO_ReadInputDataBit(stm32f4xx_gpio_ports[get_port(pin)], 1 << get_pin(pin));
 }

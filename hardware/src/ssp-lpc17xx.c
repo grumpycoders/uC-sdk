@@ -6,7 +6,7 @@
 #include "gpio.h"
 #include "ssp.h"
 
-int ssp_config(ssp_port_t ssp_port, uint32_t clock) {
+void ssp_config(ssp_port_t ssp_port, uint32_t clock) {
     SSP_CFG_Type cfg;
     LPC_SSP_TypeDef * sspdef = NULL;
     uint32_t clkpwr;
@@ -19,19 +19,13 @@ int ssp_config(ssp_port_t ssp_port, uint32_t clock) {
     case ssp_port_0:
         clkpwr = CLKPWR_PCLKSEL_SSP0;
         sspdef = LPC_SSP0;
-        if (sclk != MAKE_PIN(0, 15) && sclk != MAKE_PIN(1, 20)) return 0;
-        if (miso != MAKE_PIN(0, 17) && miso != MAKE_PIN(1, 23)) return 0;
-        if (mosi != MAKE_PIN(0, 18) && mosi != MAKE_PIN(1, 24)) return 0;
         break;
     case ssp_port_1:
         clkpwr = CLKPWR_PCLKSEL_SSP1;
         sspdef = LPC_SSP1;
-        if (sclk != MAKE_PIN(0, 7) && sclk != MAKE_PIN(1, 31)) return 0;
-        if (miso != MAKE_PIN(0, 8)) return 0;
-        if (mosi != MAKE_PIN(0, 9)) return 0;
         break;
     default:
-        return 0;
+        return;
     }
 
     PINSEL_CFG_Type pin_cfg;
@@ -61,8 +55,6 @@ int ssp_config(ssp_port_t ssp_port, uint32_t clock) {
 
     SSP_Init(sspdef, &cfg);
     SSP_Cmd(sspdef, ENABLE);
-
-    return 1;
 }
 
 // There's code for that in NXP's CMSIS, but it's overkill.
