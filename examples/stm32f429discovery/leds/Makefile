@@ -8,7 +8,7 @@ endif
 endif
 
 TARGET = leds.bin
-TARGET_OBJS = leds.o
+TARGET_SRCS = leds.c
 
 LIBDEPS = \
 $(ROOTDIR)/FreeRTOS/libFreeRTOS.a \

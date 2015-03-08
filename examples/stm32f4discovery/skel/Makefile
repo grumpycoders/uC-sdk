@@ -8,7 +8,7 @@ endif
 endif
 
 TARGET = skel.bin
-TARGET_OBJS = romfs_data.o skel.o
+TARGET_SRCS = romfs_data.c skel.c
 
 LIBDEPS = \
 $(ROOTDIR)/FreeRTOS/libFreeRTOS.a \
