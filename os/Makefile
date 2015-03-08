@@ -21,7 +21,7 @@ src/romfs.c \
 \
 src/sbrk.c \
 
-ifeq ($(CPU),arm)
+ifeq ($(CPU_FAMILY),arm)
 TARGET_SRCS += src/semifs.c src/semiio.c
 endif
 
