@@ -7,7 +7,7 @@
 typedef struct {
     // these are to be filled by caller
     pin_t cs;
-    ssp_t ssp;
+    ssp_port_t ssp_port;
     // these are read-only publics
     int got_timeout:1, error_state:1;
     // these should remain opaque

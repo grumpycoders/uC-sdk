@@ -21,6 +21,9 @@ BEGIN_DECL
 typedef uint16_t pin_t;
 #define MAKE_PIN(port, pin) ((pin_t)(((port & 0xff) << 8) | (pin & 0xff)))
 
+static inline uint8_t get_port(pin_t pin) { return (pin >> 8) & 0xff; }
+static inline uint8_t get_pin(pin_t pin) { return pin & 0xff; }
+
 typedef enum {
     pin_dir_read = 0,
     pin_dir_write = 1,
@@ -35,8 +38,5 @@ typedef enum {
 void gpio_config(pin_t pin, pin_dir_t dir, pull_t pull);
 void gpio_set(pin_t pin, int enabled);
 uint8_t gpio_get(pin_t pin);
-
-inline uint8_t get_port(pin_t pin);
-inline uint8_t get_pin(pin_t pin);
 
 END_DECL

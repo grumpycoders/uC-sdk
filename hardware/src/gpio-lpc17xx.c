@@ -3,14 +3,6 @@
 
 #include "gpio.h"
 
-inline uint8_t get_port(pin_t pin) {
-    return (pin >> 8) & 0xff;
-}
-
-inline uint8_t get_pin(pin_t pin) {
-    return pin & 0xff;
-}
-
 void gpio_config(pin_t pin, pin_dir_t dir, pull_t pull) {
     PINSEL_CFG_Type pin_cfg;
     pin_cfg.Portnum = get_port(pin);

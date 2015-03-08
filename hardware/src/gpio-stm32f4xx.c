@@ -3,14 +3,6 @@
 
 #include <gpio.h>
 
-inline uint8_t get_port(pin_t pin) {
-    return (pin >> 8) & 0xff;
-}
-
-inline uint8_t get_pin(pin_t pin) {
-    return pin & 0xff;
-}
-
 GPIO_TypeDef *ports[] = {GPIOA, GPIOB, GPIOC, GPIOD, GPIOE, GPIOF, GPIOG, GPIOH, GPIOI, GPIOJ, GPIOK};
 
 void gpio_config(pin_t pin, pin_dir_t dir, pull_t pull) { 

@@ -6,45 +6,53 @@
 #include "gpio.h"
 #include "ssp.h"
 
-void ssp_config(ssp_t ssp, uint32_t clock) {
+int ssp_config(ssp_port_t ssp_port, uint32_t clock) {
     SSP_CFG_Type cfg;
     LPC_SSP_TypeDef * sspdef = NULL;
-    int sclk, miso, mosi;
     uint32_t clkpwr;
-    int port = 0;
+    ssp_t ssp = get_ssp(ssp_port);
+    pin_t sclk = get_sclk(ssp_port);
+    pin_t miso = get_miso(ssp_port);
+    pin_t mosi = get_mosi(ssp_port);
 
     switch (ssp) {
     case ssp_port_0:
         clkpwr = CLKPWR_PCLKSEL_SSP0;
         sspdef = LPC_SSP0;
-        sclk = 15;
-        miso = 17;
-        mosi = 18;
+        if (sclk != MAKE_PIN(0, 15) && sclk != MAKE_PIN(1, 20)) return 0;
+        if (miso != MAKE_PIN(0, 17) && miso != MAKE_PIN(1, 23)) return 0;
+        if (mosi != MAKE_PIN(0, 18) && mosi != MAKE_PIN(1, 24)) return 0;
         break;
     case ssp_port_1:
         clkpwr = CLKPWR_PCLKSEL_SSP1;
         sspdef = LPC_SSP1;
-        sclk = 7;
-        miso = 8;
-        mosi = 9;
+        if (sclk != MAKE_PIN(0, 7) && sclk != MAKE_PIN(1, 31)) return 0;
+        if (miso != MAKE_PIN(0, 8)) return 0;
+        if (mosi != MAKE_PIN(0, 9)) return 0;
         break;
     default:
-        return;
+        return 0;
     }
 
     PINSEL_CFG_Type pin_cfg;
-    pin_cfg.Portnum = port;
     pin_cfg.Funcnum = 2;
     pin_cfg.Pinmode = PINSEL_PINMODE_PULLUP;
     pin_cfg.OpenDrain = PINSEL_PINMODE_NORMAL;
 
-    pin_cfg.Pinnum = sclk; PINSEL_ConfigPin(&pin_cfg);
-    pin_cfg.Pinnum = miso; PINSEL_ConfigPin(&pin_cfg);
-    pin_cfg.Pinnum = mosi; PINSEL_ConfigPin(&pin_cfg);
+    pin_cfg.Pinnum = get_pin(sclk);
+    pin_cfg.Portnum = get_port(sclk);
+    FIO_SetDir(get_port(sclk), 1 << get_pin(sclk), 1);
+    PINSEL_ConfigPin(&pin_cfg);
 
-    FIO_SetDir(port, 1 << sclk, 1);
-    FIO_SetDir(port, 1 << miso, 0);
-    FIO_SetDir(port, 1 << mosi, 1);
+    pin_cfg.Pinnum = get_pin(miso);
+    pin_cfg.Portnum = get_port(miso);
+    FIO_SetDir(get_port(miso), 1 << get_pin(miso), 0);
+    PINSEL_ConfigPin(&pin_cfg);
+
+    pin_cfg.Pinnum = get_pin(mosi);
+    pin_cfg.Portnum = get_port(mosi);
+    FIO_SetDir(get_port(mosi), 1 << get_pin(mosi), 1);
+    PINSEL_ConfigPin(&pin_cfg);
 
     CLKPWR_SetPCLKDiv(clkpwr, CLKPWR_PCLKSEL_CCLK_DIV_1);
 
@@ -53,6 +61,8 @@ void ssp_config(ssp_t ssp, uint32_t clock) {
 
     SSP_Init(sspdef, &cfg);
     SSP_Cmd(sspdef, ENABLE);
+
+    return 1;
 }
 
 // There's code for that in NXP's CMSIS, but it's overkill.
