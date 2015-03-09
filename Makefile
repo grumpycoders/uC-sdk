@@ -28,7 +28,7 @@ acorn/libacorn.a: acorn
 lwip/liblwip.a: lwip
 chips/libchips.a: chips
 
-libs: FreeRTOS arch hardware os libc libm acorn lwip
+libs: FreeRTOS arch hardware os libc libm acorn lwip chips
 
 FreeRTOS:
 	$(E) "[MAKE]   Entering FreeRTOS"
