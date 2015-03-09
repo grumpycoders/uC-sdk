@@ -4,6 +4,15 @@
 #include "lis3dsh.h"
 
 // http://www.st.com/web/en/resource/technical/document/datasheet/DM00040962.pdf
+// Disclaimer: that above documentation is abysmally wrong. Several pages of
+// them even, so it may or may not be a copy/paste mistake. The SPI protocol
+// this chip follows isn't the one described at all. More specifically, there is
+// no such thing as a "multibyte" flag in the register address byte. If you set
+// it, you'll actually end up reading or writing registers from 0x40 to 0x7f
+// instead of doing multibytes operations on 0x00 to 0x3f. Instead, multibyte is
+// controlled by the flag ADD_INC from the control register 6. It seems this
+// flag is set to enabled by default, but we'll probably want to set it anyway,
+// just to be sure.
 
 int lis3dsh_init(lis3dsh_t * lis3dsh) {
     pin_t cs = lis3dsh->cs;
@@ -74,7 +83,7 @@ void lis3dsh_power(lis3dsh_t * lis3dsh, int power) {
 }
 
 void lis3dsh_read(lis3dsh_t * lis3dsh, float axis[3]) {
-    int i;
+    int i = 0;
     pin_t cs = lis3dsh->cs;
     ssp_t ssp = get_ssp(lis3dsh->ssp_port);
 
@@ -82,14 +91,10 @@ void lis3dsh_read(lis3dsh_t * lis3dsh, float axis[3]) {
     ssp_write(ssp, 0xff);
 
     uint8_t registers[10];
-    for (i = 0; i < 10; i++) {
-        // I don't even want to know why the "read memory bank" mode doesn't work.
-        // I have come to terms with ST's craptastic documentation.
-        gpio_set(cs, 0);
-        spi_read_memory(ssp, 0x24 + i, registers + i, 1);
-        gpio_set(cs, 1);
-        ssp_write(ssp, 0xff);
-    }
+    gpio_set(cs, 0);
+    spi_read_memory(ssp, 0x24 + i, registers + i, 10);
+    gpio_set(cs, 1);
+    ssp_write(ssp, 0xff);
 
     float sensitivity = 0.0f;
 

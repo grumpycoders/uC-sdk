@@ -35,7 +35,7 @@ int main() {
     gpio_set(led_s, 0);
 
     float axis[3];
-    int n, e, s, w;
+    int n = 0, e = 0, s = 0, w = 0;
 
     while (1) {
         lis3dsh_read(&lis3dsh, axis);
