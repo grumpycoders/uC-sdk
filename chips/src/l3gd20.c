@@ -118,7 +118,7 @@ void l3gd20_read(l3gd20_t *sensor, float axis[3]){
     spi_get_register(sensor, L3GD20_OUT_X_L, b, 6);
     uint8_t i;
     for (i = 0 ; i < 3 ; i++){
-        r = (int16_t)(((uint16_t) b[2*i+11]) << 8 | b[2*i]);
+        r = (int16_t)(((uint16_t) b[2*i+1]) << 8 | b[2*i]);
         axis[i] = r * sensor->sensitivity;
     }
 }
