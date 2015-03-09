@@ -11,8 +11,8 @@ include $(ROOTDIR)/hardware/config.mk
 
 TARGET_SRCS = \
 src/sdcard.c \
-\
-src/lis3dsh.c \
+src/l3gd20.c \
+src/lis3dsh.c
 
 include $(ROOTDIR)/target-rules.mk
 
