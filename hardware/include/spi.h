@@ -2,26 +2,19 @@
 
 #include <decl.h>
 #include <stdint.h>
+#include <ssp.h>
 
 BEGIN_DECL
 
-//setup spi
-void spi_init(uint8_t id);
+static inline void spi_read_memory(ssp_t ssp, uint8_t address, uint8_t * buffer, uint8_t size) {
+    ssp_write(ssp, address | 0x80 | (size == 1 ? 0x00 : 0x40));
+    while (size--) *buffer++ = ssp_read(ssp);
+}
 
-//call before initiating a communication
-void spi_start(uint8_t id);
-//call after communication ended
-void spi_stop(uint8_t id);
-
-//read data from SPI
-void spi_read(uint8_t id, uint8_t *buffer, uint8_t nb);
-//write data to SPI
-void spi_write(uint8_t id, uint8_t *buffer, uint8_t nb);
-
-//read a register on a SPI device connected to a SPI bus
-void spi_get_register(uint8_t id, uint8_t address, uint8_t *buffer, uint8_t nb);
-//write a register on a SPI device connected to a SPI bus
-void spi_set_register(uint8_t id, uint8_t address, uint8_t *buffer, uint8_t nb);
+static inline void spi_write_memory(ssp_t ssp, uint8_t address, const uint8_t * buffer, uint8_t size) {
+    ssp_write(ssp, address | (size == 1 ? 0x00 : 0x40));
+    while (size--) ssp_write(ssp, *buffer++);
+}
 
 END_DECL
 
