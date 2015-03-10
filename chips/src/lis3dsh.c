@@ -14,13 +14,14 @@
 // just to be sure.
 
 static __inline__ void spi_read_registers(ssp_t ssp, uint8_t address, uint8_t * buffer, uint8_t size) {
-    ssp_write(ssp, address | 0x80);
-    while (size--) *buffer++ = ssp_read(ssp);
+    address |= 0x80;
+    ssp_write(ssp, address++);
+    while (size--) *buffer++ = ssp_readwrite(ssp, address++);
 }
 
-static __inline__ void spi_write_registers(ssp_t ssp, uint8_t address, const uint8_t * buffer, uint8_t size) {
+static __inline__ void spi_write_register(ssp_t ssp, uint8_t address, uint8_t value) {
     ssp_write(ssp, address);
-    while (size--) ssp_write(ssp, *buffer++);
+    ssp_write(ssp, value);
 }
 
 int lis3dsh_init_ssp(lis3dsh_t * lis3dsh, ssp_port_t ssp_port) {
@@ -45,32 +46,9 @@ int lis3dsh_init_ssp(lis3dsh_t * lis3dsh, ssp_port_t ssp_port) {
     ssp_write(ssp, 0xff);
     if (b != 0x3f) return 0;
 
-    // Let's write to CTRL_REG4 (0x20)
-    // 0x67 = 01100111
-    // bit0: Enable X
-    // bit1: Enable Y
-    // bit2: Enable Z
-    // bit3: Continuous update
-    // bit4-bit7: ODR = 100Hz - sample frequency
-    b = 0x67;
-    lis3dsh->odr = 6;
-    gpio_set(cs, 0);
-    spi_write_registers(ssp, 0x20, &b, 1);
-    gpio_set(cs, 1);
-    ssp_write(ssp, 0xff);
-
-    // Let's write to CTRL_REG5 (0x24)
-    // Basically, setting defaults, just in case.
-    // SPI mode: 4 wires
-    // Self test: disabled
-    // Full scale: 2G
-    // Anti-aliasing filter bandwidth: 800Hz
-    b = 0x00;
-    lis3dsh->scale = 0;
-    gpio_set(cs, 0);
-    spi_write_registers(ssp, 0x24, &b, 1);
-    gpio_set(cs, 1);
-    ssp_write(ssp, 0xff);
+    lis3dsh_power(lis3dsh, 1);
+    lis3dsh_frequency(lis3dsh, 6); // 100Hz
+    lis3dsh_scale(lis3dsh, 0); // lowest sampling scale
 
     return 1;
 }
@@ -84,17 +62,50 @@ void lis3dsh_power(lis3dsh_t * lis3dsh, int power) {
 
     uint8_t b;
 
-    // power off mode = 0x07
-    // power on mode  = 0x67
+    // Let's write to CTRL_REG4 (0x20)
+    // 0x67 = 01100111
+    // bit0: Enable X
+    // bit1: Enable Y
+    // bit2: Enable Z
+    // bit3: Continuous update
+    // bit4-bit7: ODR = sample frequency
+    // power off mode ==> ODR = 0
+    b = 7; // enable X, Y, Z
+    if (power) b |= lis3dsh->odr << 4;
+    lis3dsh->power = power ? 1 : 0;
 
-    b = 7;
-    if (power) {
-        b |= lis3dsh->odr << 4;
-    }
     gpio_set(cs, 0);
-    spi_write_registers(ssp, 0x20, &b, 1);
+    spi_write_register(ssp, 0x20, b);
     gpio_set(cs, 1);
     ssp_write(ssp, 0xff);
+}
+
+void lis3dsh_scale(lis3dsh_t * lis3dsh, int scale) {
+    pin_t cs = lis3dsh->cs;
+    ssp_t ssp = lis3dsh->ssp;
+
+    gpio_set(cs, 1);
+    ssp_write(ssp, 0xff);
+
+    uint8_t b;
+
+    // Let's write to CTRL_REG5 (0x24)
+    // Basically, setting defaults, just in case.
+    // SPI mode: 4 wires
+    // Self test: disabled
+    // Full scale: 2G
+    // Anti-aliasing filter bandwidth: 800Hz
+    b = 0x00;
+    lis3dsh->scale = 0;
+    gpio_set(cs, 0);
+    spi_write_register(ssp, 0x24, b);
+    gpio_set(cs, 1);
+    ssp_write(ssp, 0xff);
+}
+
+void lis3dsh_frequency(lis3dsh_t * lis3dsh, int odr) {
+    lis3dsh->odr = odr;
+    lis3dsh_power(lis3dsh, lis3dsh->power);
 }
 
 void lis3dsh_read(lis3dsh_t * lis3dsh, float axis[3]) {
@@ -149,7 +160,7 @@ void lis3dsh_read(lis3dsh_t * lis3dsh, float axis[3]) {
 #endif
     // Yes, I know, pointer aliasing. But the whole code is filled with it
     // anyway, and that should be the least of our problems.
-    int16_t * axis_data = (int16_t *) (registers + 4);
+    int16_t * axis_data = (int16_t *) registers;
     for (i = 0; i < 3; i++) {
         axis[i] = sensitivity * axis_data[i];
     }
