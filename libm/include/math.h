@@ -32,7 +32,7 @@
 BEGIN_DECL
 #if PORT_CPU_FAMILY == arm && PORT_CPU_SUBFAMILY == CM4F
 #define SOFTFLOAT_SQRTF
-static inline float sqrtf(float x) {
+static __inline__ float sqrtf(float x) {
     float r;
     asm("vsqrt.f32 %0, %1" : "=w"(r) : "w"(x));
     return r;

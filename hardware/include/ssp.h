@@ -25,14 +25,14 @@ typedef uint64_t ssp_port_t;
 
 BEGIN_DECL
 
-static inline ssp_t get_ssp(ssp_port_t ssp_port)  { return (ssp_port >> 48) & 0xffff; }
-static inline pin_t get_sclk(ssp_port_t ssp_port) { return (ssp_port >> 32) & 0xffff; }
-static inline pin_t get_mosi(ssp_port_t ssp_port) { return (ssp_port >> 16) & 0xffff; }
-static inline pin_t get_miso(ssp_port_t ssp_port) { return (ssp_port)       & 0xffff; }
+static __inline__ ssp_t get_ssp(ssp_port_t ssp_port)  { return (ssp_port >> 48) & 0xffff; }
+static __inline__ pin_t get_sclk(ssp_port_t ssp_port) { return (ssp_port >> 32) & 0xffff; }
+static __inline__ pin_t get_mosi(ssp_port_t ssp_port) { return (ssp_port >> 16) & 0xffff; }
+static __inline__ pin_t get_miso(ssp_port_t ssp_port) { return (ssp_port)       & 0xffff; }
 
 void ssp_config(ssp_port_t ssp_port, uint32_t clock);
 uint8_t ssp_readwrite(ssp_t ssp, uint8_t value);
-static inline void ssp_write(ssp_t ssp, uint8_t value) { (void) ssp_readwrite(ssp, value); }
-static inline uint8_t ssp_read(ssp_t ssp) { return ssp_readwrite(ssp, 0xff); }
+static __inline__ void ssp_write(ssp_t ssp, uint8_t value) { (void) ssp_readwrite(ssp, value); }
+static __inline__ uint8_t ssp_read(ssp_t ssp) { return ssp_readwrite(ssp, 0xff); }
 
 END_DECL

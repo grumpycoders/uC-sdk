@@ -8,7 +8,7 @@
 
 static SPI_TypeDef * const spis[] = { (void *) 0, SPI1, SPI2, SPI3, SPI4, SPI5, SPI6 };
 
-static inline uint16_t compute_prescaler(uint32_t clock) {
+static __inline__ uint16_t compute_prescaler(uint32_t clock) {
     if (clock >= SystemCoreClock / 2) {
         return SPI_BaudRatePrescaler_2;
     } else if (clock >= SystemCoreClock / 4) {

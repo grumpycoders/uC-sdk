@@ -89,7 +89,7 @@ static const uint16_t crc16_table[16] = {
     0x8108, 0x9129, 0xa14a, 0xb16b, 0xc18c, 0xd1ad, 0xe1ce, 0xf1ef
 };
 
-static inline uint16_t update_data_crc(uint16_t crc, uint8_t val) {
+static __inline__ uint16_t update_data_crc(uint16_t crc, uint8_t val) {
     unsigned int tbl_idx;
 
     tbl_idx = (crc >> 12) ^ (val >> 4);

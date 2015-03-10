@@ -4,7 +4,7 @@
 #include <stddef.h>
 #include <malloc.h>
 
-static inline void * memcpy(void * _s1, const void * _s2, size_t n) {
+static __inline__ void * memcpy(void * _s1, const void * _s2, size_t n) {
     uint8_t * s1 = (uint8_t *) _s1;
     const uint8_t * s2 = (uint8_t *) _s2;
     size_t i;
@@ -15,7 +15,7 @@ static inline void * memcpy(void * _s1, const void * _s2, size_t n) {
     return _s1;
 }
 
-static inline void * memmove(void * _s1, const void * _s2, size_t n) {
+static __inline__ void * memmove(void * _s1, const void * _s2, size_t n) {
     uint8_t * s1 = (uint8_t *) _s1;
     const uint8_t * s2 = (uint8_t *) _s2;
     size_t i;
@@ -33,7 +33,7 @@ static inline void * memmove(void * _s1, const void * _s2, size_t n) {
     return _s1;
 }
 
-static inline int memcmp(const void * _s1, const void * _s2, size_t n) {
+static __inline__ int memcmp(const void * _s1, const void * _s2, size_t n) {
     uint8_t * s1 = (uint8_t *) _s1;
     const uint8_t * s2 = (uint8_t *) _s2;
     size_t i;
@@ -49,7 +49,7 @@ static inline int memcmp(const void * _s1, const void * _s2, size_t n) {
     return 0;
 }
 
-static inline void * memset(void * _s, int c, size_t n) {
+static __inline__ void * memset(void * _s, int c, size_t n) {
     uint8_t * s = (uint8_t *) _s;
     size_t i;
     
@@ -59,7 +59,7 @@ static inline void * memset(void * _s, int c, size_t n) {
     return _s;
 }
 
-static inline const void * memchr(const void * _s, int c, size_t n) {
+static __inline__ const void * memchr(const void * _s, int c, size_t n) {
     const uint8_t * s = (uint8_t *) _s;
     size_t i;
     
@@ -70,7 +70,7 @@ static inline const void * memchr(const void * _s, int c, size_t n) {
     return NULL;
 }
 
-static inline char * strcat(char * s1, const char * s2) {
+static __inline__ char * strcat(char * s1, const char * s2) {
     char * r = s1;
     
     while (*s1)
@@ -84,7 +84,7 @@ static inline char * strcat(char * s1, const char * s2) {
     return r;
 }
 
-static inline char * strcpy(char * s1, const char * s2) {
+static __inline__ char * strcpy(char * s1, const char * s2) {
     char * r = s1;
     
     while ((*s1++ = *s2++));
@@ -92,7 +92,7 @@ static inline char * strcpy(char * s1, const char * s2) {
     return r;
 }
 
-static inline char * strncpy(char * s1, const char * s2, size_t n) {
+static __inline__ char * strncpy(char * s1, const char * s2, size_t n) {
     char * r = s1;
     size_t i;
     
@@ -107,7 +107,7 @@ static inline char * strncpy(char * s1, const char * s2, size_t n) {
     return r;
 }
 
-static inline char * strchr(const char * s, char c) {
+static __inline__ char * strchr(const char * s, char c) {
     while (*s) {
         if (*s == c)
             return (char *) s;
@@ -117,7 +117,7 @@ static inline char * strchr(const char * s, char c) {
     return NULL;
 }
 
-static inline char * strrchr(const char * s, char c) {
+static __inline__ char * strrchr(const char * s, char c) {
     const char * r = NULL;
     
     while (*s) {
@@ -129,7 +129,7 @@ static inline char * strrchr(const char * s, char c) {
     return (char *) r;
 }
 
-static inline size_t strlen(const char * s) {
+static __inline__ size_t strlen(const char * s) {
     size_t r = 0;
     
     while (*s++)
@@ -138,7 +138,7 @@ static inline size_t strlen(const char * s) {
     return r;
 }
 
-static inline char * strncat(char * s1, const char * s2, size_t n) {
+static __inline__ char * strncat(char * s1, const char * s2, size_t n) {
     char * r = s1;
     
     while (*s1)
@@ -148,7 +148,7 @@ static inline char * strncat(char * s1, const char * s2, size_t n) {
     return r;
 }
 
-static inline int strcmp(const char * s1, const char * s2) {
+static __inline__ int strcmp(const char * s1, const char * s2) {
     while (*s1 && *s2) {
         if (!*s1) {
             return -1;
@@ -166,7 +166,7 @@ static inline int strcmp(const char * s1, const char * s2) {
     return 0;
 }
 
-static inline int strncmp(const char * s1, const char * s2, size_t n) {
+static __inline__ int strncmp(const char * s1, const char * s2, size_t n) {
     while (*s1 && *s2 && n) {
         if (!*s1) {
             return -1;
@@ -185,11 +185,11 @@ static inline int strncmp(const char * s1, const char * s2, size_t n) {
     return 0;
 }
 
-static inline char * strdup(const char * s) {
+static __inline__ char * strdup(const char * s) {
     return strcpy((char *) malloc(strlen(s) + 1), s);
 }
 
-static inline char * strstr(const char * s1, const char * s2) {
+static __inline__ char * strstr(const char * s1, const char * s2) {
     size_t l = strlen(s2);
     
     while (*s1) {

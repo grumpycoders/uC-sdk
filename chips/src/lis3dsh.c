@@ -13,12 +13,12 @@
 // flag is set to enabled by default, but we'll probably want to set it anyway,
 // just to be sure.
 
-static inline void spi_read_registers(ssp_t ssp, uint8_t address, uint8_t * buffer, uint8_t size) {
+static __inline__ void spi_read_registers(ssp_t ssp, uint8_t address, uint8_t * buffer, uint8_t size) {
     ssp_write(ssp, address | 0x80);
     while (size--) *buffer++ = ssp_read(ssp);
 }
 
-static inline void spi_write_registers(ssp_t ssp, uint8_t address, const uint8_t * buffer, uint8_t size) {
+static __inline__ void spi_write_registers(ssp_t ssp, uint8_t address, const uint8_t * buffer, uint8_t size) {
     ssp_write(ssp, address);
     while (size--) ssp_write(ssp, *buffer++);
 }

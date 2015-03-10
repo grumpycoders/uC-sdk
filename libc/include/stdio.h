@@ -24,38 +24,38 @@ int vsprintf(char * str, const char * format, va_list ap);
 int vsnprintf(char * str, size_t size, const char * format, va_list ap);
 int vasprintf(char ** strp, const char * format, va_list ap);
 int vxprintf(void (*func)(const char *, int, void *), void * arg, const char * format, va_list ap);
-static inline int vfprintf(FILE * stream, const char * format, va_list ap) { return vdprintf(stream->fd, format, ap); }
-static inline int vprintf(const char * format, va_list ap) { return vfprintf(stdout, format, ap); }
+static __inline__ int vfprintf(FILE * stream, const char * format, va_list ap) { return vdprintf(stream->fd, format, ap); }
+static __inline__ int vprintf(const char * format, va_list ap) { return vfprintf(stdout, format, ap); }
 
-static inline int dprintf(int fd, const char * format, ...) { va_list ap; int r; va_start(ap, format); r = vdprintf(fd, format, ap); va_end(ap); return r; }
-static inline int sprintf(char * str, const char * format, ...) { va_list ap; int r; va_start(ap, format); r = vsprintf(str, format, ap); va_end(ap); return r; }
-static inline int snprintf(char * str, size_t size, const char * format, ...) { va_list ap; int r; va_start(ap, format); r = vsnprintf(str, size, format, ap); va_end(ap); return r; }
-static inline int asprintf(char ** strp, const char * format, ...) { va_list ap; int r; va_start(ap, format); r = vasprintf(strp, format, ap); va_end(ap); return r; }
-static inline int xprintf(void (*func)(const char *, int, void *), void * arg, const char * format, ...) { va_list ap; int r; va_start(ap, format); r = vxprintf(func, arg, format, ap); va_end(ap); return r; }
-static inline int fprintf(FILE * stream, const char * format, ...) { va_list ap; int r; va_start(ap, format); r = vfprintf(stream, format, ap); va_end(ap); return r; }
-static inline int printf(const char * format, ...) { va_list ap; int r; va_start(ap, format); r = vprintf(format, ap); va_end(ap); return r; }
+static __inline__ int dprintf(int fd, const char * format, ...) { va_list ap; int r; va_start(ap, format); r = vdprintf(fd, format, ap); va_end(ap); return r; }
+static __inline__ int sprintf(char * str, const char * format, ...) { va_list ap; int r; va_start(ap, format); r = vsprintf(str, format, ap); va_end(ap); return r; }
+static __inline__ int snprintf(char * str, size_t size, const char * format, ...) { va_list ap; int r; va_start(ap, format); r = vsnprintf(str, size, format, ap); va_end(ap); return r; }
+static __inline__ int asprintf(char ** strp, const char * format, ...) { va_list ap; int r; va_start(ap, format); r = vasprintf(strp, format, ap); va_end(ap); return r; }
+static __inline__ int xprintf(void (*func)(const char *, int, void *), void * arg, const char * format, ...) { va_list ap; int r; va_start(ap, format); r = vxprintf(func, arg, format, ap); va_end(ap); return r; }
+static __inline__ int fprintf(FILE * stream, const char * format, ...) { va_list ap; int r; va_start(ap, format); r = vfprintf(stream, format, ap); va_end(ap); return r; }
+static __inline__ int printf(const char * format, ...) { va_list ap; int r; va_start(ap, format); r = vprintf(format, ap); va_end(ap); return r; }
 
 int vdscanf(int fd, const char * format, va_list ap);
 int vsscanf(const char * str, const char * format, va_list ap);
 int vxscanf(int (*xgetc)(void *), void (*xungetc)(void *, int), void * opaque, const char * format, va_list args);
-static inline int vfscanf(FILE * stream, const char * format, va_list ap) { return vdscanf(stream->fd, format, ap); }
-static inline int vscanf(const char * format, va_list ap) { return vfscanf(stdin, format, ap); }
+static __inline__ int vfscanf(FILE * stream, const char * format, va_list ap) { return vdscanf(stream->fd, format, ap); }
+static __inline__ int vscanf(const char * format, va_list ap) { return vfscanf(stdin, format, ap); }
 
-static inline int dscanf(int fd, const char * format, ...) { va_list ap; int r; va_start(ap, format); r = vdscanf(fd, format, ap); va_end(ap); return r; }
-static inline int sscanf(const char * str, const char * format, ...)  { va_list ap; int r; va_start(ap, format); r = vsscanf(str, format, ap); va_end(ap); return r; }
-static inline int xscanf(int (*xgetc)(void *), void (*xungetc)(void *, int), void * opaque, const char *format, ...) { va_list ap; int r; va_start(ap, format); r = vxscanf(xgetc, xungetc, opaque, format, ap); va_end(ap); return r; }
-static inline int fscanf(FILE * stream, const char * format, ...) { va_list ap; int r; va_start(ap, format); r = vfscanf(stream, format, ap); va_end(ap); return r; }
-static inline int scanf(const char * format, ...) { va_list ap; int r; va_start(ap, format); r = vscanf(format, ap); va_end(ap); return r; }
+static __inline__ int dscanf(int fd, const char * format, ...) { va_list ap; int r; va_start(ap, format); r = vdscanf(fd, format, ap); va_end(ap); return r; }
+static __inline__ int sscanf(const char * str, const char * format, ...)  { va_list ap; int r; va_start(ap, format); r = vsscanf(str, format, ap); va_end(ap); return r; }
+static __inline__ int xscanf(int (*xgetc)(void *), void (*xungetc)(void *, int), void * opaque, const char *format, ...) { va_list ap; int r; va_start(ap, format); r = vxscanf(xgetc, xungetc, opaque, format, ap); va_end(ap); return r; }
+static __inline__ int fscanf(FILE * stream, const char * format, ...) { va_list ap; int r; va_start(ap, format); r = vfscanf(stream, format, ap); va_end(ap); return r; }
+static __inline__ int scanf(const char * format, ...) { va_list ap; int r; va_start(ap, format); r = vscanf(format, ap); va_end(ap); return r; }
 
 void __sinit(struct _reent *);
 
 END_DECL
 
 // We don't even buffer, so...
-static inline int fflush(FILE *stream) { return 0; }
+static __inline__ int fflush(FILE *stream) { return 0; }
 
 // hopefully, since all of the mode crap is static, gcc will optimize most of it away.
-static inline FILE * freopen(const char * fname, const char * mode, FILE * r) {
+static __inline__ FILE * freopen(const char * fname, const char * mode, FILE * r) {
     int flags = 0, plus = 0, append = 0, fd;
     if (!mode || !mode[0]) {
         set_errno(EINVAL);
@@ -118,11 +118,11 @@ static inline FILE * freopen(const char * fname, const char * mode, FILE * r) {
     return r;
 }
 
-static inline FILE * fopen(const char * fname, const char * mode) {
+static __inline__ FILE * fopen(const char * fname, const char * mode) {
     return freopen(fname, mode, NULL);
 }
 
-static inline FILE * fdopen(int fd, const char * mode) {
+static __inline__ FILE * fdopen(int fd, const char * mode) {
     FILE * r = (FILE *) malloc(sizeof(FILE));
     r->fd = fd;
     r->got_eof = 0;
@@ -130,7 +130,7 @@ static inline FILE * fdopen(int fd, const char * mode) {
     return r;
 }
 
-static inline int fclose(FILE * stream) {
+static __inline__ int fclose(FILE * stream) {
     int fd;
 
     if (!stream) {
@@ -145,7 +145,7 @@ static inline int fclose(FILE * stream) {
 
 // Again, the compiler should do the right thing, and optimize depending on the values of size and nmemb.
 // Luckily, we always will get into the short cases.
-static inline size_t fread(void * _ptr, size_t size, size_t nmemb, FILE * stream) {
+static __inline__ size_t fread(void * _ptr, size_t size, size_t nmemb, FILE * stream) {
     int i;
     uint8_t * ptr = (uint8_t *) _ptr;
     size_t r;
@@ -179,7 +179,7 @@ static inline size_t fread(void * _ptr, size_t size, size_t nmemb, FILE * stream
     return nmemb;
 }
 
-static inline size_t fwrite(const void * _ptr, size_t size, size_t nmemb, FILE * stream) {
+static __inline__ size_t fwrite(const void * _ptr, size_t size, size_t nmemb, FILE * stream) {
     int i;
     const uint8_t * ptr = (const uint8_t *) _ptr;
 
@@ -202,7 +202,7 @@ static inline size_t fwrite(const void * _ptr, size_t size, size_t nmemb, FILE *
     return nmemb;
 }
 
-static inline int fgetc(FILE * stream) {
+static __inline__ int fgetc(FILE * stream) {
     uint8_t v;
     int r;
 
@@ -224,7 +224,7 @@ static inline int fgetc(FILE * stream) {
     return v;
 }
 
-static inline int fseek(FILE * stream, off_t offset, int wheel) {
+static __inline__ int fseek(FILE * stream, off_t offset, int wheel) {
     int r;
     if (!stream) {
         set_errno(EINVAL);
@@ -237,7 +237,7 @@ static inline int fseek(FILE * stream, off_t offset, int wheel) {
     return r;
 }
 
-static inline char * fgets(char * s, int n, FILE * stream) {
+static __inline__ char * fgets(char * s, int n, FILE * stream) {
     int r, fd;
     char c, * copy = s;
     if (!stream) {
@@ -271,8 +271,8 @@ static inline char * fgets(char * s, int n, FILE * stream) {
     return copy;
 }
 
-static inline int getc() { return fgetc(stdin); }
-static inline off_t ftell(FILE * stream) { return lseek(stream->fd, 0, SEEK_CUR); }
-static inline int feof(FILE * stream) { return stream->got_eof; }
-static inline int fileno(FILE * stream) { return stream->fd; }
-static inline void rewind(FILE * stream) { fseek(stream, 0, SEEK_SET); }
+static __inline__ int getc() { return fgetc(stdin); }
+static __inline__ off_t ftell(FILE * stream) { return lseek(stream->fd, 0, SEEK_CUR); }
+static __inline__ int feof(FILE * stream) { return stream->got_eof; }
+static __inline__ int fileno(FILE * stream) { return stream->fd; }
+static __inline__ void rewind(FILE * stream) { fseek(stream, 0, SEEK_SET); }

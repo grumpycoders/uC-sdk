@@ -18,11 +18,11 @@ extern unsigned int _seed;
 
 int rand_r(unsigned int * seed); 
 
-static inline int rand(void) { return rand_r(&_seed); }
-static inline void srand(unsigned int seed) { _seed = seed * 3835238167UL; }
+static __inline__ int rand(void) { return rand_r(&_seed); }
+static __inline__ void srand(unsigned int seed) { _seed = seed * 3835238167UL; }
 
 END_DECL
 
-static inline double atof(const char * str) { double r = 0; sscanf(str, "%lf", &r); return r; }
-static inline int atoi(const char * str) { int i; sscanf(str, "%i", &i); return i; }
-static inline int atol(const char * str) { long l; sscanf(str, "%li", &l); return l; }
+static __inline__ double atof(const char * str) { double r = 0; sscanf(str, "%lf", &r); return r; }
+static __inline__ int atoi(const char * str) { int i; sscanf(str, "%i", &i); return i; }
+static __inline__ int atol(const char * str) { long l; sscanf(str, "%li", &l); return l; }

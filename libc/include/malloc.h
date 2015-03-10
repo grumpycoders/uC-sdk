@@ -19,7 +19,7 @@ extern malloc_t malloc;
 extern free_t free;
 extern realloc_t realloc;
 
-static inline void * calloc(size_t nmemb, size_t size) {
+static __inline__ void * calloc(size_t nmemb, size_t size) {
     uint8_t * r = malloc(nmemb * size);
     size_t i;
     for (i = 0; i < (size * nmemb); i++)

@@ -21,8 +21,8 @@ BEGIN_DECL
 typedef uint16_t pin_t;
 #define MAKE_PIN(port, pin) ((pin_t)(((port & 0xff) << 8) | (pin & 0xff)))
 
-static inline uint8_t get_port(pin_t pin) { return (pin >> 8) & 0xff; }
-static inline uint8_t get_pin(pin_t pin) { return pin & 0xff; }
+static __inline__ uint8_t get_port(pin_t pin) { return (pin >> 8) & 0xff; }
+static __inline__ uint8_t get_pin(pin_t pin) { return pin & 0xff; }
 
 typedef enum {
     pin_dir_read = 0,
