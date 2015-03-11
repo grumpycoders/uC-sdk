@@ -4,7 +4,7 @@ ifeq ($(VERBOSE),)
 VERBOSE = false
 endif
 ifeq ($(DEBUG),)
-DEBUG = true
+DEBUG = false
 endif
 ifeq ($(USE_FLOATINGPOINT),)
 USE_FLOATINGPOINT = true
