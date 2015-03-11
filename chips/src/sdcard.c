@@ -105,18 +105,18 @@ static int sdcard_cmd(sdcard_t * sdcard, uint8_t cmd, uint8_t arg[4], int big_re
     cmd &= 0x3f;
     cmd |= 0x40;
     gpio_set(sdcard->cs, 0);
-    ssp_write(get_ssp(sdcard->ssp_port), cmd);
+    ssp_write(sdcard->ssp, cmd);
     uint8_t crc = update_cmd_crc(0, cmd);
     int i;
     for (i = 0; i < 4; i++) {
         crc = update_cmd_crc(crc, arg[i]);
-        ssp_write(get_ssp(sdcard->ssp_port), arg[i]);
+        ssp_write(sdcard->ssp, arg[i]);
     }
-    ssp_write(get_ssp(sdcard->ssp_port), (crc << 1) | 1);
+    ssp_write(sdcard->ssp, (crc << 1) | 1);
 
     int retries = MAX_RETRIES;
     while (--retries) {
-        response[0] = ssp_read(get_ssp(sdcard->ssp_port));
+        response[0] = ssp_read(sdcard->ssp);
         if ((response[0] & 0x80) == 0)
             break;
         if (response[0] != 0xff)
@@ -136,19 +136,19 @@ static int sdcard_cmd(sdcard_t * sdcard, uint8_t cmd, uint8_t arg[4], int big_re
         big_response = 6;
 
     for (i = 1; i < big_response; i++)
-        response[i] = ssp_read(get_ssp(sdcard->ssp_port));
+        response[i] = ssp_read(sdcard->ssp);
 
     if (wait) {
         SDPUTS("Waiting...");
         retries = MAX_RETRIES;
         while (--retries)
-            (void) ssp_read(get_ssp(sdcard->ssp_port));
+            (void) ssp_read(sdcard->ssp);
         if (retries == 0) {
             sdcard->got_timeout = 1;
             gpio_set(sdcard->cs, 1);
             return 0;
         }
-        ssp_write(get_ssp(sdcard->ssp_port), 0xff);
+        ssp_write(sdcard->ssp, 0xff);
     }
 
     gpio_set(sdcard->cs, 1);
@@ -157,22 +157,24 @@ static int sdcard_cmd(sdcard_t * sdcard, uint8_t cmd, uint8_t arg[4], int big_re
 
 static void error_out(sdcard_t * sdcard) {
     gpio_set(sdcard->cs, 1);
-    ssp_write(get_ssp(sdcard->ssp_port), 0xff);
+    ssp_write(sdcard->ssp, 0xff);
     sdcard->error_state = 1;
 }
 
-int sdcard_init(sdcard_t * sdcard) {
+int sdcard_init(sdcard_t * sdcard, ssp_port_t ssp_port, pin_t cs) {
     int i;
 
     SDPUTS("Starting sdcard init..");
 
+    sdcard->cs = cs;
+    sdcard->ssp = get_ssp(ssp_port);
     sdcard->got_timeout = 0;
     sdcard->error_state = 0;
     sdcard->v2 = 0;
     sdcard->sdhc = 0;
 
     SDPUTS("Configuring SSP.");
-    ssp_config(sdcard->ssp_port, 400000); // standard says we can ping the card at 400khz first.
+    ssp_config(ssp_port, 400000); // standard says we can ping the card at 400khz first.
     SDPUTS("Configuring CS.");
     gpio_config(sdcard->cs, pin_dir_write, pull_up);
     gpio_set(sdcard->cs, 1);
@@ -180,13 +182,13 @@ int sdcard_init(sdcard_t * sdcard) {
     // first, let's send 74 dummy clocks, with MOSI = 1 and CS = 1; that's about 10 bytes equal to 0xff.
     SDPUTS("Waiting 74+ cycles.");
     for (i = 0; i < 10; i++)
-        ssp_write(get_ssp(sdcard->ssp_port), 0xff);
+        ssp_write(sdcard->ssp, 0xff);
 
     SDPUTS("Waiting 16+ cycles.");
     // then, we need 16 dummy clocks, with MOSI = 1 and CS = 0. Two bytes.
     gpio_set(sdcard->cs, 0);
     for (i = 0; i < 2; i++)
-        ssp_write(get_ssp(sdcard->ssp_port), 0xff);
+        ssp_write(sdcard->ssp, 0xff);
 
     uint8_t argument[4] = { 0, 0, 0, 0 };
     uint8_t response[6];
@@ -285,7 +287,7 @@ int sdcard_init(sdcard_t * sdcard) {
     // like to get an actual sdcard with these requirements to properly test it. In the meantime, I'll
     // just error out. It seems to be the "MMC V3" sdcard btw.
 
-    ssp_config(get_ssp(sdcard->ssp_port), 4000000); // let's crank up the speed to 4Mhz.
+    ssp_config(sdcard->ssp, 4000000); // let's crank up the speed to 4Mhz.
 
     SDPUTS("Turning on CRC checks");
     // since we're computing them, might as well require the card to check them...
@@ -371,7 +373,7 @@ int sdcard_read(sdcard_t * sdcard, uint8_t * data, unsigned int block) {
     gpio_set(sdcard->cs, 0);
     int retries = MAX_RETRIES;
     while (--retries) {
-        uint8_t pad = ssp_read(get_ssp(sdcard->ssp_port));
+        uint8_t pad = ssp_read(sdcard->ssp);
         if (pad == 0xff)
             continue;
         if (pad == 0xfe)
@@ -392,13 +394,13 @@ int sdcard_read(sdcard_t * sdcard, uint8_t * data, unsigned int block) {
     int i;
 
     for (i = 0; i < 512; i++) {
-        uint8_t val = data[i] = ssp_read(get_ssp(sdcard->ssp_port));
+        uint8_t val = data[i] = ssp_read(sdcard->ssp);
         crc = update_data_crc(crc, val);
     }
 
-    uint16_t sdcrc = ssp_read(get_ssp(sdcard->ssp_port));
+    uint16_t sdcrc = ssp_read(sdcard->ssp);
     sdcrc <<= 8;
-    sdcrc |= ssp_read(get_ssp(sdcard->ssp_port));
+    sdcrc |= ssp_read(sdcard->ssp);
 
     gpio_set(sdcard->cs, 1);
 

@@ -21,8 +21,7 @@ int main() {
 
     lis3dsh_t lis3dsh;
 
-    lis3dsh.cs = MAKE_PIN(GPIO_PORT_E, 3);
-    lis3dsh_init_ssp(&lis3dsh, MAKE_SSP_PORT(ssp_port_1, MAKE_PIN(GPIO_PORT_A, 5), MAKE_PIN(GPIO_PORT_A, 7), MAKE_PIN(GPIO_PORT_A, 6)));
+    lis3dsh_init_ssp(&lis3dsh, MAKE_SSP_PORT(ssp_port_1, MAKE_PIN(GPIO_PORT_A, 5), MAKE_PIN(GPIO_PORT_A, 7), MAKE_PIN(GPIO_PORT_A, 6)), MAKE_PIN(GPIO_PORT_E, 3));
 
     gpio_config(led_w, pin_dir_write, pull_up);
     gpio_config(led_n, pin_dir_write, pull_up);

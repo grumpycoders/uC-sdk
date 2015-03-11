@@ -1,11 +1,10 @@
 #pragma once
 
+#include <decl.h>
 #include <gpio.h>
 #include <ssp.h>
 #include <i2c.h>
 
-
-// ought to be generic, cm3-specific for now
 typedef enum {
     L3GD20_I2C,
     L3GD20_SPI,
@@ -33,18 +32,15 @@ typedef enum {
 }l3gd20_bandwidth_t;
 
 typedef struct {
-    // these are to be filled by caller
     pin_t cs;
-    // private data
     l3gd20_communication_t comm;
     ssp_t ssp;
-//    i2c_t i2c;
     uint8_t odr:2, bw:2, scale:2, power:1;
 } l3gd20_t;
 
+BEGIN_DECL
 
-int l3gd20_init_ssp(l3gd20_t *l3gd20, ssp_port_t ssp_port);
-//int l3gd20_init_i2c(l3gd20_t *l3gd20, i2c_port_t port);
+int l3gd20_init_ssp(l3gd20_t *l3gd20, ssp_port_t ssp_port, pin_t cs);
 
 void l3gd20_power(l3gd20_t *l3gd20, int power);
 void l3gd20_scale(l3gd20_t *l3gd20, l3gd20_scale_t scale);
@@ -52,4 +48,4 @@ void l3gd20_frequency(l3gd20_t *l3gd20, l3gd20_datarate_t odr, l3gd20_bandwidth_
 void l3gd20_filter(l3gd20_t *l3gd20, float cutoff);
 void l3gd20_read(l3gd20_t *l3gd20, float axis[3]);
 
-
+END_DECL

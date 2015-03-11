@@ -62,8 +62,8 @@ void spi_write_register(ssp_t ssp, uint8_t address, uint8_t value) {
     ssp_write(ssp, value);
 }
 
-int l3gd20_init_ssp(l3gd20_t *l3gd20, ssp_port_t ssp_port) {
-    pin_t cs = l3gd20->cs;
+int l3gd20_init_ssp(l3gd20_t *l3gd20, ssp_port_t ssp_port, pin_t cs) {
+    l3gd20->cs = cs;
     ssp_t ssp = get_ssp(ssp_port);
     l3gd20->ssp = ssp;
     l3gd20->comm = L3GD20_SPI;
@@ -87,12 +87,6 @@ int l3gd20_init_ssp(l3gd20_t *l3gd20, ssp_port_t ssp_port) {
 
     return 1;
 }
-
-/*
-int l3gd20_init_i2c(l3gd20_t *l3gd20, i2c_port_t port){
-    return NULL;
-}
-*/
 
 void l3gd20_power(l3gd20_t *l3gd20, int power) {
     pin_t cs = l3gd20->cs;
@@ -192,5 +186,3 @@ void l3gd20_read(l3gd20_t *l3gd20, float axis[3]) {
 
 void l3gd20_setup_filter(l3gd20_t *sensor, float cutoff){
 }
-
-

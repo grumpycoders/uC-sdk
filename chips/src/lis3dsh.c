@@ -24,10 +24,11 @@ static __inline__ void spi_write_register(ssp_t ssp, uint8_t address, uint8_t va
     ssp_write(ssp, value);
 }
 
-int lis3dsh_init_ssp(lis3dsh_t * lis3dsh, ssp_port_t ssp_port) {
-    pin_t cs = lis3dsh->cs;
+int lis3dsh_init_ssp(lis3dsh_t * lis3dsh, ssp_port_t ssp_port, pin_t cs) {
+    lis3dsh->cs = cs;
     ssp_t ssp = get_ssp(ssp_port);
     lis3dsh->ssp = ssp;
+    lis3dsh->power = 0;
 
     gpio_config(cs, pin_dir_write, pull_up);
     gpio_set(cs, 1);
@@ -39,21 +40,21 @@ int lis3dsh_init_ssp(lis3dsh_t * lis3dsh, ssp_port_t ssp_port) {
 
     uint8_t b;
 
-    // Let's read WHO_AM_I (0x0f) - should be 0x3f for LIS3DSH.
+    // Reading register "WHO_AM_I", should return 0x3f for lis3dsh.
     gpio_set(cs, 0);
     spi_read_registers(ssp, 0x0f, &b, 1);
     gpio_set(cs, 1);
     ssp_write(ssp, 0xff);
     if (b != 0x3f) return 0;
 
-    lis3dsh_power(lis3dsh, 1);
-    lis3dsh_frequency(lis3dsh, 6); // 100Hz
-    lis3dsh_scale(lis3dsh, 0); // lowest sampling scale
+    lis3dsh_frequency(lis3dsh, LIS3DSH_ODR_100HZ);
+    lis3dsh_scale(lis3dsh, LIS3DSH_SCALE_2G);
+    lis3dsh_power(lis3dsh, LIS3DSH_POWER_ON);
 
     return 1;
 }
 
-void lis3dsh_power(lis3dsh_t * lis3dsh, int power) {
+void lis3dsh_power(lis3dsh_t * lis3dsh, lis3dsh_power_t power) {
     pin_t cs = lis3dsh->cs;
     ssp_t ssp = lis3dsh->ssp;
 
@@ -63,7 +64,6 @@ void lis3dsh_power(lis3dsh_t * lis3dsh, int power) {
     uint8_t b;
 
     // Let's write to CTRL_REG4 (0x20)
-    // 0x67 = 01100111
     // bit0: Enable X
     // bit1: Enable Y
     // bit2: Enable Z
@@ -80,7 +80,7 @@ void lis3dsh_power(lis3dsh_t * lis3dsh, int power) {
     ssp_write(ssp, 0xff);
 }
 
-void lis3dsh_scale(lis3dsh_t * lis3dsh, int scale) {
+void lis3dsh_scale(lis3dsh_t * lis3dsh, lis3dsh_scale_t scale) {
     pin_t cs = lis3dsh->cs;
     ssp_t ssp = lis3dsh->ssp;
 
@@ -90,20 +90,15 @@ void lis3dsh_scale(lis3dsh_t * lis3dsh, int scale) {
     uint8_t b;
 
     // Let's write to CTRL_REG5 (0x24)
-    // Basically, setting defaults, just in case.
-    // SPI mode: 4 wires
-    // Self test: disabled
-    // Full scale: 2G
-    // Anti-aliasing filter bandwidth: 800Hz
-    b = 0x00;
-    lis3dsh->scale = 0;
+    b = scale << 3;
+    lis3dsh->scale = scale;
     gpio_set(cs, 0);
     spi_write_register(ssp, 0x24, b);
     gpio_set(cs, 1);
     ssp_write(ssp, 0xff);
 }
 
-void lis3dsh_frequency(lis3dsh_t * lis3dsh, int odr) {
+void lis3dsh_frequency(lis3dsh_t * lis3dsh, lis3dsh_odr_t odr) {
     lis3dsh->odr = odr;
     lis3dsh_power(lis3dsh, lis3dsh->power);
 }
@@ -123,22 +118,20 @@ void lis3dsh_read(lis3dsh_t * lis3dsh, float axis[3]) {
 
     float sensitivity = 0.0f;
 
-    // Reading scaling register from CTRL_REG5 (0x24)
-    // That's bits 3 to 5.
     switch (lis3dsh->scale) {
-    case 0:
+    case LIS3DSH_SCALE_2G:
         sensitivity = 0.06f;
         break;
-    case 1:
+    case LIS3DSH_SCALE_4G:
         sensitivity = 0.12f;
         break;
-    case 2:
+    case LIS3DSH_SCALE_6G:
         sensitivity = 0.18f;
         break;
-    case 3:
+    case LIS3DSH_SCALE_8G:
         sensitivity = 0.24f;
         break;
-    case 4:
+    case LIS3DSH_SCALE_16G:
         sensitivity = 0.73f;
         break;
     }
