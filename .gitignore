@@ -4,7 +4,8 @@
 *.elf
 *.a
 *.map
-tools/mkromfs
+tools/cm3-checksum/cm3-checksum
+tools/romfs/mkromfs
 *~
 .DS_Store
 *.pdf
