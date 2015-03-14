@@ -67,9 +67,9 @@ void ssp_config(ssp_port_t ssp_port, uint32_t clock) {
     }
 
     uint32_t port_flags = 0;
-    port_flags |= get_port(sclk);
-    port_flags |= get_port(miso);
-    port_flags |= get_port(mosi);
+    port_flags |= 1 << get_port(sclk);
+    port_flags |= 1 << get_port(miso);
+    port_flags |= 1 << get_port(mosi);
     RCC_AHB1PeriphClockCmd(port_flags, ENABLE);
 
 
@@ -78,7 +78,7 @@ void ssp_config(ssp_port_t ssp_port, uint32_t clock) {
     GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_AF;
     GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
     GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_DOWN;
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_25MHz;
 
     GPIO_InitStructure.GPIO_Pin   = 1 << get_pin(sclk);
     GPIO_PinAFConfig(stm32f4xx_gpio_ports[get_port(sclk)], get_pin(sclk), af);

@@ -68,6 +68,8 @@ int l3gd20_init_ssp(l3gd20_t *l3gd20, ssp_port_t ssp_port, pin_t cs) {
     l3gd20->ssp = ssp;
     l3gd20->comm = L3GD20_SPI;
 
+    gpio_config(cs, pin_dir_write, pull_up);
+    
     gpio_set(cs, 1);
 
     ssp_config(ssp_port, 8 * 1000 * 1000);
