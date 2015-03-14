@@ -48,7 +48,7 @@ uC-sdk:
 	$(E) "[MAKE]   Entering uC-sdk"
 	$(Q)$(MAKE) $(MAKE_OPTS) -C $(ROOTDIR)
 
-romfs_data.c:
+romfs_data.c: $(ROOTDIR)/tools/romfs/mkromfs
 	$(E) "[ROMFS]  Building romfs"
 	$(Q)$(ROOTDIR)/tools/romfs/mkromfs -d romfs -c romfs romfs_data.c
 
@@ -63,5 +63,6 @@ include $(ROOTDIR)/libc/config.mk
 include $(ROOTDIR)/libm/config.mk
 include $(ROOTDIR)/acorn/config.mk
 include $(ROOTDIR)/hardware/config.mk
+include $(ROOTDIR)/chips/config.mk
+include $(ROOTDIR)/lwip/config.mk
 include $(ROOTDIR)/target-rules.mk
-

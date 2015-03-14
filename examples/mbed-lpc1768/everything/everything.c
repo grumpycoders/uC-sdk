@@ -2,6 +2,7 @@
 #include <task.h>
 #include <semphr.h>
 #include <gpio.h>
+#include <ssp.h>
 #include <sdcard.h>
 #include <BoardConsole.h>
 #include <osdebug.h>
@@ -29,6 +30,8 @@
 #define LED2_wire MAKE_PIN(1, 20)
 #define LED3_wire MAKE_PIN(1, 21)
 #define LED4_wire MAKE_PIN(1, 23)
+
+extern const char romfs[];
 
 static void setupLEDs() {
     gpio_config(LED1_wire, pin_dir_write, pull_up);
@@ -96,8 +99,6 @@ static void badTask(void *x) {
 
 static const char msg[] = "Hello world - from fwrite!\r\n";
 
-extern uint8_t _binary_test_romfs_bin_start[];
-
 struct ip_addr board_ip;
 static struct netif board_netif;
 static xSemaphoreHandle lwip_sem;
@@ -137,7 +138,7 @@ uint32_t sys_now() { return xTaskGetTickCount() * portTICK_RATE_MS; }
 
 static void lwip_task(void * p) {
     net_init();
-    httpd_init(_binary_test_romfs_bin_start);
+    httpd_init((uint8_t *) romfs);
     echo_init();
 
     uint32_t currentIP = board_netif.ip_addr.addr;
@@ -170,9 +171,9 @@ int main() {
     char buf[32];
     int c;
     register_devfs();
-    register_stdio();
+    register_stdio_devices();
     register_semifs();
-    register_romfs("romfs", _binary_test_romfs_bin_start);
+    register_romfs("romfs", (uint8_t *) romfs);
     handle = xSemaphoreCreateMutex();
     printf("Hello world - from stdio!\r\n");
     fflush(stdout);
@@ -206,9 +207,7 @@ int main() {
     litLED(3, 0);
     litLED(4, 0);
     sdcard_t sdcard;
-    sdcard.ssp = ssp_port_1;
-    sdcard.cs = MAKE_PIN(0, 6);
-    if (sdcard_init(&sdcard)) {
+    if (sdcard_init(&sdcard, MAKE_SSP_PORT(ssp_port_1, MAKE_PIN(0, 7), MAKE_PIN(0, 9), MAKE_PIN(0, 8)), MAKE_PIN(0, 6))) {
         printf("Successfully initialized sdcard - reading first sector\n");
         uint8_t data[512];
         if (sdcard_read(&sdcard, data, 0)) {
