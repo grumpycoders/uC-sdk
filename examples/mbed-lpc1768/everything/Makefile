@@ -1,4 +1,4 @@
-export BOARD = stm32f4discovery
+export BOARD = mbed-lpc1768
 ROOTDIR = $(CURDIR)/uC-sdk
 
 ifeq ($(wildcard $(ROOTDIR)/uC-sdk.root),)
@@ -7,8 +7,8 @@ ROOTDIR = ../../..
 endif
 endif
 
-TARGET = skel.bin
-TARGET_SRCS = romfs_data.c skel.c
+TARGET = everything.bin
+TARGET_SRCS = romfs_data.c everything.c
 
 LIBDEPS = \
 $(ROOTDIR)/FreeRTOS/libFreeRTOS.a \
@@ -18,6 +18,8 @@ $(ROOTDIR)/libc/libc.a \
 $(ROOTDIR)/libm/libm.a \
 $(ROOTDIR)/acorn/libacorn.a \
 $(ROOTDIR)/hardware/libhardware.a \
+$(ROOTDIR)/chips/libchips.a \
+$(ROOTDIR)/lwip/liblwip.a \
 
 LIBS = -Wl,--start-group $(LIBDEPS) -Wl,--end-group
 TARGET_INCLUDES = include
@@ -39,6 +41,8 @@ $(ROOTDIR)/libc/libc.a: uC-sdk
 $(ROOTDIR)/libm/libm.a: uC-sdk
 $(ROOTDIR)/acorn/libacorn.a: uC-sdk
 $(ROOTDIR)/hardware/libhardware.a: uC-sdk
+$(ROOTDIR)/chips/libchips.a: uC-sdk
+$(ROOTDIR)/lwip/liblwip.a: uC-sdk
 
 uC-sdk:
 	$(E) "[MAKE]   Entering uC-sdk"
@@ -59,5 +63,6 @@ include $(ROOTDIR)/libc/config.mk
 include $(ROOTDIR)/libm/config.mk
 include $(ROOTDIR)/acorn/config.mk
 include $(ROOTDIR)/hardware/config.mk
+include $(ROOTDIR)/chips/config.mk
+include $(ROOTDIR)/lwip/config.mk
 include $(ROOTDIR)/target-rules.mk
-

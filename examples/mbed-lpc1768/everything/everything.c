@@ -2,6 +2,7 @@
 #include <task.h>
 #include <semphr.h>
 #include <gpio.h>
+#include <ssp.h>
 #include <sdcard.h>
 #include <BoardConsole.h>
 #include <osdebug.h>
@@ -11,7 +12,6 @@
 #include <romfs.h>
 #include <semifs.h>
 #include <malloc_wrapper.h>
-#ifdef HAS_ETHERNET
 #include <lwip/inet.h>
 #include <lwip/tcp.h>
 #include <lwip/ip_frag.h>
@@ -25,14 +25,13 @@
 #include <webserver/httpd.h>
 #include <echo/echo.h>
 #include <lwip/dhcp.h>
-#endif
-
-#ifdef BOARD_MBED
 
 #define LED1_wire MAKE_PIN(1, 18)
 #define LED2_wire MAKE_PIN(1, 20)
 #define LED3_wire MAKE_PIN(1, 21)
 #define LED4_wire MAKE_PIN(1, 23)
+
+extern const char romfs[];
 
 static void setupLEDs() {
     gpio_config(LED1_wire, pin_dir_write, pull_up);
@@ -44,14 +43,14 @@ static void setupLEDs() {
 static void litLED(int led, int value) {
     if ((led > 4) || (led < 1))
         return;
-    
+
     switch (led) {
         case 1: led = LED1_wire; break;
         case 2: led = LED2_wire; break;
         case 3: led = LED3_wire; break;
         case 4: led = LED4_wire; break;
     }
-    
+
     gpio_set(led, value);
 }
 
@@ -69,11 +68,9 @@ static void ledTask(void *p) {
         vTaskDelay(200);
     }
 }
-#endif
 
 xSemaphoreHandle handle;
 
-#ifdef SHOW_SIMPLE_TASKS
 static void simpleTask1(void *p) {
     while (1) {
         xSemaphoreTake(handle, portMAX_DELAY);
@@ -91,7 +88,6 @@ static void simpleTask2(void *p) {
         vTaskDelay(1357);
     }
 }
-#endif
 
 #ifdef USE_BAD_TASK
 static void badTask(void *x) {
@@ -103,9 +99,6 @@ static void badTask(void *x) {
 
 static const char msg[] = "Hello world - from fwrite!\r\n";
 
-extern uint8_t _binary_test_romfs_bin_start[];
-
-#ifdef HAS_ETHERNET
 struct ip_addr board_ip;
 static struct netif board_netif;
 static xSemaphoreHandle lwip_sem;
@@ -125,7 +118,7 @@ static void net_init() {
 #endif
     lwip_init();
     vSemaphoreCreateBinary(lwip_sem);
-    
+
     if (netif_add(&board_netif, &board_ip, &netmask, &gw_ip, NULL, interface_init, ethernet_input) == NULL) {
         fprintf(stderr, "net_init: netif_add(lpc17xx_if_init) failed.\r\n");
         return;
@@ -145,7 +138,7 @@ uint32_t sys_now() { return xTaskGetTickCount() * portTICK_RATE_MS; }
 
 static void lwip_task(void * p) {
     net_init();
-    httpd_init(_binary_test_romfs_bin_start);
+    httpd_init((uint8_t *) romfs);
     echo_init();
 
     uint32_t currentIP = board_netif.ip_addr.addr;
@@ -171,7 +164,6 @@ void ENET_IRQHandler() {
     xSemaphoreGiveFromISR(lwip_sem, &woken);
     portEND_SWITCHING_ISR(woken);
 }
-#endif
 
 int main() {
     init_malloc_wrapper();
@@ -179,11 +171,9 @@ int main() {
     char buf[32];
     int c;
     register_devfs();
-    register_stdio();
-#ifdef HAS_SEMIFS
+    register_stdio_devices();
     register_semifs();
-#endif
-    register_romfs("romfs", _binary_test_romfs_bin_start);
+    register_romfs("romfs", (uint8_t *) romfs);
     handle = xSemaphoreCreateMutex();
     printf("Hello world - from stdio!\r\n");
     fflush(stdout);
@@ -200,7 +190,6 @@ int main() {
     } else {
         printf("Unable to open /romfs/test.txt.\n");
     }
-#ifdef HAS_SEMIFS
     FILE * f3 = fopen("/host/TEST.TXT", "r");
     if (f3) {
         c = fread(buf, 1, 32, f3);
@@ -210,20 +199,15 @@ int main() {
     } else {
         printf("Unable to open /host/TEST.TXT.\n");
     }
-#endif
     fflush(f1);
     fclose(f1);
-#ifdef BOARD_MBED
     setupLEDs();
     litLED(1, 0);
     litLED(2, 0);
     litLED(3, 0);
     litLED(4, 0);
-#endif
     sdcard_t sdcard;
-    sdcard.ssp = ssp_port_1;
-    sdcard.cs = MAKE_PIN(0, 6);
-    if (sdcard_init(&sdcard)) {
+    if (sdcard_init(&sdcard, MAKE_SSP_PORT(ssp_port_1, MAKE_PIN(0, 7), MAKE_PIN(0, 9), MAKE_PIN(0, 8)), MAKE_PIN(0, 6))) {
         printf("Successfully initialized sdcard - reading first sector\n");
         uint8_t data[512];
         if (sdcard_read(&sdcard, data, 0)) {
@@ -240,19 +224,13 @@ int main() {
     }
     printf("Test: %f\n", 12.3456f);
     BoardConsolePuts("Creating simple tasks.");
-#ifdef SHOW_SIMPLE_TASKS
     xTaskCreate(simpleTask1, (signed char *) "st1", configMINIMAL_STACK_SIZE, (void *)NULL, tskIDLE_PRIORITY, NULL);
     xTaskCreate(simpleTask2, (signed char *) "st2", configMINIMAL_STACK_SIZE, (void *)NULL, tskIDLE_PRIORITY, NULL);
-#endif
 #ifdef USE_BAD_TASK
     xTaskCreate(badTask, (signed char *) "bad", configMINIMAL_STACK_SIZE, (void *)NULL, tskIDLE_PRIORITY, NULL);
 #endif
-#ifdef BOARD_MBED
     xTaskCreate(ledTask, (signed char *) "led", configMINIMAL_STACK_SIZE, (void *)NULL, tskIDLE_PRIORITY, NULL);
-#endif
-#ifdef HAS_ETHERNET
     xTaskCreate(lwip_task, (signed char *) "lwip", 1024, (void *) NULL, tskIDLE_PRIORITY | portPRIVILEGE_BIT, NULL);
-#endif
     BoardConsolePuts("Scheduler starting.");
     vTaskStartScheduler();
     BoardConsolePuts("Scheduler exitting.");
