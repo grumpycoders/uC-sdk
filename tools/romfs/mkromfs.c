@@ -120,6 +120,7 @@ int main(int argc, char ** argv) {
     DIR * dirp;
     int c_mode = 0;
     OUTFILE outfile;
+    outfile.size = 0;
 
     argc--;
     while ((o = *argv++)) {
