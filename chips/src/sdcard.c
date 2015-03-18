@@ -167,7 +167,7 @@ int sdcard_init(sdcard_t * sdcard, ssp_port_t ssp_port, pin_t cs) {
     SDPUTS("Starting sdcard init..");
 
     sdcard->cs = cs;
-    sdcard->ssp = get_ssp(ssp_port);
+    sdcard->ssp = ssp_port.ssp;
     sdcard->got_timeout = 0;
     sdcard->error_state = 0;
     sdcard->v2 = 0;
@@ -287,7 +287,7 @@ int sdcard_init(sdcard_t * sdcard, ssp_port_t ssp_port, pin_t cs) {
     // like to get an actual sdcard with these requirements to properly test it. In the meantime, I'll
     // just error out. It seems to be the "MMC V3" sdcard btw.
 
-    ssp_config(sdcard->ssp, 4000000); // let's crank up the speed to 4Mhz.
+    ssp_config(ssp_port, 4000000); // let's crank up the speed to 4Mhz.
 
     SDPUTS("Turning on CRC checks");
     // since we're computing them, might as well require the card to check them...

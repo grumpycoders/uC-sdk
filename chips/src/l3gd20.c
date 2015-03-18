@@ -64,7 +64,7 @@ void spi_write_register(ssp_t ssp, uint8_t address, uint8_t value) {
 
 int l3gd20_init_ssp(l3gd20_t *l3gd20, ssp_port_t ssp_port, pin_t cs) {
     l3gd20->cs = cs;
-    ssp_t ssp = get_ssp(ssp_port);
+    ssp_t ssp = ssp_port.ssp;
     l3gd20->ssp = ssp;
     l3gd20->comm = L3GD20_SPI;
 

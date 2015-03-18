@@ -6,6 +6,7 @@
 #include "stm32f4xx_dbgmcu.h"
 #include "stm32f4xx_dcmi.h"
 #include "stm32f4xx_dma.h"
+#include "stm32f4xx_dma2d.h"
 #include "stm32f4xx_exti.h"
 #include "stm32f4xx_flash.h"
 #include "stm32f4xx_fsmc.h"
@@ -13,6 +14,7 @@
 #include "stm32f4xx_hash.h"
 #include "stm32f4xx_i2c.h"
 #include "stm32f4xx_iwdg.h"
+#include "stm32f4xx_ltdc.h"
 #include "stm32f4xx_pwr.h"
 #include "stm32f4xx_rcc.h"
 #include "stm32f4xx_rng.h"
@@ -29,7 +31,9 @@ void cpu_deinit_all() {
     ADC_DeInit();
     CAN_DeInit(CAN1);
     CAN_DeInit(CAN2);
+    CRYP_DeInit();
     DAC_DeInit();
+    DCMI_DeInit();
     DMA_DeInit(DMA1_Stream0);
     DMA_DeInit(DMA1_Stream1);
     DMA_DeInit(DMA1_Stream2);
@@ -46,6 +50,7 @@ void cpu_deinit_all() {
     DMA_DeInit(DMA2_Stream5);
     DMA_DeInit(DMA2_Stream6);
     DMA_DeInit(DMA2_Stream7);
+    DMA2D_DeInit();
     EXTI_DeInit();
     GPIO_DeInit(GPIOA);
     GPIO_DeInit(GPIOB);
@@ -58,11 +63,16 @@ void cpu_deinit_all() {
     GPIO_DeInit(GPIOI);
     GPIO_DeInit(GPIOJ);
     GPIO_DeInit(GPIOK);
+    HASH_DeInit();
     I2C_DeInit(I2C1);
     I2C_DeInit(I2C2);
     I2C_DeInit(I2C3);
+    LTDC_DeInit();
     PWR_DeInit();
     RCC_DeInit();
+    RNG_DeInit();
+    RTC_DeInit();
+    //SAI_DeInit(SAI_TypeDef* SAIx);
     SDIO_DeInit();
     SPI_I2S_DeInit(SPI1);
     SPI_I2S_DeInit(SPI2);
@@ -72,6 +82,7 @@ void cpu_deinit_all() {
     SPI_I2S_DeInit(SPI6);
     SPI_I2S_DeInit(I2S2ext);
     SPI_I2S_DeInit(I2S3ext);
+    SYSCFG_DeInit();
     TIM_DeInit(TIM1);
     TIM_DeInit(TIM2);
     TIM_DeInit(TIM3);

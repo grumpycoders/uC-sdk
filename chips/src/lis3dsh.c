@@ -26,7 +26,7 @@ static __inline__ void spi_write_register(ssp_t ssp, uint8_t address, uint8_t va
 
 int lis3dsh_init_ssp(lis3dsh_t * lis3dsh, ssp_port_t ssp_port, pin_t cs) {
     lis3dsh->cs = cs;
-    ssp_t ssp = get_ssp(ssp_port);
+    ssp_t ssp = ssp_port.ssp;
     lis3dsh->ssp = ssp;
     lis3dsh->power = 0;
 

@@ -29,10 +29,10 @@ static __inline__ uint16_t compute_prescaler(uint32_t clock) {
 }
 
 void ssp_config(ssp_port_t ssp_port, uint32_t clock) {
-    ssp_t ssp = get_ssp(ssp_port);
-    pin_t sclk = get_sclk(ssp_port);
-    pin_t miso = get_miso(ssp_port);
-    pin_t mosi = get_mosi(ssp_port);
+    ssp_t ssp = ssp_port.ssp;
+    pin_t sclk = ssp_port.sclk;
+    pin_t miso = ssp_port.miso;
+    pin_t mosi = ssp_port.mosi;
 
     SPI_TypeDef * id = spis[ssp];
     uint8_t af;
@@ -67,9 +67,9 @@ void ssp_config(ssp_port_t ssp_port, uint32_t clock) {
     }
 
     uint32_t port_flags = 0;
-    port_flags |= 1 << get_port(sclk);
-    port_flags |= 1 << get_port(miso);
-    port_flags |= 1 << get_port(mosi);
+    port_flags |= 1 << sclk.port;
+    port_flags |= 1 << miso.port;
+    port_flags |= 1 << mosi.port;
     RCC_AHB1PeriphClockCmd(port_flags, ENABLE);
 
 
@@ -78,19 +78,19 @@ void ssp_config(ssp_port_t ssp_port, uint32_t clock) {
     GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_AF;
     GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
     GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_DOWN;
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_25MHz;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 
-    GPIO_InitStructure.GPIO_Pin   = 1 << get_pin(sclk);
-    GPIO_PinAFConfig(stm32f4xx_gpio_ports[get_port(sclk)], get_pin(sclk), af);
-    GPIO_Init(stm32f4xx_gpio_ports[get_port(sclk)], &GPIO_InitStructure);
+    GPIO_InitStructure.GPIO_Pin   = 1 << sclk.pin;
+    GPIO_PinAFConfig(stm32f4xx_gpio_ports[sclk.port], sclk.pin, af);
+    GPIO_Init(stm32f4xx_gpio_ports[sclk.port], &GPIO_InitStructure);
 
-    GPIO_InitStructure.GPIO_Pin   = 1 << get_pin(miso);
-    GPIO_PinAFConfig(stm32f4xx_gpio_ports[get_port(miso)], get_pin(miso), af);
-    GPIO_Init(stm32f4xx_gpio_ports[get_port(miso)], &GPIO_InitStructure);
+    GPIO_InitStructure.GPIO_Pin   = 1 << miso.pin;
+    GPIO_PinAFConfig(stm32f4xx_gpio_ports[miso.port], miso.pin, af);
+    GPIO_Init(stm32f4xx_gpio_ports[miso.port], &GPIO_InitStructure);
 
-    GPIO_InitStructure.GPIO_Pin   = 1 << get_pin(mosi);
-    GPIO_PinAFConfig(stm32f4xx_gpio_ports[get_port(mosi)], get_pin(mosi), af);
-    GPIO_Init(stm32f4xx_gpio_ports[get_port(mosi)], &GPIO_InitStructure);
+    GPIO_InitStructure.GPIO_Pin   = 1 << mosi.pin;
+    GPIO_PinAFConfig(stm32f4xx_gpio_ports[mosi.port], mosi.pin, af);
+    GPIO_Init(stm32f4xx_gpio_ports[mosi.port], &GPIO_InitStructure);
 
 
     SPI_InitTypeDef SPI_InitStructure;

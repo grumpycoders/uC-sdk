@@ -24,14 +24,14 @@ void adc_config_single(uint8_t adc, uint8_t channel, pin_t pin)
         return;
 
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1 << (adc - 1),ENABLE);
-    RCC_AHB1PeriphClockCmd(1 << get_port(pin), ENABLE);
+    RCC_AHB1PeriphClockCmd(1 << pin.port, ENABLE);
 
     GPIO_InitTypeDef gpiodef;
     GPIO_StructInit(&gpiodef);
-    gpiodef.GPIO_Pin = 1 << get_pin(pin);
+    gpiodef.GPIO_Pin = 1 << pin.pin;
     gpiodef.GPIO_Mode = GPIO_Mode_AN;
     gpiodef.GPIO_PuPd = GPIO_PuPd_NOPULL;
-    GPIO_Init(ports[get_port(pin)], &gpiodef);
+    GPIO_Init(ports[pin.port], &gpiodef);
 
     ADC_InitTypeDef def;
     ADC_StructInit(&def);
@@ -60,14 +60,14 @@ void adc_config_continuous(uint8_t adc, uint8_t *channel, pin_t *pin, uint16_t *
 
     for (i = 0 ; i < nb ; i++)
     {
-        RCC_AHB1PeriphClockCmd(1 << get_port(pin[i]), ENABLE);
+        RCC_AHB1PeriphClockCmd(1 << pin[i].port, ENABLE);
 
         GPIO_InitTypeDef gpiodef;
         GPIO_StructInit(&gpiodef);
-        gpiodef.GPIO_Pin = 1 << get_pin(pin[i]);
+        gpiodef.GPIO_Pin = 1 << pin[i].pin;
         gpiodef.GPIO_Mode = GPIO_Mode_AN;
         gpiodef.GPIO_PuPd = GPIO_PuPd_NOPULL;
-        GPIO_Init(ports[get_port(pin[i])], &gpiodef);
+        GPIO_Init(ports[pin[i].port], &gpiodef);
     }
  
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_DMA2,ENABLE);

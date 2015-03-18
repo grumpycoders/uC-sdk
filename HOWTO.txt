@@ -1,0 +1,18 @@
+Add a new CPU family
+====================
+
+Add a new CPU subfamily
+=======================
+
+Make sure its family is supported
+
+Add a new CPU flavor
+====================
+
+Make sure its subfamily is supported
+
+Add a new board
+===============
+
+Make sure its CPU is supported.
+

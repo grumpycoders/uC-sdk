@@ -73,14 +73,14 @@ void timer_init_pwmchannel(uint8_t timer, uint8_t channel, pin_t pin, uint32_t p
    struct timerInitDef_t * timerInitDef = timerInitDefs + timer - 1;
 
     //clock the pin
-    RCC_AHB1PeriphClockCmd(1 << get_port(pin), ENABLE);
+    RCC_AHB1PeriphClockCmd(1 << pin.port, ENABLE);
 
     //setup the GPIO pin
     GPIO_InitTypeDef gpiodef;
-    gpiodef.GPIO_Pin = 1 << get_pin(pin);
+    gpiodef.GPIO_Pin = 1 << pin.pin;
     gpiodef.GPIO_Mode = GPIO_Mode_AF;
     gpiodef.GPIO_Speed = GPIO_Speed_50MHz;
-    GPIO_Init(ports[get_port(pin)], &gpiodef);
+    GPIO_Init(ports[pin.port], &gpiodef);
 
    //setup the Timer channel
     TIM_OCInitTypeDef def;
@@ -113,7 +113,7 @@ void timer_init_pwmchannel(uint8_t timer, uint8_t channel, pin_t pin, uint32_t p
             break;
     }
 
-    GPIO_PinAFConfig(ports[get_port(pin)], get_pin(pin), timerInitDef->af);
+    GPIO_PinAFConfig(ports[pin.port], pin.pin, timerInitDef->af);
 }
 
 

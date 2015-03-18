@@ -7,8 +7,8 @@
 #include <semiio.h>
 #include <l3gd20.h>
 
-static const pin_t led_w = MAKE_PIN(GPIO_PORT_G, 13);
-static const pin_t led_e = MAKE_PIN(GPIO_PORT_G, 14);
+#define led_w make_pin(GPIO_PORT_G, 13)
+#define led_e make_pin(GPIO_PORT_G, 14)
 
 int main() {
     init_malloc_wrapper();
@@ -21,12 +21,15 @@ int main() {
     gpio_set(led_e, 0);
 
     l3gd20_t l3gd20;
-    if (!l3gd20_init_ssp(&l3gd20, 
-        MAKE_SSP_PORT(ssp_port_5, 
-            MAKE_PIN(GPIO_PORT_F, 7), 
-            MAKE_PIN(GPIO_PORT_F, 9), 
-            MAKE_PIN(GPIO_PORT_F, 8)), 
-        MAKE_PIN(GPIO_PORT_C, 1)))
+
+    pin_t sclk = { .port = GPIO_PORT_F, .pin = 7 };
+    pin_t mosi = { .port = GPIO_PORT_F, .pin = 9 };
+    pin_t miso = { .port = GPIO_PORT_F, .pin = 8 };
+    pin_t cs   = { .port = GPIO_PORT_C, .pin = 1 };
+
+    ssp_port_t ssp = { .ssp = ssp_port_5, .sclk = sclk, .mosi = mosi, .miso = miso };
+
+    if (!l3gd20_init_ssp(&l3gd20, ssp, cs))
     {
         printf("Cannot initialize gyroscope");
         return 0;

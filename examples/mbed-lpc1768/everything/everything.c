@@ -26,10 +26,10 @@
 #include <echo/echo.h>
 #include <lwip/dhcp.h>
 
-#define LED1_wire MAKE_PIN(1, 18)
-#define LED2_wire MAKE_PIN(1, 20)
-#define LED3_wire MAKE_PIN(1, 21)
-#define LED4_wire MAKE_PIN(1, 23)
+#define LED1_wire make_pin(GPIO_PORT_B, 18)
+#define LED2_wire make_pin(GPIO_PORT_B, 20)
+#define LED3_wire make_pin(GPIO_PORT_B, 21)
+#define LED4_wire make_pin(GPIO_PORT_B, 23)
 
 extern const char romfs[];
 
@@ -44,14 +44,16 @@ static void litLED(int led, int value) {
     if ((led > 4) || (led < 1))
         return;
 
+    pin_t ledpin;
+
     switch (led) {
-        case 1: led = LED1_wire; break;
-        case 2: led = LED2_wire; break;
-        case 3: led = LED3_wire; break;
-        case 4: led = LED4_wire; break;
+        case 1: ledpin = LED1_wire; break;
+        case 2: ledpin = LED2_wire; break;
+        case 3: ledpin = LED3_wire; break;
+        case 4: ledpin = LED4_wire; break;
     }
 
-    gpio_set(led, value);
+    gpio_set(ledpin, value);
 }
 
 static void ledTask(void *p) {
@@ -207,7 +209,15 @@ int main() {
     litLED(3, 0);
     litLED(4, 0);
     sdcard_t sdcard;
-    if (sdcard_init(&sdcard, MAKE_SSP_PORT(ssp_port_1, MAKE_PIN(0, 7), MAKE_PIN(0, 9), MAKE_PIN(0, 8)), MAKE_PIN(0, 6))) {
+
+    pin_t sclk = { .port = GPIO_PORT_A, .pin = 7 };
+    pin_t mosi = { .port = GPIO_PORT_A, .pin = 9 };
+    pin_t miso = { .port = GPIO_PORT_A, .pin = 8 };
+    pin_t cs   = { .port = GPIO_PORT_A, .pin = 6 };
+
+    ssp_port_t ssp = { .ssp = ssp_port_1, .sclk = sclk, .mosi = mosi, .miso = miso };
+
+    if (sdcard_init(&sdcard, ssp, cs)) {
         printf("Successfully initialized sdcard - reading first sector\n");
         uint8_t data[512];
         if (sdcard_read(&sdcard, data, 0)) {

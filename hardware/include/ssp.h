@@ -15,20 +15,16 @@ typedef enum {
     ssp_port_6,
 } ssp_t;
 
-typedef uint64_t ssp_port_t;
+typedef struct {
+    pin_t sclk;
+    pin_t mosi;
+    pin_t miso;
+    ssp_t ssp;
+} ssp_port_t;
 
-#define MAKE_SSP_PORT(ssp, sclk, mosi, miso) (\
-(((uint64_t) ssp) << 48) | \
-(((uint64_t) sclk) << 32) | \
-(((uint64_t) mosi) << 16) | \
-(((uint64_t) miso)))
+_Static_assert(sizeof(ssp_port_t) <= 8, "ssp_port_t isn't 64 bits-wide");
 
 BEGIN_DECL
-
-static __inline__ ssp_t get_ssp(ssp_port_t ssp_port)  { return (ssp_port >> 48) & 0xffff; }
-static __inline__ pin_t get_sclk(ssp_port_t ssp_port) { return (ssp_port >> 32) & 0xffff; }
-static __inline__ pin_t get_mosi(ssp_port_t ssp_port) { return (ssp_port >> 16) & 0xffff; }
-static __inline__ pin_t get_miso(ssp_port_t ssp_port) { return (ssp_port)       & 0xffff; }
 
 void ssp_config(ssp_port_t ssp_port, uint32_t clock);
 uint8_t ssp_readwrite(ssp_t ssp, uint8_t value);

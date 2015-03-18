@@ -8,10 +8,10 @@
 #include <semiio.h>
 #include <lis3dsh.h>
 
-static const pin_t led_w = MAKE_PIN(GPIO_PORT_D, 12);
-static const pin_t led_n = MAKE_PIN(GPIO_PORT_D, 13);
-static const pin_t led_e = MAKE_PIN(GPIO_PORT_D, 14);
-static const pin_t led_s = MAKE_PIN(GPIO_PORT_D, 15);
+#define led_w make_pin(GPIO_PORT_D, 12)
+#define led_n make_pin(GPIO_PORT_D, 13)
+#define led_e make_pin(GPIO_PORT_D, 14)
+#define led_s make_pin(GPIO_PORT_D, 15)
 
 int main() {
     init_malloc_wrapper();
@@ -21,7 +21,14 @@ int main() {
 
     lis3dsh_t lis3dsh;
 
-    lis3dsh_init_ssp(&lis3dsh, MAKE_SSP_PORT(ssp_port_1, MAKE_PIN(GPIO_PORT_A, 5), MAKE_PIN(GPIO_PORT_A, 7), MAKE_PIN(GPIO_PORT_A, 6)), MAKE_PIN(GPIO_PORT_E, 3));
+    pin_t sclk = { .port = GPIO_PORT_A, .pin = 5 };
+    pin_t mosi = { .port = GPIO_PORT_A, .pin = 7 };
+    pin_t miso = { .port = GPIO_PORT_A, .pin = 6 };
+    pin_t cs   = { .port = GPIO_PORT_E, .pin = 3 };
+
+    ssp_port_t ssp = { .ssp = ssp_port_1, .sclk = sclk, .mosi = mosi, .miso = miso };
+
+    lis3dsh_init_ssp(&lis3dsh, ssp, cs);
 
     gpio_config(led_w, pin_dir_write, pull_up);
     gpio_config(led_n, pin_dir_write, pull_up);
