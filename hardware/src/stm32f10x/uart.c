@@ -1,5 +1,6 @@
-#include "spi.h"
-#include "task.h"
+#include "uart.h"
+#include "hardware.h"
+
 #include <stm32f10x.h>
 #include <stm32f10x_gpio.h>
 #include <stm32f10x_rcc.h>
@@ -7,115 +8,100 @@
 
 #include <stdio.h>
 
-struct uartInitDef_t {
-    // tx / rx
-    USART_TypeDef * id;
-    GPIO_TypeDef * tdef[2];
-    GPIO_InitTypeDef gpiodef[2];
-    // uart / gpio
-    volatile uint32_t * bridge[2];
-    uint32_t peripheral[2];
-};
+//MOVE THIS TO gpio.c when it's implemented
+GPIO_TypeDef * const stm32f10x_gpio_ports[] = { GPIOA, GPIOB, GPIOC, GPIOD, GPIOE, GPIOF, GPIOG };
 
-static struct uartInitDef_t uartInitDefs[5] = {
-    { USART1, { GPIOA, GPIOA}, {   // UART1
-        { GPIO_Pin_9 , GPIO_Speed_50MHz, GPIO_Mode_AF_PP },       // TX
-        { GPIO_Pin_10, GPIO_Speed_50MHz, GPIO_Mode_IN_FLOATING },       // RX
-    }, {&RCC->APB2ENR, &RCC->APB2ENR}, {RCC_APB2Periph_USART1, RCC_APB2Periph_GPIOA } },
-    { USART2, { GPIOA, GPIOA }, {   // UART2
-        { GPIO_Pin_2 , GPIO_Speed_50MHz, GPIO_Mode_AF_PP },       // TX
-        { GPIO_Pin_3, GPIO_Speed_50MHz, GPIO_Mode_IN_FLOATING },       // RX
-    }, {&RCC->APB1ENR, &RCC->APB2ENR}, {RCC_APB1Periph_USART2, RCC_APB2Periph_GPIOA } },
-    { USART3, { GPIOB, GPIOB }, {   // UART3
-        { GPIO_Pin_10 , GPIO_Speed_50MHz, GPIO_Mode_AF_PP },       // TX
-        { GPIO_Pin_11, GPIO_Speed_50MHz, GPIO_Mode_IN_FLOATING },       // RX
-    }, {&RCC->APB1ENR, &RCC->APB2ENR}, {RCC_APB1Periph_USART3, RCC_APB2Periph_GPIOB } },
-    { UART4, { GPIOC, GPIOC }, {   // UART4
-        { GPIO_Pin_10 , GPIO_Speed_50MHz, GPIO_Mode_AF_PP },       // TX
-        { GPIO_Pin_11, GPIO_Speed_50MHz, GPIO_Mode_IN_FLOATING },       // RX
-    }, {&RCC->APB1ENR, &RCC->APB2ENR}, {RCC_APB1Periph_UART4, RCC_APB2Periph_GPIOC } },
-    { UART5, { GPIOC, GPIOD }, {   // UART5
-        { GPIO_Pin_12 , GPIO_Speed_50MHz, GPIO_Mode_AF_PP },       // TX
-        { GPIO_Pin_2, GPIO_Speed_50MHz, GPIO_Mode_IN_FLOATING },       // RX
-    }, {&RCC->APB1ENR, &RCC->APB2ENR}, {RCC_APB1Periph_UART5, RCC_APB2Periph_GPIOC | RCC_APB2Periph_GPIOD } },
-};
+static USART_TypeDef * const uarts[] = { (void *) 0, USART1, USART2, USART3, UART4, UART5 };
 
-void uart_init(uint8_t id, uint32_t baudrate)
+void uart_config(uart_port_t uart_port, uint32_t baudrate)
 {
-    if (!((id >= 1) && (id <= 3)))
-        return;
+    uart_t uart = uart_port.uart;
+    pin_t rx = uart_port.rx;
+    pin_t tx = uart_port.tx;
+//    pin_t rts = uart_port.rts;
+//    pin_t cts = uart_port.cts;
 
-    struct uartInitDef_t * uartInitDef = uartInitDefs + id - 1;
+    USART_TypeDef * id = uarts[uart];
 
     //clock AFIO
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
 
-    int i;
-    for (i = 0; i < 2; i++)
-        *(uartInitDef->bridge[i]) |= uartInitDef->peripheral[i];
+    switch (uart) {
+    case uart_port_1:
+        RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
+        break;
+    case uart_port_2:
+        RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);
+        break;
+    case uart_port_3:
+        RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE);
+        break;
+    case uart_port_4:
+        RCC_APB1PeriphClockCmd(RCC_APB1Periph_UART4, ENABLE);
+        break;
+    case uart_port_5:
+        RCC_APB1PeriphClockCmd(RCC_APB1Periph_UART5, ENABLE);
+        break;
+    default:
+        return;
+    }
 
-    for (i = 0; i < 2; i++)
-        GPIO_Init(uartInitDef->tdef[i], &uartInitDef->gpiodef[i]);
+    uint32_t port_flags = 0;
+    port_flags |= 1 << rx.port;
+    port_flags |= 1 << tx.port;
+/*    if (uart == uart_port_1 || uart == uart_port_2 || uart == uart_port_3 || uart == uart_port_6){
+        port_flags |= 1 << rts.port;
+        port_flags |= 1 << cts.port;
+    }*/
+    RCC_APB2PeriphClockCmd(port_flags, ENABLE);
 
-    USART_InitTypeDef usartdef;
+    GPIO_InitTypeDef gpiodef;
+    gpiodef.GPIO_Speed = GPIO_Speed_50MHz;
 
-    usartdef.USART_BaudRate = baudrate;
-    usartdef.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
-    usartdef.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
-    usartdef.USART_WordLength = USART_WordLength_8b;
-    usartdef.USART_StopBits = USART_StopBits_1;
-    usartdef.USART_Parity = USART_Parity_No;
+    gpiodef.GPIO_Pin = 1 << rx.pin;
+    gpiodef.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+    GPIO_Init(stm32f10x_gpio_ports[rx.port], &gpiodef);
 
-    USART_Init(uartInitDef->id, &usartdef);
+    gpiodef.GPIO_Pin = 1 << tx.pin;
+    gpiodef.GPIO_Mode = GPIO_Mode_AF_PP;
+    GPIO_Init(stm32f10x_gpio_ports[tx.port], &gpiodef);
+
+    USART_InitTypeDef uartdef;
+
+    uartdef.USART_BaudRate = baudrate;
+    uartdef.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
+    uartdef.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
+    uartdef.USART_WordLength = USART_WordLength_8b;
+    uartdef.USART_StopBits = USART_StopBits_1;
+    uartdef.USART_Parity = USART_Parity_No;
+
+    USART_Init(id, &uartdef);
 
     USART_ClockInitTypeDef clockdef;
     USART_ClockStructInit(&clockdef);
-    USART_ClockInit(uartInitDef->id, &clockdef);
+    USART_ClockInit(id, &clockdef);
 
-    USART_Cmd(uartInitDef->id, ENABLE);
+    USART_Cmd(id, ENABLE);
 }
 
-void uart_deinit(uint8_t id)
+/*
+void uart_deinit(uart_t uart)
 {
-    if (!((id >= 1) && (id <= 3)))
-        return;
+    USART_DeInit(uarts[uart]);
+}*/
 
-    struct uartInitDef_t * uartInitDef = uartInitDefs + id - 1;
-
-    USART_DeInit(uartInitDef->id);
-}
-
-void uart_send_char(uint8_t id, uint8_t c)
+void uart_send_char(uart_t uart, uint8_t c)
 {
-    if (!((id >= 1) && (id <= 3)))
-        return;
+    USART_TypeDef * id = uarts[uart];
 
-    struct uartInitDef_t * uartInitDef = uartInitDefs + id - 1;
-
-    while (USART_GetFlagStatus(uartInitDef->id, USART_FLAG_TXE) == RESET);
-    USART_SendData(uartInitDef->id, c);
+    while (USART_GetFlagStatus(id, USART_FLAG_TXE) == RESET);
+    USART_SendData(id, c);
 }
 
-uint8_t uart_receive_char(uint8_t id)
+uint8_t uart_receive_char(uart_t uart)
 {
-    if (!((id >= 1) && (id <= 3)))
-        return 0;
+    USART_TypeDef * id = uarts[uart];
 
-    struct uartInitDef_t * uartInitDef = uartInitDefs + id - 1;
-
-    while (USART_GetFlagStatus(uartInitDef->id, USART_FLAG_RXNE) == RESET);
-    return (uint8_t) USART_ReceiveData(uartInitDef->id);
+    while (USART_GetFlagStatus(id, USART_FLAG_RXNE) == RESET);
+    return (uint8_t) USART_ReceiveData(id);
 }
-
-void uart_read(uint8_t id, uint8_t *buffer, uint8_t nb)
-{
-    while (nb--)
-        *buffer++ = uart_receive_char(id);
-}
-
-void uart_write(uint8_t id, uint8_t *buffer, uint8_t nb)
-{
-    while (nb--)
-        uart_send_char(id, (uint8_t) (*buffer++));
-}
-

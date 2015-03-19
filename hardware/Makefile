@@ -15,7 +15,7 @@ TARGET_SRCS += src/lpc17xx/ssp.c
 endif
 
 ifeq ($(CPU_FLAVOR),stm32f10x)
-TARGET_SRCS += src/stm32f10x/i2c.c
+#TARGET_SRCS += src/stm32f10x/i2c.c
 TARGET_SRCS += src/stm32f10x/uart.c
 endif
 endif

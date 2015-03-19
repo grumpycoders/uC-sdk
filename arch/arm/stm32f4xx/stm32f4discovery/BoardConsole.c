@@ -8,7 +8,12 @@
 #include <uart.h>
 
 void BoardConsoleInit() {
-    uart_init(1, 115200);
+    pin_t rx = make_pin(GPIO_PORT_A, 9);
+    pin_t tx = make_pin(GPIO_PORT_A, 10);
+
+    uart_port_t uart = { .uart = uart_port_1, .rx = rx, .tx = tx };
+
+    uart_config(uart, 115200);
 }
 
 void BoardConsolePuts(const char * str) {
@@ -20,15 +25,14 @@ void BoardConsolePuts(const char * str) {
 }
 
 void BoardConsolePutc(int c) {
-return;
     if (c == '\r') return;
     if (c == '\n') c = '\r';
 
-    uart_send_char(1, c);
+    uart_send_char(uart_port_1, c);
 
     if (c == '\r') {
         c = '\n';
-        uart_send_char(1, c);
+        uart_send_char(uart_port_1, c);
     }
 }
 
