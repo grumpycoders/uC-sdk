@@ -66,6 +66,9 @@ void uart_config(uart_port_t uart_port, uint32_t baudrate)
     gpiodef.GPIO_Mode = GPIO_Mode_AF_PP;
     GPIO_Init(stm32f10x_gpio_ports[tx.port], &gpiodef);
 
+    //clock AFIO
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
+
     USART_InitTypeDef uartdef;
 
     uartdef.USART_BaudRate = baudrate;

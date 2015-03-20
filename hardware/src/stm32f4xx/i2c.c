@@ -5,37 +5,7 @@
 #include <stm32f4xx_rcc.h>
 #include <stm32f4xx_i2c.h>
 
-#include <FreeRTOS.h>
-#include <task.h>
-
 static I2C_TypeDef * const i2cs[] = { (void *) 0, I2C1, I2C2, I2C3 };
-
-/*
-struct i2cInitDef_t {
-    // scl / sda
-    I2C_TypeDef * id;
-    uint8_t afid;
-    GPIO_TypeDef * tdef[2];
-    GPIO_InitTypeDef gpiodef[2];
-    uint16_t gpiopinsource[2];
-    // i2c / gpio
-    volatile uint32_t * bridge[2];
-    uint32_t peripheral[2];
-};
-
-static struct i2cInitDef_t i2cInitDefs[2] = {
-    { I2C1, GPIO_AF_I2C1, { GPIOB, GPIOB }, {   // I2C1
-        { GPIO_Pin_6, GPIO_Mode_AF, GPIO_Speed_50MHz, GPIO_OType_OD, GPIO_PuPd_UP },        // SCL
-        { GPIO_Pin_7, GPIO_Mode_AF, GPIO_Speed_50MHz, GPIO_OType_OD, GPIO_PuPd_UP },        // SDA
-    }, {GPIO_PinSource6, GPIO_PinSource7}, {&RCC->APB1ENR, &RCC->AHB1ENR}, {RCC_APB1Periph_I2C1, RCC_AHB1Periph_GPIOB } },
-    { I2C2, GPIO_AF_I2C2, { GPIOB, GPIOB }, {   // I2C2
-        { GPIO_Pin_10, GPIO_Mode_AF, GPIO_Speed_50MHz, GPIO_OType_OD, GPIO_PuPd_UP },       // SCL
-        { GPIO_Pin_11, GPIO_Mode_AF, GPIO_Speed_50MHz, GPIO_OType_OD, GPIO_PuPd_UP },       // SDA
-    }, {GPIO_PinSource10, GPIO_PinSource11}, {&RCC->APB1ENR, &RCC->AHB1ENR}, {RCC_APB1Periph_I2C2, RCC_AHB1Periph_GPIOB } },
-};
-
-
-void i2c_init(uint8_t id, uint32_t speed)*/
 
 void i2c_config(i2c_port_t i2c_port, uint32_t speed)
 {
@@ -160,12 +130,12 @@ void i2c_write_polling(i2c_t i2c, uint8_t *value, uint8_t nb)
 }
 
 /*
-void i2c_read_dma(uint8_t id, uint8_t *buffer, uint8_t nb)
+void i2c_read_dma(i2c_t i2c, uint8_t *value, uint8_t nb)
 {
 
 }
 
-void i2c_write_dma(uint8_t id, uint8_t *buffer, uint8_t nb)
+void i2c_write_dma(i2c_t i2c, uint8_t *value, uint8_t nb)
 {
 
 }*/
