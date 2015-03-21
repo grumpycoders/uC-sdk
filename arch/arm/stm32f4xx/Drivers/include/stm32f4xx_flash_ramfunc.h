@@ -1,11 +1,10 @@
 /**
   ******************************************************************************
-  * @file    stm32f4xx_wwdg.h
+  * @file    stm32f4xx_flash_ramfunc.h
   * @author  MCD Application Team
   * @version V1.5.0
   * @date    06-March-2015
-  * @brief   This file contains all the functions prototypes for the WWDG firmware
-  *          library.
+  * @brief   Header file of FLASH RAMFUNC driver.
   ******************************************************************************
   * @attention
   *
@@ -26,9 +25,10 @@
   ******************************************************************************
   */
 
+
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __STM32F4xx_WWDG_H
-#define __STM32F4xx_WWDG_H
+#ifndef __STM32F4xx_FLASH_RAMFUNC_H
+#define __STM32F4xx_FLASH_RAMFUNC_H
 
 #ifdef __cplusplus
  extern "C" {
@@ -41,64 +41,55 @@
   * @{
   */
 
-/** @addtogroup WWDG
+/** @addtogroup FLASH RAMFUNC
   * @{
   */ 
 
 /* Exported types ------------------------------------------------------------*/
+/* Private define ------------------------------------------------------------*/
+/** 
+  * @brief  __RAM_FUNC definition
+  */ 
+#if defined ( __CC_ARM   )
+/* ARM Compiler
+   ------------
+   RAM functions are defined using the toolchain options. 
+   Functions that are executed in RAM should reside in a separate source module.
+   Using the 'Options for File' dialog you can simply change the 'Code / Const' 
+   area of a module to a memory space in physical RAM.
+   Available memory areas are declared in the 'Target' tab of the 'Options for Target'
+   dialog. 
+*/
+#define __RAM_FUNC void 
+
+#elif defined ( __ICCARM__ )
+/* ICCARM Compiler
+   ---------------
+   RAM functions are defined using a specific toolchain keyword "__ramfunc". 
+*/
+#define __RAM_FUNC __ramfunc void
+
+#elif defined   (  __GNUC__  )
+/* GNU Compiler
+   ------------
+  RAM functions are defined using a specific toolchain attribute 
+   "__attribute__((section(".RamFunc")))".
+*/
+#define __RAM_FUNC void  __attribute__((section(".RamFunc")))
+
+#endif
 /* Exported constants --------------------------------------------------------*/
-
-/** @defgroup WWDG_Exported_Constants
-  * @{
-  */ 
-  
-/** @defgroup WWDG_Prescaler 
-  * @{
-  */
-  
-#define WWDG_Prescaler_1    ((uint32_t)0x00000000)
-#define WWDG_Prescaler_2    ((uint32_t)0x00000080)
-#define WWDG_Prescaler_4    ((uint32_t)0x00000100)
-#define WWDG_Prescaler_8    ((uint32_t)0x00000180)
-#define IS_WWDG_PRESCALER(PRESCALER) (((PRESCALER) == WWDG_Prescaler_1) || \
-                                      ((PRESCALER) == WWDG_Prescaler_2) || \
-                                      ((PRESCALER) == WWDG_Prescaler_4) || \
-                                      ((PRESCALER) == WWDG_Prescaler_8))
-#define IS_WWDG_WINDOW_VALUE(VALUE) ((VALUE) <= 0x7F)
-#define IS_WWDG_COUNTER(COUNTER) (((COUNTER) >= 0x40) && ((COUNTER) <= 0x7F))
-
-/**
-  * @}
-  */ 
-
-/**
-  * @}
-  */ 
-
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions --------------------------------------------------------*/
-  
-/*  Function used to set the WWDG configuration to the default reset state ****/  
-void WWDG_DeInit(void);
+__RAM_FUNC FLASH_FlashInterfaceCmd(FunctionalState NewState);
+__RAM_FUNC FLASH_FlashSleepModeCmd(FunctionalState NewState);
 
-/* Prescaler, Refresh window and Counter configuration functions **************/
-void WWDG_SetPrescaler(uint32_t WWDG_Prescaler);
-void WWDG_SetWindowValue(uint8_t WindowValue);
-void WWDG_EnableIT(void);
-void WWDG_SetCounter(uint8_t Counter);
-
-/* WWDG activation function ***************************************************/
-void WWDG_Enable(uint8_t Counter);
-
-/* Interrupts and flags management functions **********************************/
-FlagStatus WWDG_GetFlagStatus(void);
-void WWDG_ClearFlag(void);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __STM32F4xx_WWDG_H */
+#endif /* __STM32F4xx_FLASH_RAMFUNC_H */
 
 /**
   * @}
@@ -109,3 +100,4 @@ void WWDG_ClearFlag(void);
   */ 
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
+
