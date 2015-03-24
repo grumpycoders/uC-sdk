@@ -13,7 +13,8 @@ TARGET_SRCS = \
 src/sdcard.c \
 src/l3gd20.c \
 src/lis3dsh.c \
-src/lcd.c
+# src/lcd.c \
+
 
 include $(ROOTDIR)/target-rules.mk
 
