@@ -1,6 +1,6 @@
 TARGET_LIB = libm.a
 
-TARGET_CPPFLAGS = -D_IEEE_LIBM -fno-strict-aliasing
+TARGET_CPPFLAGS += -D_IEEE_LIBM -fno-strict-aliasing
 
 all: $(TARGET_LIB)
 
@@ -9,7 +9,7 @@ include config.mk
 include $(ROOTDIR)/libc/config.mk
 
 ifneq ($(USE_FLOATINGPOINT),true)
-TARGET_CPPFLAGS = -DNOFLOATINGPOINT
+TARGET_CPPFLAGS += -DNOFLOATINGPOINT
 endif
 
 #	k_standard.c k_rem_pio2.c \

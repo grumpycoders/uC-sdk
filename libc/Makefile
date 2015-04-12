@@ -9,7 +9,7 @@ include $(ROOTDIR)/os/config.mk
 include $(ROOTDIR)/libm/config.mk
 
 ifneq ($(USE_FLOATINGPOINT),true)
-TARGET_CPPFLAGS = -DNOFLOATINGPOINT
+TARGET_CPPFLAGS += -DNOFLOATINGPOINT
 endif
 
 TARGET_SRCS = \
