@@ -7,7 +7,7 @@
 int open(const char * path, int flags) {
     int r;
 
-    r = fs_open(path, flags, 0755);
+    r = os_fs_open(path, flags, 0755);
 
     if (r >= 0)
         return r;

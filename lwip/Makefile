@@ -39,9 +39,8 @@ src/api/err.c \
 \
 src/netif/etharp.c \
 \
-apps/webserver/httpd.c \
-apps/webserver/fs.c \
-apps/echo/echo.c \
+apps/httpserver_raw/httpd.c \
+apps/httpserver_raw/fs.c \
 
 ifeq ($(CPU_FAMILY),arm)
 ifeq ($(CPU_FLAVOR),lpc17xx)
