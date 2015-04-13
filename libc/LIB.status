@@ -9,7 +9,7 @@ atol     - ok, inlined, bound to sscanf, will read hex and octal
 strtod   - missing
 strtof   - missing
 strtold  - missing (do we want to support long double anyway?)
-strtol   - missing
+strtol   - ok
 strtoul  - missing
 strtoq   - missing
 strtouq  - missing

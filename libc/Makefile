@@ -27,6 +27,7 @@ src/initfini.c \
 \
 src/malloc.c \
 \
+src/strto.c \
 src/xprintf.c \
 src/xscanf.c \
 src/yscanf.c \
