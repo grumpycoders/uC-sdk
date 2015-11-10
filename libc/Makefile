@@ -9,7 +9,7 @@ include $(ROOTDIR)/os/config.mk
 include $(ROOTDIR)/libm/config.mk
 
 ifneq ($(USE_FLOATINGPOINT),true)
-TARGET_CPPFLAGS = -DNOFLOATINGPOINT
+TARGET_CPPFLAGS += -DNOFLOATINGPOINT
 endif
 
 TARGET_SRCS = \
@@ -27,6 +27,7 @@ src/initfini.c \
 \
 src/malloc.c \
 \
+src/strto.c \
 src/xprintf.c \
 src/xscanf.c \
 src/yscanf.c \

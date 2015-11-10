@@ -83,9 +83,9 @@
 
 #if PPP_SUPPORT /* don't build if not configured for use in lwipopts.h */
 
+#include "ppp_impl.h"
 #include "lwip/ip.h" /* for ip_input() */
 
-#include "ppp.h"
 #include "pppdebug.h"
 
 #include "randm.h"
@@ -172,7 +172,9 @@ typedef struct PPPControlRx_s {
   /** the rx file descriptor */
   sio_fd_t fd;
   /** receive buffer - encoded data is stored here */
+#if PPP_INPROC_OWNTHREAD
   u_char rxbuf[PPPOS_RX_BUFSIZE];
+#endif /* PPP_INPROC_OWNTHREAD */
 
   /* The input packet. */
   struct pbuf *inHead, *inTail;
@@ -241,6 +243,7 @@ static void pppInputThread(void *arg);
 #endif /* PPP_INPROC_OWNTHREAD */
 static void pppDrop(PPPControlRx *pcrx);
 static void pppInProc(PPPControlRx *pcrx, u_char *s, int l);
+static void pppFreeCurrentInputPacket(PPPControlRx *pcrx);
 #endif /* PPPOS_SUPPORT */
 
 
@@ -339,13 +342,17 @@ static u_char pppACCMMask[] = {
   0x80
 };
 
+#if PPP_INPROC_OWNTHREAD
 /** Wake up the task blocked in reading from serial line (if any) */
 static void
 pppRecvWakeup(int pd)
 {
   PPPDEBUG(LOG_DEBUG, ("pppRecvWakeup: unit %d\n", pd));
-  sio_read_abort(pppControl[pd].fd);
+  if (pppControl[pd].openFlag != 0) {
+    sio_read_abort(pppControl[pd].fd);
+  }
 }
+#endif /* PPP_INPROC_OWNTHREAD */
 #endif /* PPPOS_SUPPORT */
 
 void
@@ -361,9 +368,10 @@ pppLinkTerminated(int pd)
   {
 #if PPPOS_SUPPORT
     PPPControl* pc;
+#if PPP_INPROC_OWNTHREAD
     pppRecvWakeup(pd);
+#endif /* PPP_INPROC_OWNTHREAD */
     pc = &pppControl[pd];
-    pppDrop(&pc->rx); /* bug fix #17726 */
 
     PPPDEBUG(LOG_DEBUG, ("pppLinkTerminated: unit %d: linkStatusCB=%p errCode=%d\n", pd, pc->linkStatusCB, pc->errCode));
     if (pc->linkStatusCB) {
@@ -387,9 +395,9 @@ pppLinkDown(int pd)
   } else
 #endif /* PPPOE_SUPPORT */
   {
-#if PPPOS_SUPPORT
+#if PPPOS_SUPPORT && PPP_INPROC_OWNTHREAD
     pppRecvWakeup(pd);
-#endif /* PPPOS_SUPPORT */
+#endif /* PPPOS_SUPPORT && PPP_INPROC_OWNTHREAD*/
   }
 }
 
@@ -439,7 +447,7 @@ pppInit(void)
 
   magicInit();
 
-  subnetMask = PP_HTONL(0xffffff00);
+  subnetMask = PP_HTONL(0xffffff00UL);
 
   for (i = 0; i < NUM_PPP; i++) {
     /* Initialize each protocol to the standard option set. */
@@ -526,7 +534,7 @@ pppSetAuth(enum pppAuthType authType, const char *user, const char *passwd)
  * pppOpen() is directly defined to this function.
  */
 int
-pppOverSerialOpen(sio_fd_t fd, void (*linkStatusCB)(void *ctx, int errCode, void *arg), void *linkStatusCtx)
+pppOverSerialOpen(sio_fd_t fd, pppLinkStatusCB_fn linkStatusCB, void *linkStatusCtx)
 {
   PPPControl *pc;
   int pd;
@@ -544,6 +552,8 @@ pppOverSerialOpen(sio_fd_t fd, void (*linkStatusCB)(void *ctx, int errCode, void
     pd = PPPERR_OPEN;
   } else {
     pc = &pppControl[pd];
+    /* input pbuf left over from last session? */
+    pppFreeCurrentInputPacket(&pc->rx);
     /* @todo: is this correct or do I overwrite something? */
     memset(pc, 0, sizeof(PPPControl));
     pc->rx.pd = pd;
@@ -573,7 +583,7 @@ pppOverSerialOpen(sio_fd_t fd, void (*linkStatusCB)(void *ctx, int errCode, void
     pppStart(pd);
 #if PPP_INPROC_OWNTHREAD
     sys_thread_new(PPP_THREAD_NAME, pppInputThread, (void*)&pc->rx, PPP_THREAD_STACKSIZE, PPP_THREAD_PRIO);
-#endif
+#endif /* PPP_INPROC_OWNTHREAD */
   }
 
   return pd;
@@ -594,7 +604,8 @@ pppOverEthernetClose(int pd)
   pppoe_destroy(&pc->netif);
 }
 
-int pppOverEthernetOpen(struct netif *ethif, const char *service_name, const char *concentrator_name, void (*linkStatusCB)(void *ctx, int errCode, void *arg), void *linkStatusCtx)
+int pppOverEthernetOpen(struct netif *ethif, const char *service_name, const char *concentrator_name,
+                        pppLinkStatusCB_fn linkStatusCB, void *linkStatusCtx)
 {
   PPPControl *pc;
   int pd;
@@ -670,7 +681,9 @@ pppClose(int pd)
     pc->errCode = PPPERR_USER;
     /* This will leave us at PHASE_DEAD. */
     pppStop(pd);
+#if PPP_INPROC_OWNTHREAD
     pppRecvWakeup(pd);
+#endif /* PPP_INPROC_OWNTHREAD */
 #endif /* PPPOS_SUPPORT */
   }
 
@@ -681,20 +694,8 @@ pppClose(int pd)
 void
 pppSigHUP(int pd)
 {
-#if PPPOE_SUPPORT
-  PPPControl *pc = &pppControl[pd];
-  if(pc->ethif) {
-    PPPDEBUG(LOG_DEBUG, ("pppSigHUP: unit %d sig_hup -> pppHupCB\n", pd));
-    pppHup(pd);
-  } else
-#endif /* PPPOE_SUPPORT */
-  {
-#if PPPOS_SUPPORT
-    PPPDEBUG(LOG_DEBUG, ("pppSigHUP: unit %d sig_hup -> pppHupCB\n", pd));
-    pppHup(pd);
-    pppRecvWakeup(pd);
-#endif /* PPPOS_SUPPORT */
-  }
+  PPPDEBUG(LOG_DEBUG, ("pppSigHUP: unit %d sig_hup -> pppHupCB\n", pd));
+  pppHup(pd);
 }
 
 #if PPPOS_SUPPORT
@@ -1271,7 +1272,7 @@ GetMask(u32_t addr)
 {
   u32_t mask, nmask;
 
-  htonl(addr);
+  addr = htonl(addr);
   if (IP_CLASSA(addr)) { /* determine network mask for address class */
     nmask = IP_CLASSA_NET;
   } else if (IP_CLASSB(addr)) {
@@ -1725,6 +1726,22 @@ out:
  * Drop the input packet.
  */
 static void
+pppFreeCurrentInputPacket(PPPControlRx *pcrx)
+{
+  if (pcrx->inHead != NULL) {
+    if (pcrx->inTail && (pcrx->inTail != pcrx->inHead)) {
+      pbuf_free(pcrx->inTail);
+    }
+    pbuf_free(pcrx->inHead);
+    pcrx->inHead = NULL;
+  }
+  pcrx->inTail = NULL;
+}
+
+/*
+ * Drop the input packet and increase error counters.
+ */
+static void
 pppDrop(PPPControlRx *pcrx)
 {
   if (pcrx->inHead != NULL) {
@@ -1732,13 +1749,8 @@ pppDrop(PPPControlRx *pcrx)
     PPPDEBUG(LOG_INFO, ("pppDrop: %d:%.*H\n", pcrx->inHead->len, min(60, pcrx->inHead->len * 2), pcrx->inHead->payload));
 #endif
     PPPDEBUG(LOG_INFO, ("pppDrop: pbuf len=%d, addr %p\n", pcrx->inHead->len, (void*)pcrx->inHead));
-    if (pcrx->inTail && (pcrx->inTail != pcrx->inHead)) {
-      pbuf_free(pcrx->inTail);
-    }
-    pbuf_free(pcrx->inHead);
-    pcrx->inHead = NULL;
-    pcrx->inTail = NULL;
   }
+  pppFreeCurrentInputPacket(pcrx);
 #if VJ_SUPPORT
   vj_uncompress_err(&pppControl[pcrx->pd].vjComp);
 #endif /* VJ_SUPPORT */
@@ -1747,6 +1759,7 @@ pppDrop(PPPControlRx *pcrx)
   snmp_inc_ifindiscards(&pppControl[pcrx->pd].netif);
 }
 
+#if !PPP_INPROC_OWNTHREAD
 /** Pass received raw characters to PPPoS to be decoded. This function is
  * thread-safe and can be called from a dedicated RX-thread or from a main-loop.
  *
@@ -1759,6 +1772,7 @@ pppos_input(int pd, u_char* data, int len)
 {
   pppInProc(&pppControl[pd].rx, data, len);
 }
+#endif
 
 /**
  * Process a received octet string.
@@ -1809,6 +1823,7 @@ pppInProc(PPPControlRx *pcrx, u_char *s, int l)
           pppDrop(pcrx);
         /* Otherwise it's a good packet so pass it on. */
         } else {
+          struct pbuf *inp;
           /* Trim off the checksum. */
           if(pcrx->inTail->len >= 2) {
             pcrx->inTail->len -= 2;
@@ -1827,18 +1842,20 @@ pppInProc(PPPControlRx *pcrx, u_char *s, int l)
           }
 
           /* Dispatch the packet thereby consuming it. */
+          inp = pcrx->inHead;
+          /* Packet consumed, release our references. */
+          pcrx->inHead = NULL;
+          pcrx->inTail = NULL;
 #if PPP_INPROC_MULTITHREADED
-          if(tcpip_callback_with_block(pppInput, pcrx->inHead, 0) != ERR_OK) {
+          if(tcpip_callback_with_block(pppInput, inp, 0) != ERR_OK) {
             PPPDEBUG(LOG_ERR, ("pppInProc[%d]: tcpip_callback() failed, dropping packet\n", pcrx->pd));
-            pbuf_free(pcrx->inHead);
+            pbuf_free(inp);
             LINK_STATS_INC(link.drop);
             snmp_inc_ifindiscards(&pppControl[pcrx->pd].netif);
           }
 #else /* PPP_INPROC_MULTITHREADED */
-          pppInput(pcrx->inHead);
+          pppInput(inp);
 #endif /* PPP_INPROC_MULTITHREADED */
-          pcrx->inHead = NULL;
-          pcrx->inTail = NULL;
         }
 
         /* Prepare for a new packet. */
@@ -1912,10 +1929,12 @@ pppInProc(PPPControlRx *pcrx, u_char *s, int l)
         case PDDATA:                    /* Process data byte. */
           /* Make space to receive processed data. */
           if (pcrx->inTail == NULL || pcrx->inTail->len == PBUF_POOL_BUFSIZE) {
-            if(pcrx->inTail) {
+            if (pcrx->inTail != NULL) {
               pcrx->inTail->tot_len = pcrx->inTail->len;
               if (pcrx->inTail != pcrx->inHead) {
                 pbuf_cat(pcrx->inHead, pcrx->inTail);
+                /* give up the inTail reference now */
+                pcrx->inTail = NULL;
               }
             }
             /* If we haven't started a packet, we need a packet header. */

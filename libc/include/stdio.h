@@ -12,6 +12,7 @@ static const int EOF = -1;
 struct _FILE {
     int fd;
     int got_eof;
+    int got_error;
 };
 
 BEGIN_DECL
@@ -110,6 +111,7 @@ static __inline__ FILE * freopen(const char * fname, const char * mode, FILE * r
         }
         r->fd = fd;
         r->got_eof = 0;
+        r->got_error = 0;
     }
 
     if (append)
@@ -126,6 +128,7 @@ static __inline__ FILE * fdopen(int fd, const char * mode) {
     FILE * r = (FILE *) malloc(sizeof(FILE));
     r->fd = fd;
     r->got_eof = 0;
+    r->got_error = 0;
 
     return r;
 }
@@ -148,7 +151,7 @@ static __inline__ int fclose(FILE * stream) {
 static __inline__ size_t fread(void * _ptr, size_t size, size_t nmemb, FILE * stream) {
     int i;
     uint8_t * ptr = (uint8_t *) _ptr;
-    size_t r;
+    ssize_t r;
 
     if (!stream) {
         set_errno(EINVAL);
@@ -157,20 +160,31 @@ static __inline__ size_t fread(void * _ptr, size_t size, size_t nmemb, FILE * st
 
     if (size == 1) {
         r = read(stream->fd, ptr, nmemb);
-        if (r == 0)
-            stream->got_eof = 1;
+        if (r == 0) stream->got_eof = 1;
+        if (r < 0) {
+            stream->got_error = 1;
+            return 0;
+        }
         return r;
     }
 
     if (nmemb == 1) {
         r = read(stream->fd, ptr, size) == size ? 1 : 0;
-        if (r == 0)
-            stream->got_eof = 1;
+        if (r == 0) stream->got_eof = 1;
+        if (r < 0) {
+            stream->got_error = 1;
+            return 0;
+        }
         return r;
     }
 
     for (i = 0; i < nmemb; i++) {
-        if (read(stream->fd, ptr + size * i, size) != size) {
+        r = read(stream->fd, ptr + size * i, size);
+        if (r < 0) {
+            stream->got_error = 1;
+            return 0;
+        }
+        if (r != size) {
             stream->got_eof = 1;
             return i;
         }
@@ -182,21 +196,38 @@ static __inline__ size_t fread(void * _ptr, size_t size, size_t nmemb, FILE * st
 static __inline__ size_t fwrite(const void * _ptr, size_t size, size_t nmemb, FILE * stream) {
     int i;
     const uint8_t * ptr = (const uint8_t *) _ptr;
+    ssize_t r;
 
     if (!stream) {
         set_errno(EINVAL);
         return -1;
     }
 
-    if (size == 1)
-        return write(stream->fd, ptr, nmemb);
+    if (size == 1) {
+        r = write(stream->fd, ptr, nmemb);
+        if (r < 0) {
+            stream->got_error = 1;
+            return 0;
+        }
+        return r;
+    }
 
-    if (nmemb == 1)
-        return write(stream->fd, ptr, size) == size ? 1 : 0;
+    if (nmemb == 1) {
+        r = write(stream->fd, ptr, size);
+        if (r < 0) {
+            stream->got_error = 1;
+            return 0;
+        }
+        return r == size ? 1 : 0;
+    }
 
     for (i = 0; i < nmemb; i++) {
-        if (write(stream->fd, ptr + size * i, size) != size)
-            return i;
+        r = write(stream->fd, ptr + size * i, size);
+        if (r < 0) {
+            stream->got_error = 1;
+            return 0;
+        }
+        if (r != size) return i;
     }
 
     return nmemb;
@@ -204,7 +235,7 @@ static __inline__ size_t fwrite(const void * _ptr, size_t size, size_t nmemb, FI
 
 static __inline__ int fgetc(FILE * stream) {
     uint8_t v;
-    int r;
+    ssize_t r;
 
     if (!stream) {
         set_errno(EINVAL);
@@ -214,10 +245,8 @@ static __inline__ int fgetc(FILE * stream) {
     r = read(stream->fd, &v, 1);
 
     if (r != 1) {
-        if (r == 0) {
-            set_errno(0);
-            stream->got_eof = 1;
-        }
+        if (r == 0) stream->got_eof = 1;
+        else stream->got_error = 1;
         return EOF;
     }
 
@@ -226,20 +255,22 @@ static __inline__ int fgetc(FILE * stream) {
 
 static __inline__ int fseek(FILE * stream, off_t offset, int wheel) {
     int r;
+
     if (!stream) {
         set_errno(EINVAL);
         return -1;
     }
 
     r = lseek(stream->fd, offset, wheel) != -1 ? 0 : -1;
-    if (!r)
-        stream->got_eof = 0;
+    if (!r) stream->got_eof = 0;
+    if (errno != 0) stream->got_error = 1;
     return r;
 }
 
 static __inline__ char * fgets(char * s, int n, FILE * stream) {
     int r, fd;
     char c, * copy = s;
+
     if (!stream) {
         set_errno(EINVAL);
         return NULL;
@@ -262,6 +293,7 @@ static __inline__ char * fgets(char * s, int n, FILE * stream) {
             }
             break;
         case -1:
+            stream->got_error = 1;
             return NULL;
             break;
         }
@@ -274,5 +306,6 @@ static __inline__ char * fgets(char * s, int n, FILE * stream) {
 static __inline__ int getc() { return fgetc(stdin); }
 static __inline__ off_t ftell(FILE * stream) { return lseek(stream->fd, 0, SEEK_CUR); }
 static __inline__ int feof(FILE * stream) { return stream->got_eof; }
+static __inline__ int ferror(FILE * stream) { return stream->got_error; }
 static __inline__ int fileno(FILE * stream) { return stream->fd; }
 static __inline__ void rewind(FILE * stream) { fseek(stream, 0, SEEK_SET); }

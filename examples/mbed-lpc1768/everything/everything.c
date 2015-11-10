@@ -22,8 +22,7 @@
 #include <lwip/timers.h>
 #include <netif/etharp.h>
 #include <netif/interface.h>
-#include <webserver/httpd.h>
-#include <echo/echo.h>
+#include <httpserver_raw/httpd.h>
 #include <lwip/dhcp.h>
 
 #define LED1_wire make_pin(GPIO_PORT_B, 18)
@@ -140,8 +139,7 @@ uint32_t sys_now() { return xTaskGetTickCount() * portTICK_RATE_MS; }
 
 static void lwip_task(void * p) {
     net_init();
-    httpd_init((uint8_t *) romfs);
-    echo_init();
+    httpd_init();
 
     uint32_t currentIP = board_netif.ip_addr.addr;
     while (1) {

@@ -5,7 +5,7 @@
 
 extern uint8_t lwip_ram_heap[];
 
-#define IPv6              0
+#define IPv6              1
 #define NO_SYS            1
 #define LWIP_ARP          1
 #define LWIP_RAW          1

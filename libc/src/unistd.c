@@ -7,7 +7,9 @@
 int open(const char * path, int flags) {
     int r;
 
-    r = fs_open(path, flags, 0755);
+    set_errno(0);
+
+    r = os_fs_open(path, flags, 0755);
 
     if (r >= 0)
         return r;
@@ -17,6 +19,8 @@ int open(const char * path, int flags) {
 }
 
 int close(int fd) {
+    set_errno(0);
+
     if (!fio_is_open(fd)) {
         set_errno(EBADF);
         return -1;
@@ -27,6 +31,8 @@ int close(int fd) {
 
 ssize_t read(int fd, void * buf, size_t size) {
     ssize_t r;
+
+    set_errno(0);
 
     if (!fio_is_open(fd)) {
         set_errno(EBADF);
@@ -46,6 +52,8 @@ ssize_t read(int fd, void * buf, size_t size) {
 ssize_t write(int fd, const void * buf, size_t size) {
     ssize_t r;
 
+    set_errno(0);
+
     if (!fio_is_open(fd)) {
         set_errno(EBADF);
         return -1;
@@ -63,6 +71,8 @@ ssize_t write(int fd, const void * buf, size_t size) {
 
 off_t lseek(int fd, off_t seek, int wheel) {
     off_t r;
+
+    set_errno(0);
 
     if ((wheel != SEEK_SET) && (wheel != SEEK_CUR) && (wheel != SEEK_END)) {
         set_errno(EINVAL);

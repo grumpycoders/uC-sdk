@@ -200,3 +200,5 @@ static __inline__ char * strstr(const char * s1, const char * s2) {
     
     return NULL;
 }
+
+static __inline__ char * strerror(int errnum) { return errnum ? "Not compiled with error strings" : "No error"; }

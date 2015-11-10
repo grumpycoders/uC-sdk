@@ -11,6 +11,6 @@ BEGIN_DECL
 typedef int (*fs_open_t)(void * opaque, const char * fname, int flags, int mode);
 
 int register_fs(const char * mountpoint, fs_open_t callback, void * opaque);
-int fs_open(const char * path, int flags, int mode);
+int os_fs_open(const char * path, int flags, int mode);
 
 END_DECL
