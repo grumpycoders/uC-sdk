@@ -27,7 +27,7 @@ static struct timerInitDef_t timerInitDefs[] = {
     { TIM14, GPIO_AF_TIM14, &RCC->APB1ENR, RCC_APB1Periph_TIM14}
 };
 
-extern GPIO_TypeDef *ports[];
+extern GPIO_TypeDef *stm32f4xx_gpio_ports[];
 
 uint32_t timer_get_freq(uint8_t timer)
 {
@@ -80,7 +80,7 @@ void timer_init_pwmchannel(uint8_t timer, uint8_t channel, pin_t pin, uint32_t p
     gpiodef.GPIO_Pin = 1 << pin.pin;
     gpiodef.GPIO_Mode = GPIO_Mode_AF;
     gpiodef.GPIO_Speed = GPIO_Speed_50MHz;
-    GPIO_Init(ports[pin.port], &gpiodef);
+    GPIO_Init(stm32f4xx_gpio_ports[pin.port], &gpiodef);
 
    //setup the Timer channel
     TIM_OCInitTypeDef def;
@@ -113,7 +113,7 @@ void timer_init_pwmchannel(uint8_t timer, uint8_t channel, pin_t pin, uint32_t p
             break;
     }
 
-    GPIO_PinAFConfig(ports[pin.port], pin.pin, timerInitDef->af);
+    GPIO_PinAFConfig(stm32f4xx_gpio_ports[pin.port], pin.pin, timerInitDef->af);
 }
 
 
