@@ -2,8 +2,8 @@ export BOARD = stm32f429discovery
 ROOTDIR = $(CURDIR)/uC-sdk
 
 ifeq ($(wildcard $(ROOTDIR)/uC-sdk.root),)
-ifneq ($(wildcard ./uC-sdk.root),)
-ROOTDIR = .
+ifneq ($(wildcard ../../../uC-sdk.root),)
+ROOTDIR = ../../..
 endif
 endif
 
