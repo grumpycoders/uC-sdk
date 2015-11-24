@@ -4,7 +4,7 @@
 #include <adc.h>
 
 ADC_TypeDef *adclist[] = {ADC1, ADC2, ADC3};
-extern GPIO_TypeDef *ports[];
+extern GPIO_TypeDef *stm32f4xx_gpio_ports[];
 
 //global configuration for all DMAs
 //let's keep it like this for now
@@ -31,7 +31,7 @@ void adc_config_single(uint8_t adc, uint8_t channel, pin_t pin)
     gpiodef.GPIO_Pin = 1 << pin.pin;
     gpiodef.GPIO_Mode = GPIO_Mode_AN;
     gpiodef.GPIO_PuPd = GPIO_PuPd_NOPULL;
-    GPIO_Init(ports[pin.port], &gpiodef);
+    GPIO_Init(stm32f4xx_gpio_ports[pin.port], &gpiodef);
 
     ADC_InitTypeDef def;
     ADC_StructInit(&def);
@@ -53,7 +53,7 @@ void adc_config_continuous(uint8_t adc, uint8_t *channel, pin_t *pin, uint16_t *
 {
     if (adc < 1 || adc > 3)
         return;
-    int i;    
+    int i;
     for (i = 0 ; i < nb ; i++)
         if (channel[i] < 1 || channel[i] > 18)
             return;
@@ -67,7 +67,7 @@ void adc_config_continuous(uint8_t adc, uint8_t *channel, pin_t *pin, uint16_t *
         gpiodef.GPIO_Pin = 1 << pin[i].pin;
         gpiodef.GPIO_Mode = GPIO_Mode_AN;
         gpiodef.GPIO_PuPd = GPIO_PuPd_NOPULL;
-        GPIO_Init(ports[pin[i].port], &gpiodef);
+        GPIO_Init(stm32f4xx_gpio_ports[pin[i].port], &gpiodef);
     }
  
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_DMA2,ENABLE);
