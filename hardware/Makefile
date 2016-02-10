@@ -18,6 +18,7 @@ ifeq ($(CPU_FLAVOR),stm32f10x)
 TARGET_SRCS += src/stm32f10x/gpio.c
 TARGET_SRCS += src/stm32f10x/ssp.c
 TARGET_SRCS += src/stm32f10x/i2c.c
+TARGET_SRCS += src/stm32f10x/timer.c
 TARGET_SRCS += src/stm32f10x/uart.c
 endif
 endif

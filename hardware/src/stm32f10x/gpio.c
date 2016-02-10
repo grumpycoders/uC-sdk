@@ -1,7 +1,7 @@
 #include <stm32f10x.h>
 #include <stm32f10x_gpio.h>
 #include <stm32f10x_rcc.h>
-#include "hardware.h"
+#include <hardware.h>
 
 #include <gpio.h>
 
