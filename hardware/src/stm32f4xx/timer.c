@@ -1,5 +1,6 @@
 #include <stm32f4xx.h>
 #include <stm32f4xx_tim.h>
+#include <hardware.h>
 
 #include <timer.h>
 
@@ -26,8 +27,6 @@ static struct timerInitDef_t timerInitDefs[] = {
     { TIM13, GPIO_AF_TIM13, &RCC->APB1ENR, RCC_APB1Periph_TIM13},
     { TIM14, GPIO_AF_TIM14, &RCC->APB1ENR, RCC_APB1Periph_TIM14}
 };
-
-extern GPIO_TypeDef *stm32f4xx_gpio_ports[];
 
 uint32_t timer_get_freq(uint8_t timer)
 {

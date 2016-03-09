@@ -148,8 +148,6 @@ void l3gd20_read(l3gd20_t *l3gd20, float axis[3]) {
     pin_t cs = l3gd20->cs;
     ssp_t ssp = l3gd20->ssp;
 
-    gpio_set(cs, 1);
-
     uint8_t registers[6];
     gpio_set(cs, 0);
     spi_read_registers(ssp, L3GD20_OUT_X_L, registers, 6);

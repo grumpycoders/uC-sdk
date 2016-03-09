@@ -1,5 +1,6 @@
 #include "ssp.h"
-#include "hardware.h"
+
+#include <hardware.h>
 
 #include <stm32f10x.h>
 #include <stm32f10x_gpio.h>
@@ -52,9 +53,9 @@ void ssp_config(ssp_port_t ssp_port, uint32_t clock)
     }
 
     uint32_t port_flags = 0;
-    port_flags |= 1 << sclk.port;
-    port_flags |= 1 << miso.port;
-    port_flags |= 1 << mosi.port;
+    port_flags |= 1 << (sclk.port + 2);
+    port_flags |= 1 << (miso.port + 2);
+    port_flags |= 1 << (mosi.port + 2);
     RCC_APB2PeriphClockCmd(port_flags, ENABLE);
 
 

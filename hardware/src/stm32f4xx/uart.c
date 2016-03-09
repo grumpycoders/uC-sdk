@@ -1,5 +1,6 @@
 #include "uart.h"
-#include "hardware.h"
+
+#include <hardware.h>
 
 #include <FreeRTOS.h>
 #include <task.h>

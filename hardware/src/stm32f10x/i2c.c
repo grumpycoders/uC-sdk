@@ -1,5 +1,6 @@
 #include "i2c.h"
-#include "hardware.h"
+
+#include <hardware.h>
 
 #include <stm32f10x.h>
 #include <stm32f10x_gpio.h>
@@ -28,8 +29,8 @@ void i2c_config(i2c_port_t i2c_port, uint32_t speed)
     }
 
     uint32_t port_flags = 0;
-    port_flags |= 1 << scl.port;
-    port_flags |= 1 << sda.port;
+    port_flags |= 1 << (scl.port + 2);
+    port_flags |= 1 << (sda.port + 2);
     RCC_APB2PeriphClockCmd(port_flags, ENABLE);
 
 

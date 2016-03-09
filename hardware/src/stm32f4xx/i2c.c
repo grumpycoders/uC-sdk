@@ -1,5 +1,6 @@
 #include "i2c.h"
-#include "hardware.h"
+
+#include <hardware.h>
 
 #include <stm32f4xx_gpio.h>
 #include <stm32f4xx_rcc.h>

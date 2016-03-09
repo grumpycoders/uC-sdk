@@ -1,10 +1,12 @@
+#include "timer.h"
+
+#include <hardware.h>
+
 #include <stm32f10x.h>
 #include <stm32f10x_gpio.h>
 #include <stm32f10x_tim.h>
 #include <stm32f10x_rcc.h>
-#include <hardware.h>
 
-#include <timer.h>
 
 struct timerInitDef_t {
     TIM_TypeDef * id;
@@ -31,8 +33,6 @@ static struct timerInitDef_t timerInitDefs[] = {
     { TIM16, &RCC->APB2ENR, RCC_APB2Periph_TIM16 },
     { TIM17, &RCC->APB2ENR, RCC_APB2Periph_TIM17 }
 };
-
-extern GPIO_TypeDef *stm32f4xx_gpio_ports[];
 
 uint32_t timer_get_freq(uint8_t timer)
 {
@@ -82,7 +82,7 @@ void timer_init_pwmchannel(uint8_t timer, uint8_t channel, pin_t pin, uint32_t p
    struct timerInitDef_t * timerInitDef = timerInitDefs + timer - 1;
 
     //clock the pin
-    RCC_APB2PeriphClockCmd(1 << pin.port, ENABLE);
+    RCC_APB2PeriphClockCmd(1 << (pin.port + 2), ENABLE);
 
     //setup the GPIO pin
     GPIO_InitTypeDef gpiodef;

@@ -5,38 +5,17 @@
 #include <FreeRTOS.h>
 #include <task.h>
 
-#include <stm32f10x_gpio.h>
-#include <stm32f10x_rcc.h>
-#include <stm32f10x_usart.h>
+#include <uart.h>
+
+static USART_TypeDef * const uarts[] = { (void *) 0, USART1, USART2, USART3, UART4, UART5 };
 
 void BoardConsoleInit() {
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1 | RCC_APB2Periph_GPIOA | RCC_APB2Periph_AFIO, ENABLE);
+    pin_t rx = make_pin(GPIO_PORT_A, 9);
+    pin_t tx = make_pin(GPIO_PORT_A, 10);
 
-    GPIO_InitTypeDef gpiodef;
-    gpiodef.GPIO_Pin = GPIO_Pin_9;
-    gpiodef.GPIO_Mode = GPIO_Mode_AF_PP;
-    gpiodef.GPIO_Speed = GPIO_Speed_50MHz;
-    GPIO_Init(GPIOA, &gpiodef);
-    gpiodef.GPIO_Pin = GPIO_Pin_10;
-    gpiodef.GPIO_Mode = GPIO_Mode_IN_FLOATING;
-    GPIO_Init(GPIOA, &gpiodef);
+    uart_port_t uart = { .uart = uart_port_1, .rx = rx, .tx = tx };
 
-    USART_InitTypeDef usartdef;
-
-    usartdef.USART_BaudRate = 115200;
-    usartdef.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
-    usartdef.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
-    usartdef.USART_WordLength = USART_WordLength_8b;
-    usartdef.USART_StopBits = USART_StopBits_1;
-    usartdef.USART_Parity = USART_Parity_No;
-
-    USART_Init(USART1, &usartdef);
-
-    USART_ClockInitTypeDef clockdef;
-    USART_ClockStructInit(&clockdef);
-    USART_ClockInit(USART1, &clockdef);
-
-    USART_Cmd(USART1, ENABLE);
+    uart_config(uart, 115200);
 }
 
 void BoardConsolePuts(const char * str) {
@@ -50,14 +29,14 @@ void BoardConsolePuts(const char * str) {
 void BoardConsolePutc(int c) {
     if (c == '\r') return;
     if (c == '\n') c = '\r';
-    while (USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET);
-    USART_SendData(USART1, c);
+
+    uart_send_char(uart_port_1, c);
+
     if (c == '\r') {
         c = '\n';
-        USART_SendData(USART1, c);
+        uart_send_char(uart_port_1, c);
     }
 }
-
 
 void BoardConsolePrintf(const char * fmt, ...) {
     va_list ap;

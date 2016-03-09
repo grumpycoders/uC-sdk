@@ -9,7 +9,7 @@ GPIO_TypeDef * const stm32f10x_gpio_ports[] = { GPIOA, GPIOB, GPIOC, GPIOD, GPIO
 
 void gpio_config(pin_t pin, pin_dir_t dir, pull_t pull) {
     //Clock the port
-    RCC_APB2PeriphClockCmd(1 << pin.port, ENABLE);
+    RCC_APB2PeriphClockCmd(1 << (pin.port + 2), ENABLE);
 
     GPIO_InitTypeDef def;
     def.GPIO_Pin = 1 << pin.pin;

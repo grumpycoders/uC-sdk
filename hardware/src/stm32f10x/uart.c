@@ -1,17 +1,18 @@
 #include "uart.h"
-#include "hardware.h"
+
+#include <stdio.h>
+
+#include <hardware.h>
 
 #include <stm32f10x.h>
 #include <stm32f10x_gpio.h>
 #include <stm32f10x_rcc.h>
 #include <stm32f10x_usart.h>
 
-#include <stdio.h>
-
-//MOVE THIS TO gpio.c when it's implemented
-GPIO_TypeDef * const stm32f10x_gpio_ports[] = { GPIOA, GPIOB, GPIOC, GPIOD, GPIOE, GPIOF, GPIOG };
+#include <gpio.h>
 
 static USART_TypeDef * const uarts[] = { (void *) 0, USART1, USART2, USART3, UART4, UART5 };
+
 
 void uart_config(uart_port_t uart_port, uint32_t baudrate)
 {
@@ -23,9 +24,10 @@ void uart_config(uart_port_t uart_port, uint32_t baudrate)
 
     USART_TypeDef * id = uarts[uart];
 
-    //clock AFIO
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
+    if (uart > uart_port_5)
+        return;
 
+    //clock USART
     switch (uart) {
     case uart_port_1:
         RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
@@ -46,9 +48,13 @@ void uart_config(uart_port_t uart_port, uint32_t baudrate)
         return;
     }
 
-    uint32_t port_flags = 0;
-    port_flags |= 1 << rx.port;
-    port_flags |= 1 << tx.port;
+    //clock AFIO
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
+
+    //CLOCK GPIO pins
+    volatile uint32_t port_flags = 0;
+    port_flags |= 1 << (rx.port + 2);
+    port_flags |= 1 << (tx.port + 2);
 /*    if (uart == uart_port_1 || uart == uart_port_2 || uart == uart_port_3 || uart == uart_port_6){
         port_flags |= 1 << rts.port;
         port_flags |= 1 << cts.port;
@@ -59,15 +65,12 @@ void uart_config(uart_port_t uart_port, uint32_t baudrate)
     gpiodef.GPIO_Speed = GPIO_Speed_50MHz;
 
     gpiodef.GPIO_Pin = 1 << rx.pin;
-    gpiodef.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+    gpiodef.GPIO_Mode = GPIO_Mode_AF_PP;
     GPIO_Init(stm32f10x_gpio_ports[rx.port], &gpiodef);
 
     gpiodef.GPIO_Pin = 1 << tx.pin;
-    gpiodef.GPIO_Mode = GPIO_Mode_AF_PP;
+    gpiodef.GPIO_Mode = GPIO_Mode_IN_FLOATING;
     GPIO_Init(stm32f10x_gpio_ports[tx.port], &gpiodef);
-
-    //clock AFIO
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
 
     USART_InitTypeDef uartdef;
 

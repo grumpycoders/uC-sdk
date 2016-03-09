@@ -1,10 +1,11 @@
 #include <stm32f4xx.h>
 #include <stm32f4xx_adc.h>
 
+#include <hardware.h>
+
 #include <adc.h>
 
 ADC_TypeDef *adclist[] = {ADC1, ADC2, ADC3};
-extern GPIO_TypeDef *stm32f4xx_gpio_ports[];
 
 //global configuration for all DMAs
 //let's keep it like this for now
