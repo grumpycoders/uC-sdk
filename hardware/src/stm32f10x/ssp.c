@@ -78,17 +78,17 @@ void ssp_config(ssp_port_t ssp_port, uint32_t clock)
 
     //Init SPI
     SPI_InitTypeDef spidef;
-    spidef.SPI_Direction = SPI_Direction_2Lines_FullDuplex; 
-    spidef.SPI_Mode = SPI_Mode_Master; 
-    spidef.SPI_DataSize = SPI_DataSize_8b; 
-    spidef.SPI_CPOL = SPI_CPOL_Low; 
-    spidef.SPI_CPHA = SPI_CPHA_1Edge; 
-    spidef.SPI_NSS = SPI_NSS_Soft; 
-    spidef.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_4; 
-    spidef.SPI_FirstBit = SPI_FirstBit_MSB; 
+    spidef.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
+    spidef.SPI_Mode = SPI_Mode_Master;
+    spidef.SPI_DataSize = SPI_DataSize_8b;
+    spidef.SPI_CPOL = SPI_CPOL_Low;
+    spidef.SPI_CPHA = SPI_CPHA_1Edge;
+    spidef.SPI_NSS = SPI_NSS_Soft;
+    spidef.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_4;
+    spidef.SPI_FirstBit = SPI_FirstBit_MSB;
     spidef.SPI_CRCPolynomial = 7;
 
-    SPI_Init(id, &spidef); 
+    SPI_Init(id, &spidef);
     SPI_Cmd(id, ENABLE);
 }
 

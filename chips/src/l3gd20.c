@@ -69,7 +69,7 @@ int l3gd20_init_ssp(l3gd20_t *l3gd20, ssp_port_t ssp_port, pin_t cs) {
     l3gd20->comm = L3GD20_SPI;
 
     gpio_config(cs, pin_dir_write, pull_up);
-    
+
     gpio_set(cs, 1);
 
     ssp_config(ssp_port, 8 * 1000 * 1000);
@@ -144,20 +144,17 @@ void l3gd20_frequency(l3gd20_t *l3gd20, l3gd20_datarate_t odr, l3gd20_bandwidth_
     l3gd20_power(l3gd20, l3gd20->power);
 }
 
-void l3gd20_read(l3gd20_t *l3gd20, float axis[3]) {
-    pin_t cs = l3gd20->cs;
-    ssp_t ssp = l3gd20->ssp;
+void l3gd20_read(l3gd20_t l3gd20, float data[3]) {
+    pin_t cs = l3gd20.cs;
+    ssp_t ssp = l3gd20.ssp;
 
-    uint8_t registers[6];
+    uint8_t buffer[6];
     gpio_set(cs, 0);
-    spi_read_registers(ssp, L3GD20_OUT_X_L, registers, 6);
+    spi_read_registers(ssp, L3GD20_OUT_X_L, buffer, 6);
     gpio_set(cs, 1);
 
     float sensitivity = 0.0f;
-
-    // Reading scaling register from CTRL_REG5 (0x24)
-    // That's bits 3 to 5.
-    switch (l3gd20->scale) {
+    switch (l3gd20.scale) {
     case L3GD20_250DPS:
         sensitivity = 8.75f;
         break;
@@ -173,15 +170,9 @@ void l3gd20_read(l3gd20_t *l3gd20, float axis[3]) {
     }
 
     int i;
-    // Now let's read X, Y, and Z.
-    // That's registers 0x28 to 0x2d.
-    // X is in 0x28 - 0x29.
-    // Y is in 0x2a - 0x2b.
-    // Z is in 0x2c - 0x2d.
-    int16_t * axis_data = (int16_t *) registers;
-    for (i = 0; i < 3; i++) {
-        axis[i] = sensitivity * axis_data[i];
-    }
+    int16_t * axis_data = (int16_t *) buffer;
+    for (i = 0; i < 3; i++)
+        data[i] = sensitivity * axis_data[i];
 }
 
 void l3gd20_setup_filter(l3gd20_t *sensor, float cutoff){

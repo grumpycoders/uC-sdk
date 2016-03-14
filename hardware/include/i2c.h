@@ -36,6 +36,9 @@ void i2c_stop(i2c_t i2c);
 void i2c_read(i2c_t i2c, uint8_t *value, uint8_t nb);
 void i2c_write(i2c_t i2c, uint8_t *value, uint8_t nb);
 
+//wait for the bus to be ready
+void i2c_wait(i2c_t i2c);
+
 //void i2c_read_dma(uint8_t id, uint8_t *buffer, uint8_t nb);
 //void i2c_write_dma(uint8_t id, uint8_t *buffer, uint8_t nb);
 

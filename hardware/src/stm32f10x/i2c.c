@@ -94,7 +94,7 @@ void i2c_stop(i2c_t i2c)
     I2C_GenerateSTOP(i2cs[i2c], ENABLE);
 }
 
-void i2c_read_polling(i2c_t i2c, uint8_t *value, uint8_t nb)
+void i2c_read(i2c_t i2c, uint8_t *value, uint8_t nb)
 {
     I2C_TypeDef * id = i2cs[i2c];
 
@@ -102,15 +102,14 @@ void i2c_read_polling(i2c_t i2c, uint8_t *value, uint8_t nb)
     {
         if (nb == 0)
             I2C_AcknowledgeConfig(id, DISABLE);
-      
-      while (!I2C_CheckEvent(id, I2C_EVENT_MASTER_BYTE_RECEIVED));
-      *value++ = I2C_ReceiveData(id);
+
+        while (!I2C_CheckEvent(id, I2C_EVENT_MASTER_BYTE_RECEIVED));
+        *value++ = I2C_ReceiveData(id);
     }
-    
     I2C_AcknowledgeConfig(id, ENABLE);
 }
 
-void i2c_write_polling(i2c_t i2c, uint8_t *value, uint8_t nb)
+void i2c_write(i2c_t i2c, uint8_t *value, uint8_t nb)
 {
     I2C_TypeDef * id = i2cs[i2c];
 
@@ -119,6 +118,11 @@ void i2c_write_polling(i2c_t i2c, uint8_t *value, uint8_t nb)
         I2C_SendData(id, *value++);
         while(!I2C_CheckEvent(id, I2C_EVENT_MASTER_BYTE_TRANSMITTED));
     }
+}
+
+void i2c_wait(i2c_t i2c)
+{
+    while(I2C_GetFlagStatus(i2cs[i2c], I2C_FLAG_BUSY));
 }
 
 /*

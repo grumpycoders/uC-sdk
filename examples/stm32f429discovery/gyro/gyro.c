@@ -38,7 +38,7 @@ int main() {
     float axis[3];
     int e = 0, w = 0;
     while (1) {
-        l3gd20_read(&l3gd20, axis);
+        l3gd20_read(l3gd20, axis);
 #ifdef DEBUG_OUTPUT
         char output[128];
         sprintf(output, "x = %5.2f, y = %5.2f, z = %5.2f\n", axis[0], axis[1], axis[2]);

@@ -13,6 +13,7 @@ TARGET_SRCS = \
 src/sdcard.c \
 src/l3gd20.c \
 src/lis3dsh.c \
+src/lsm303dlhc.c \
 # src/lcd.c \
 
 
