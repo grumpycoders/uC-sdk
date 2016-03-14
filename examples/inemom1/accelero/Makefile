@@ -8,7 +8,7 @@ endif
 endif
 
 TARGET = accelero.bin
-TARGET_SRCS = accelero.c LSM303DLHC.c
+TARGET_SRCS = accelero.c
 
 LIBDEPS = \
 $(ROOTDIR)/FreeRTOS/libFreeRTOS.a \
