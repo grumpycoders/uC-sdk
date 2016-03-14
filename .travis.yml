@@ -5,6 +5,7 @@ before_install:
   - sudo apt-get install -qq gcc-arm-none-eabi
 env:
   matrix:
+    - TARGET=inemom1/leds
     - TARGET=stm32f4discovery/skel
     - TARGET=stm32f429discovery/leds
     - TARGET=mbed-lpc1768/leds
