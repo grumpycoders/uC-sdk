@@ -43,9 +43,27 @@ typedef enum {
     pull_down = 2,
 } pull_t;
 
+//initialize a pin structure for use in functions below
 static __inline__ pin_t make_pin(uint8_t port, uint8_t pin) { pin_t p = { port, pin }; return p; }
+
+/*
+    Initializes a GPIO
+*/
 void gpio_config(pin_t pin, pin_dir_t dir, pull_t pull);
+
+/*
+    Initializes a GPIO for an alternate function
+*/
+void gpio_config_alternate(pin_t pin, pin_dir_t dir, pull_t pull, uint8_t af);
+
+/*
+    Writes a value on a pin
+*/
 void gpio_set(pin_t pin, int enabled);
+
+/*
+    Reads a value on a pin
+*/
 uint8_t gpio_get(pin_t pin);
 
 END_DECL
