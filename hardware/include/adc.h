@@ -7,7 +7,7 @@
 
 BEGIN_DECL
 
-#define GPIO_PORT_A 0
+void adc_calibrate(uint8_t adc);
 
 //configure all ADC
 void adc_config_all();

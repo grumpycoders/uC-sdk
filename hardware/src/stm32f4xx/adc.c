@@ -7,7 +7,7 @@
 
 static ADC_TypeDef *adclist[] = {ADC1, ADC2, ADC3};
 
-static void adc_calibrate(uint8_t adc)
+void adc_calibrate(uint8_t adc)
 {/*
     if (adc < 1 || adc > 3)
         return;
