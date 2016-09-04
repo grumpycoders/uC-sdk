@@ -70,7 +70,7 @@ void adc_config_continuous(uint8_t adc, uint8_t *channel, pin_t *pin, uint16_t *
         gpiodef.GPIO_PuPd = GPIO_PuPd_NOPULL;
         GPIO_Init(stm32f4xx_gpio_ports[pin[i].port], &gpiodef);
     }
- 
+
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_DMA2,ENABLE);
 
     DMA_InitTypeDef dmadef;
