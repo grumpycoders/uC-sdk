@@ -28,7 +28,6 @@ include $(ROOTDIR)/common.mk
 all: uC-sdk $(TARGET)
 
 clean: clean-generic
-	$(Q)rm -f romfs_data.*
 	$(Q)$(MAKE) $(MAKE_OPTS) -C $(ROOTDIR) clean
 
 .PHONY: uC-sdk

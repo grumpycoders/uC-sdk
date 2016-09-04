@@ -27,7 +27,6 @@ include $(ROOTDIR)/common.mk
 all: uC-sdk $(TARGET)
 
 clean: clean-generic
-	$(Q)rm -f romfs_data.*
 	$(Q)$(MAKE) $(MAKE_OPTS) -C $(ROOTDIR) clean
 
 .PHONY: uC-sdk
@@ -43,10 +42,6 @@ $(ROOTDIR)/hardware/libhardware.a: uC-sdk
 uC-sdk:
 	$(E) "[MAKE]   Entering uC-sdk"
 	$(Q)$(MAKE) $(MAKE_OPTS) -C $(ROOTDIR)
-
-romfs_data.c:
-	$(E) "[ROMFS]  Building romfs"
-	$(Q)$(ROOTDIR)/tools/romfs/mkromfs -d romfs -c romfs romfs_data.c
 
 deps: ldeps
 	$(E) "[DEPS]   Creating dependency tree for uC-sdk"
