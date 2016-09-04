@@ -5,7 +5,18 @@
 
 #include <adc.h>
 
-ADC_TypeDef *adclist[] = {ADC1, ADC2, ADC3};
+static ADC_TypeDef *adclist[] = {ADC1, ADC2, ADC3};
+
+static void adc_calibrate(uint8_t adc)
+{/*
+    if (adc < 1 || adc > 3)
+        return;
+
+    ADC_ResetCalibration(adclist[adc - 1]);
+    while(ADC_GetResetCalibrationStatus(adclist[adc - 1]));
+    ADC_StartCalibration(adclist[adc - 1]);
+    while(ADC_GetCalibrationStatus(adclist[adc - 1]));*/
+}
 
 //global configuration for all DMAs
 //let's keep it like this for now
@@ -73,10 +84,19 @@ void adc_config_continuous(uint8_t adc, uint8_t *channel, pin_t *pin, uint16_t *
 
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_DMA2,ENABLE);
 
+    /*
+        DMA2
+        ADC1: Channel 0, Stream 0 or Stream 4
+        ADC2: Channel 1, Stream 2 or Stream 3
+        ADC3: Channel 2, Stream 0 or Stream 1
+    */
+    DMA_Stream_TypeDef *dmastreams[] = {DMA2_Stream4, DMA2_Stream2, DMA2_Stream1};
+    uint32_t dmachannels[] = {DMA_Channel_0, DMA_Channel_1, DMA_Channel_2};
+
     DMA_InitTypeDef dmadef;
     DMA_StructInit(&dmadef);
-    DMA_DeInit(DMA2_Stream4);
-    dmadef.DMA_Channel = DMA_Channel_0;
+    DMA_DeInit(dmastreams[adc]);
+    dmadef.DMA_Channel = dmachannels[adc];
     dmadef.DMA_PeripheralBaseAddr = (uint32_t)&(adclist[adc - 1])->DR;
     dmadef.DMA_Memory0BaseAddr = (uint32_t) &dest[0];
     dmadef.DMA_DIR = DMA_DIR_PeripheralToMemory;
@@ -91,8 +111,8 @@ void adc_config_continuous(uint8_t adc, uint8_t *channel, pin_t *pin, uint16_t *
     dmadef.DMA_FIFOThreshold = DMA_FIFOThreshold_HalfFull;
     dmadef.DMA_MemoryBurst = DMA_MemoryBurst_Single;
     dmadef.DMA_PeripheralBurst = DMA_PeripheralBurst_Single;
-    DMA_Init(DMA2_Stream4, &dmadef);
-    DMA_Cmd(DMA2_Stream4, ENABLE);
+    DMA_Init(dmastreams[adc], &dmadef);
+    DMA_Cmd(dmastreams[adc], ENABLE);
 
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1 << (adc - 1),ENABLE);
 
@@ -114,20 +134,9 @@ void adc_config_continuous(uint8_t adc, uint8_t *channel, pin_t *pin, uint16_t *
 
     ADC_DMACmd(adclist[adc - 1], ENABLE);
 
-    ADC_Cmd(adclist[adc - 1],ENABLE);
+    ADC_Cmd(adclist[adc - 1], ENABLE);
 
-    ADC_SoftwareStartConv(ADC1);
-}
-
-void adc_calibrate(uint8_t adc)
-{/*
-    if (adc < 1 || adc > 3)
-        return;
-
-    ADC_ResetCalibration(adclist[adc - 1]);
-    while(ADC_GetResetCalibrationStatus(adclist[adc - 1]));
-    ADC_StartCalibration(adclist[adc - 1]);
-    while(ADC_GetCalibrationStatus(adclist[adc - 1]));*/
+    ADC_SoftwareStartConv(adclist[adc - 1]);
 }
 
 uint16_t adc_get(uint8_t adc)

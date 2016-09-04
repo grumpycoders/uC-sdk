@@ -1,9 +1,14 @@
+#include "adc.h"
+
 #include <stm32f10x.h>
 #include <stm32f10x_adc.h>
+#include <stm32f10x_rcc.h>
+#include <stm32f10x_gpio.h>
+#include <stm32f10x_dma.h>
 
-#include <hardware.h>
+#include <stddef.h>
 
-#include <adc.h>
+#include "hardware.h"
 
 ADC_TypeDef *adclist[] = {ADC1, ADC2, ADC3};
 /*
@@ -61,18 +66,21 @@ ADC_TypeDef *adclist[] = {ADC1, ADC2, ADC3};
 
 */
 
+static void adc_calibrate(uint8_t adc)
+{
+    if (adc < 1 || adc > 3)
+        return;
+
+    ADC_ResetCalibration(adclist[adc - 1]);
+    while(ADC_GetResetCalibrationStatus(adclist[adc - 1]));
+    ADC_StartCalibration(adclist[adc - 1]);
+    while(ADC_GetCalibrationStatus(adclist[adc - 1]));
+}
+
 //global configuration for all DMAs
 //let's keep it like this for now
 void adc_config_all()
 {
-    ADC_InitTypeDef commondef;
-    commondef.ADC_Mode = ADC_Mode_Independent;
-    commondef.ADC_ScanConvMode = DISABLE;
-    commondef.ADC_ContinuousConvMode = DISABLE;
-    commondef.ADC_ExternalTrigConv = ADC_ExternalTrigConv_T1_CC1;
-    commondef.ADC_DataAlign = ADC_DataAlign_Right;
-    commondef.ADC_NbrOfChannel = 1;
-    ADC_CommonInit(&commondef);
 }
 
 void adc_config_single(uint8_t adc, uint8_t channel, pin_t pin)
@@ -81,14 +89,13 @@ void adc_config_single(uint8_t adc, uint8_t channel, pin_t pin)
         return;
 
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1 << (adc - 1),ENABLE);
-    RCC_AHB1PeriphClockCmd(1 << pin.port, ENABLE);
+    RCC_APB2PeriphClockCmd(1 << pin.port, ENABLE);
 
     GPIO_InitTypeDef gpiodef;
     GPIO_StructInit(&gpiodef);
     gpiodef.GPIO_Pin = 1 << pin.pin;
-    gpiodef.GPIO_Mode = GPIO_Mode_AN;
-    gpiodef.GPIO_PuPd = GPIO_PuPd_NOPULL;
-    GPIO_Init(stm32f4xx_gpio_ports[pin.port], &gpiodef);
+    gpiodef.GPIO_Mode = GPIO_Mode_AIN;
+    GPIO_Init(stm32f10x_gpio_ports[pin.port], &gpiodef);
 
     ADC_InitTypeDef def;
     ADC_StructInit(&def);
@@ -106,14 +113,14 @@ void adc_config_single(uint8_t adc, uint8_t channel, pin_t pin)
 
     ADC_RegularChannelConfig(adclist[adc - 1], channel, 1, ADC_SampleTime_41Cycles5);
 
-    ADC_Cmd(adclist[adc - 1],ENABLE);
+    ADC_Cmd(adclist[adc - 1], ENABLE);
 
     adc_calibrate(adc);
 }
 
 void adc_config_continuous(uint8_t adc, uint8_t *channel, pin_t *pin, uint16_t *dest, uint8_t nb)
 {
-    if (adc < 1 || adc > 3)
+    if (adc < 1 || adc > 3 || adc == 2) //looks like adc2 has no DMA capability
         return;
     int i;
     for (i = 0 ; i < nb ; i++)
@@ -122,23 +129,29 @@ void adc_config_continuous(uint8_t adc, uint8_t *channel, pin_t *pin, uint16_t *
 
     for (i = 0 ; i < nb ; i++)
     {
-        RCC_AHB1PeriphClockCmd(1 << pin[i].port, ENABLE);
+        RCC_APB2PeriphClockCmd(1 << pin[i].port, ENABLE);
 
         GPIO_InitTypeDef gpiodef;
         GPIO_StructInit(&gpiodef);
         gpiodef.GPIO_Pin = 1 << pin[i].pin;
-        gpiodef.GPIO_Mode = GPIO_Mode_AN;
-        gpiodef.GPIO_PuPd = GPIO_PuPd_NOPULL;
-        GPIO_Init(stm32f4xx_gpio_ports[pin[i].port], &gpiodef);
+        gpiodef.GPIO_Mode = GPIO_Mode_AIN;
+        GPIO_Init(stm32f10x_gpio_ports[pin[i].port], &gpiodef);
     }
 
     RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA1, ENABLE);
 
+    /*
+        ADC1: DMA1 Channel 1
+        ADC2: ?
+        ADC3: DMA2 Channel 5 “only in high-density and XL-density devices”
+    */
+    DMA_Channel_TypeDef *dmachannels[] = {DMA1_Channel1, NULL, DMA2_Channel5};
+
     DMA_InitTypeDef dmadef;
-    DMA_StineructInit(&dmadef);
-    DMA_DeInit(DMA2_Stream4);
+    DMA_StructInit(&dmadef);
+    DMA_DeInit(dmachannels[adc]);
     dmadef.DMA_PeripheralBaseAddr = (uint32_t)&(adclist[adc - 1])->DR;
-    dmadef.DMA_Memory0BaseAddr = (uint32_t) &dest[0];
+    dmadef.DMA_MemoryBaseAddr = (uint32_t) &dest[0];
     dmadef.DMA_DIR = DMA_DIR_PeripheralSRC;//DMA_DIR_PeripheralToMemory;
     dmadef.DMA_BufferSize = nb;
     dmadef.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
@@ -148,8 +161,8 @@ void adc_config_continuous(uint8_t adc, uint8_t *channel, pin_t *pin, uint16_t *
     dmadef.DMA_Mode = DMA_Mode_Normal;//DMA_Mode_Circular;
     dmadef.DMA_Priority = DMA_Priority_High;
     dmadef.DMA_M2M = DMA_M2M_Disable;
-    DMA_Init(DMA2_Stream4, &dmadef);
-    DMA_Cmd(DMA2_Stream4, ENABLE);
+    DMA_Init(dmachannels[adc], &dmadef);
+    DMA_Cmd(dmachannels[adc], ENABLE);
 
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1 << (adc - 1),ENABLE);
 
@@ -166,26 +179,15 @@ void adc_config_continuous(uint8_t adc, uint8_t *channel, pin_t *pin, uint16_t *
     for (i = 0 ; i < nb ; i++)
         ADC_RegularChannelConfig(adclist[adc - 1], channel[i], (i + 1), ADC_SampleTime_41Cycles5);
 
-    ADC_DMARequestAfterLastTransferCmd(adclist[adc - 1], ENABLE);
+//    ADC_DMARequestAfterLastTransferCmd(adclist[adc - 1], ENABLE);
 
     ADC_DMACmd(adclist[adc - 1], ENABLE);
 
-    ADC_Cmd(adclist[adc - 1],ENABLE);
+    ADC_Cmd(adclist[adc - 1], ENABLE);
 
     adc_calibrate(adc);
 
-    ADC_SoftwareStartConv(ADC1);
-}
-
-void adc_calibrate(uint8_t adc)
-{
-    if (adc < 1 || adc > 3)
-        return;
-
-    ADC_ResetCalibration(adclist[adc - 1]);
-    while(ADC_GetResetCalibrationStatus(adclist[adc - 1]));
-    ADC_StartCalibration(adclist[adc - 1]);
-    while(ADC_GetCalibrationStatus(adclist[adc - 1]));
+    ADC_SoftwareStartConvCmd(adclist[adc - 1], ENABLE);
 }
 
 uint16_t adc_get(uint8_t adc)
@@ -193,7 +195,7 @@ uint16_t adc_get(uint8_t adc)
     if (adc < 1 || adc > 3)
         return 0;
 
-    ADC_SoftwareStartConv(adclist[adc - 1]);
+    ADC_SoftwareStartConvCmd(adclist[adc - 1], ENABLE);
     while(!ADC_GetFlagStatus(adclist[adc - 1], ADC_FLAG_EOC)){}
     uint16_t res = ADC_GetConversionValue(adclist[adc - 1]);
     ADC_ClearFlag(adclist[adc - 1], ADC_FLAG_EOC);
