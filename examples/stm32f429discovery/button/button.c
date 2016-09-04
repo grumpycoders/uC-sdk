@@ -1,15 +1,16 @@
 #include <gpio.h>
 #include <irq.h>
 
-pin_t led, button;
+static volatile int status = 0;
 
 void toggleled(){
-    static int a = 0;
-    gpio_set(led, a % 2);
-    a++;
+    status ^= 1;
 }
 
 int main() {
+    //declare the pin structures for the led and the button
+    pin_t led, button;
+
     //Initialize the pin_t structure with the pin port and number
     //On this board there is a button on PA0
     button = make_pin(GPIO_PORT_A, 0);
@@ -28,7 +29,9 @@ int main() {
     gpio_config(led, pin_dir_write, pull_down);
 
     //Loop
-    while (1);
+    while (1){
+        gpio_set(led, status);
+    }
 
     return 0;
 }
