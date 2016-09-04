@@ -33,10 +33,12 @@
 #define __LOp(x) *(1+(int*)x)
 #endif
 
+#ifndef __P //edit: if already defined, like in cdefs.h
 #ifdef __STDC__
 #define	__P(p)	p
 #else
 #define	__P(p)	()
+#endif
 #endif
 
 /*
