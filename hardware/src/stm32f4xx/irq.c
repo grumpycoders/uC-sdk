@@ -6,12 +6,12 @@
 #include <stddef.h>
 
 static void (*systick_callback)() = NULL;
-
+/*
 void SysTick_Handler(void){
     if (systick_callback)
         systick_callback();
 }
-
+*/
 void set_timer(uint32_t ms, void (*cb) ()){
     systick_callback = cb;
     SysTick_Config(ms * SystemCoreClock/1000);
@@ -45,7 +45,8 @@ static void (*irq_line_callback[IRQ_MAX])();
 
 __attribute__((constructor)) static void irq_init() {
     int i;
-    for (i = 0; i < IRQ_MAX; i++) irq_line_callback[i] = NULL;
+    for (i = 0; i < IRQ_MAX; i++)
+        irq_line_callback[i] = NULL;
 }
 
 static void call_callback(int index) {

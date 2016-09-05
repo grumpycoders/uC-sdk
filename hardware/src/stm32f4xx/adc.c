@@ -8,14 +8,7 @@
 static ADC_TypeDef *adclist[] = {ADC1, ADC2, ADC3};
 
 void adc_calibrate(uint8_t adc)
-{/*
-    if (adc < 1 || adc > 3)
-        return;
-
-    ADC_ResetCalibration(adclist[adc - 1]);
-    while(ADC_GetResetCalibrationStatus(adclist[adc - 1]));
-    ADC_StartCalibration(adclist[adc - 1]);
-    while(ADC_GetCalibrationStatus(adclist[adc - 1]));*/
+{
 }
 
 //global configuration for all DMAs
@@ -32,10 +25,9 @@ void adc_config_all()
 
 void adc_config_single(uint8_t adc, uint8_t channel, pin_t pin)
 {
-    if (adc < 1 || adc > 3 || channel < 1 || channel > 18)
+    if (adc < 1 || adc > 3 || channel > 18)
         return;
 
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1 << (adc - 1),ENABLE);
     RCC_AHB1PeriphClockCmd(1 << pin.port, ENABLE);
 
     GPIO_InitTypeDef gpiodef;
@@ -45,6 +37,8 @@ void adc_config_single(uint8_t adc, uint8_t channel, pin_t pin)
     gpiodef.GPIO_PuPd = GPIO_PuPd_NOPULL;
     GPIO_Init(stm32f4xx_gpio_ports[pin.port], &gpiodef);
 
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1 << (adc - 1),ENABLE);
+
     ADC_InitTypeDef def;
     ADC_StructInit(&def);
     def.ADC_DataAlign = ADC_DataAlign_Right;
@@ -53,7 +47,7 @@ void adc_config_single(uint8_t adc, uint8_t channel, pin_t pin)
     def.ADC_ExternalTrigConv = 0;
     def.ADC_ExternalTrigConvEdge = ADC_ExternalTrigConvEdge_None;
     def.ADC_NbrOfConversion = 1;
-    def.ADC_ScanConvMode = DISABLE;
+    def.ADC_ScanConvMode = ENABLE;
     ADC_Init(adclist[adc - 1], &def);
 
     ADC_RegularChannelConfig(adclist[adc - 1], channel, 1, ADC_SampleTime_144Cycles);
@@ -67,7 +61,7 @@ void adc_config_continuous(uint8_t adc, uint8_t *channel, pin_t *pin, uint16_t *
         return;
     int i;
     for (i = 0 ; i < nb ; i++)
-        if (channel[i] < 1 || channel[i] > 18)
+        if (channel[i] > 18)
             return;
 
     for (i = 0 ; i < nb ; i++)
@@ -96,7 +90,7 @@ void adc_config_continuous(uint8_t adc, uint8_t *channel, pin_t *pin, uint16_t *
     DMA_InitTypeDef dmadef;
     DMA_StructInit(&dmadef);
     DMA_DeInit(dmastreams[adc]);
-    dmadef.DMA_Channel = dmachannels[adc];
+    dmadef.DMA_Channel = dmachannels[adc - 1];
     dmadef.DMA_PeripheralBaseAddr = (uint32_t)&(adclist[adc - 1])->DR;
     dmadef.DMA_Memory0BaseAddr = (uint32_t) &dest[0];
     dmadef.DMA_DIR = DMA_DIR_PeripheralToMemory;
@@ -111,17 +105,24 @@ void adc_config_continuous(uint8_t adc, uint8_t *channel, pin_t *pin, uint16_t *
     dmadef.DMA_FIFOThreshold = DMA_FIFOThreshold_HalfFull;
     dmadef.DMA_MemoryBurst = DMA_MemoryBurst_Single;
     dmadef.DMA_PeripheralBurst = DMA_PeripheralBurst_Single;
-    DMA_Init(dmastreams[adc], &dmadef);
-    DMA_Cmd(dmastreams[adc], ENABLE);
+    DMA_Init(dmastreams[adc - 1], &dmadef);
+    DMA_Cmd(dmastreams[adc - 1], ENABLE);
 
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1 << (adc - 1),ENABLE);
+
+    ADC_CommonInitTypeDef commondef;
+    commondef.ADC_Mode = ADC_Mode_Independent;
+    commondef.ADC_Prescaler = ADC_Prescaler_Div2;
+    commondef.ADC_DMAAccessMode = ADC_DMAAccessMode_Disabled;
+    commondef.ADC_TwoSamplingDelay = ADC_TwoSamplingDelay_5Cycles;
+    ADC_CommonInit(&commondef);
 
     ADC_InitTypeDef def;
     ADC_StructInit(&def);
     def.ADC_DataAlign = ADC_DataAlign_Right;
     def.ADC_Resolution = ADC_Resolution_12b;
     def.ADC_ContinuousConvMode = ENABLE;
-    def.ADC_ExternalTrigConv = 0;
+    //def.ADC_ExternalTrigConv = 0;
     def.ADC_ExternalTrigConvEdge = ADC_ExternalTrigConvEdge_None;
     def.ADC_NbrOfConversion = nb;
     def.ADC_ScanConvMode = ENABLE;
@@ -148,7 +149,6 @@ uint16_t adc_get(uint8_t adc)
     while(!ADC_GetFlagStatus(adclist[adc - 1], ADC_FLAG_EOC)){}
     uint16_t res = ADC_GetConversionValue(adclist[adc - 1]);
     ADC_ClearFlag(adclist[adc - 1], ADC_FLAG_EOC);
+
     return res;
 }
-
-

@@ -149,7 +149,7 @@ void adc_config_continuous(uint8_t adc, uint8_t *channel, pin_t *pin, uint16_t *
 
     DMA_InitTypeDef dmadef;
     DMA_StructInit(&dmadef);
-    DMA_DeInit(dmachannels[adc]);
+    DMA_DeInit(dmachannels[adc - 1]);
     dmadef.DMA_PeripheralBaseAddr = (uint32_t)&(adclist[adc - 1])->DR;
     dmadef.DMA_MemoryBaseAddr = (uint32_t) &dest[0];
     dmadef.DMA_DIR = DMA_DIR_PeripheralSRC;//DMA_DIR_PeripheralToMemory;
@@ -161,8 +161,8 @@ void adc_config_continuous(uint8_t adc, uint8_t *channel, pin_t *pin, uint16_t *
     dmadef.DMA_Mode = DMA_Mode_Normal;//DMA_Mode_Circular;
     dmadef.DMA_Priority = DMA_Priority_High;
     dmadef.DMA_M2M = DMA_M2M_Disable;
-    DMA_Init(dmachannels[adc], &dmadef);
-    DMA_Cmd(dmachannels[adc], ENABLE);
+    DMA_Init(dmachannels[adc - 1], &dmadef);
+    DMA_Cmd(dmachannels[adc - 1], ENABLE);
 
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1 << (adc - 1),ENABLE);
 

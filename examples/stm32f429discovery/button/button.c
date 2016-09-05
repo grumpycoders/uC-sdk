@@ -1,5 +1,6 @@
 #include <gpio.h>
 #include <irq.h>
+#include <stdio.h>
 
 static volatile int status = 0;
 

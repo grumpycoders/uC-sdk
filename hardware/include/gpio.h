@@ -24,14 +24,6 @@ typedef struct {
 
 _Static_assert(sizeof(pin_t) == 2, "pin_t isn't 16 bits-wide");
 
-/*
-// should be for CM3 - that's for everyone for now
-typedef uint16_t pin_t;
-#define MAKE_PIN(port, pin) ((pin_t)(((port & 0xff) << 8) | (pin & 0xff)))
-
-static __inline__ uint8_t get_port(pin_t pin) { return (pin >> 8) & 0xff; }
-static __inline__ uint8_t get_pin(pin_t pin) { return pin & 0xff; }
-*/
 typedef enum {
     pin_dir_read = 0,
     pin_dir_write = 1,

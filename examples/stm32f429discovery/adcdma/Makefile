@@ -7,8 +7,8 @@ ROOTDIR = ../../..
 endif
 endif
 
-TARGET = charlcd.bin
-TARGET_SRCS = charlcd.c
+TARGET = adcdma.bin
+TARGET_SRCS = adcdma.c
 
 LIBDEPS = \
 $(ROOTDIR)/FreeRTOS/libFreeRTOS.a \
@@ -18,7 +18,6 @@ $(ROOTDIR)/libc/libc.a \
 $(ROOTDIR)/libm/libm.a \
 $(ROOTDIR)/acorn/libacorn.a \
 $(ROOTDIR)/hardware/libhardware.a \
-$(ROOTDIR)/chips/libchips.a \
 
 LIBS = -Wl,--start-group $(LIBDEPS) -Wl,--end-group
 TARGET_INCLUDES = include
@@ -39,7 +38,6 @@ $(ROOTDIR)/libc/libc.a: uC-sdk
 $(ROOTDIR)/libm/libm.a: uC-sdk
 $(ROOTDIR)/acorn/libacorn.a: uC-sdk
 $(ROOTDIR)/hardware/libhardware.a: uC-sdk
-$(ROOTDIR)/chips/libchips.a: uC-sdk
 
 uC-sdk:
 	$(E) "[MAKE]   Entering uC-sdk"
@@ -56,5 +54,5 @@ include $(ROOTDIR)/libc/config.mk
 include $(ROOTDIR)/libm/config.mk
 include $(ROOTDIR)/acorn/config.mk
 include $(ROOTDIR)/hardware/config.mk
-include $(ROOTDIR)/chips/config.mk
 include $(ROOTDIR)/target-rules.mk
+
