@@ -1,6 +1,6 @@
 #include "ssp.h"
 
-#include <hardware.h>
+#include "hardware.h"
 
 #include <stm32f10x.h>
 #include <stm32f10x_gpio.h>
@@ -52,29 +52,16 @@ void ssp_config(ssp_port_t ssp_port, uint32_t clock)
         return;
     }
 
-    uint32_t port_flags = 0;
-    port_flags |= 1 << (sclk.port + 2);
-    port_flags |= 1 << (miso.port + 2);
-    port_flags |= 1 << (mosi.port + 2);
-    RCC_APB2PeriphClockCmd(port_flags, ENABLE);
-
-
-    GPIO_InitTypeDef gpiodef;
-    gpiodef.GPIO_Speed = GPIO_Speed_50MHz;
-    gpiodef.GPIO_Mode = GPIO_Mode_AF_PP;
-
-    gpiodef.GPIO_Pin = 1 << sclk.pin;
-    GPIO_Init(stm32f10x_gpio_ports[sclk.port], &gpiodef);
-
-    gpiodef.GPIO_Pin = 1 << mosi.pin;
-    GPIO_Init(stm32f10x_gpio_ports[mosi.port], &gpiodef);
-
-    gpiodef.GPIO_Pin = 1 << miso.pin;
-    gpiodef.GPIO_Mode = GPIO_Mode_IN_FLOATING;
-    GPIO_Init(stm32f10x_gpio_ports[miso.port], &gpiodef);
-
-    //clock AFIO
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
+    if (ssp == ssp_port_3){
+        gpio_config_alternate(sclk, pin_dir_write, pull_down, 6);
+        gpio_config_alternate(miso, pin_dir_write, pull_down, 6);
+        gpio_config_alternate(mosi, pin_dir_write, pull_down, 6);
+    }
+    else{
+        gpio_config_alternate(sclk, pin_dir_write, pull_down, 5);
+        gpio_config_alternate(miso, pin_dir_write, pull_down, 5);
+        gpio_config_alternate(mosi, pin_dir_write, pull_down, 5);
+    }
 
     //Init SPI
     SPI_InitTypeDef spidef;

@@ -1,8 +1,9 @@
 #include <stm32f4xx.h>
 #include <stm32f4xx_gpio.h>
-#include <hardware.h>
 
-#include <gpio.h>
+#include "hardware.h"
+
+#include "gpio.h"
 
 GPIO_TypeDef * const stm32f4xx_gpio_ports[] = { GPIOA, GPIOB, GPIOC, GPIOD, GPIOE, GPIOF, GPIOG, GPIOH, GPIOI, GPIOJ, GPIOK };
 

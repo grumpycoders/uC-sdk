@@ -1,5 +1,6 @@
 #include "ssp.h"
-#include <hardware.h>
+
+#include "hardware.h"
 
 #include <stm32f4xx.h>
 #include <stm32f4xx_gpio.h>
@@ -35,63 +36,40 @@ void ssp_config(ssp_port_t ssp_port, uint32_t clock) {
     pin_t mosi = ssp_port.mosi;
 
     SPI_TypeDef * id = spis[ssp];
-    uint8_t af;
 
     switch (ssp) {
     case ssp_port_1:
-        af = GPIO_AF_SPI1;
         RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1, ENABLE);
         break;
     case ssp_port_2:
-        af = GPIO_AF_SPI2;
         RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI2, ENABLE);
         break;
     case ssp_port_3:
-        af = GPIO_AF_SPI3;
         RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI3, ENABLE);
         break;
     case ssp_port_4:
-        af = GPIO_AF_SPI4;
         RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI4, ENABLE);
         break;
     case ssp_port_5:
-        af = GPIO_AF_SPI5;
         RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI5, ENABLE);
         break;
     case ssp_port_6:
-        af = GPIO_AF_SPI6;
         RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI6, ENABLE);
         break;
     default:
         return;
     }
 
-    uint32_t port_flags = 0;
-    port_flags |= 1 << sclk.port;
-    port_flags |= 1 << miso.port;
-    port_flags |= 1 << mosi.port;
-    RCC_AHB1PeriphClockCmd(port_flags, ENABLE);
-
-
-    GPIO_InitTypeDef GPIO_InitStructure;
-
-    GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_AF;
-    GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-    GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_DOWN;
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-
-    GPIO_InitStructure.GPIO_Pin   = 1 << sclk.pin;
-    GPIO_PinAFConfig(stm32f4xx_gpio_ports[sclk.port], sclk.pin, af);
-    GPIO_Init(stm32f4xx_gpio_ports[sclk.port], &GPIO_InitStructure);
-
-    GPIO_InitStructure.GPIO_Pin   = 1 << miso.pin;
-    GPIO_PinAFConfig(stm32f4xx_gpio_ports[miso.port], miso.pin, af);
-    GPIO_Init(stm32f4xx_gpio_ports[miso.port], &GPIO_InitStructure);
-
-    GPIO_InitStructure.GPIO_Pin   = 1 << mosi.pin;
-    GPIO_PinAFConfig(stm32f4xx_gpio_ports[mosi.port], mosi.pin, af);
-    GPIO_Init(stm32f4xx_gpio_ports[mosi.port], &GPIO_InitStructure);
-
+    if (ssp == ssp_port_3){
+        gpio_config_alternate(sclk, pin_dir_write, pull_down, 6);
+        gpio_config_alternate(miso, pin_dir_write, pull_down, 6);
+        gpio_config_alternate(mosi, pin_dir_write, pull_down, 6);
+    }
+    else{
+        gpio_config_alternate(sclk, pin_dir_write, pull_down, 5);
+        gpio_config_alternate(miso, pin_dir_write, pull_down, 5);
+        gpio_config_alternate(mosi, pin_dir_write, pull_down, 5);
+    }
 
     SPI_InitTypeDef SPI_InitStructure;
 

@@ -1,9 +1,10 @@
 #include <stm32f10x.h>
 #include <stm32f10x_gpio.h>
 #include <stm32f10x_rcc.h>
-#include <hardware.h>
 
-#include <gpio.h>
+#include "hardware.h"
+
+#include "gpio.h"
 
 GPIO_TypeDef * const stm32f10x_gpio_ports[] = { GPIOA, GPIOB, GPIOC, GPIOD, GPIOE, GPIOF, GPIOG };
 
@@ -21,7 +22,6 @@ void gpio_config(pin_t pin, pin_dir_t dir, pull_t pull) {
     }
     else //input
     {
-      /* GPIO_Mode_AIN ? */
       switch(pull)
       {
         case pull_none:
@@ -35,8 +35,26 @@ void gpio_config(pin_t pin, pin_dir_t dir, pull_t pull) {
           break;
       }
     }
-    /* GPIO_Mode_AF_OD, GPIO_Mode_AF_PP */
     GPIO_Init(stm32f10x_gpio_ports[pin.port], &def);
+}
+
+void gpio_config_alternate(pin_t pin, pin_dir_t dir, pull_t pull, uint8_t af) {
+    if (af > 15)
+        return;
+    //Clock the port
+    RCC_APB2PeriphClockCmd(1 << pin.port, ENABLE);
+
+    GPIO_InitTypeDef def;
+    def.GPIO_Pin = 1 << pin.pin;
+    def.GPIO_Speed = GPIO_Speed_50MHz;
+    if (dir)
+        def.GPIO_Mode = GPIO_Mode_AF_PP; //output : Push Pull
+    else
+        def.GPIO_Mode = GPIO_Mode_AF_OD; //input : Open Drain
+
+    GPIO_Init(stm32f10x_gpio_ports[pin.port], &def);
+
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
 }
 
 void gpio_set(pin_t pin, int enabled) {
