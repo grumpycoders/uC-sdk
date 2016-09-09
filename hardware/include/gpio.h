@@ -18,6 +18,13 @@ typedef enum {
     gpio_port_j,
 } gpio_port_t;
 
+typedef enum
+{
+    rising = 0,
+    falling = 1,
+    change = 2,
+} irq_trigger_t;
+
 typedef struct {
     uint8_t port;
     uint8_t pin;
