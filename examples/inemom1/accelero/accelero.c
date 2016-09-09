@@ -14,7 +14,7 @@ void initAccelero(){
     i2c_port_t i2c = {
         .scl = make_pin(GPIO_PORT_B, 10),
         .sda = make_pin(GPIO_PORT_B, 11),
-        .i2c = i2c_port_2 };
+        .i2c = i2c_2 };
     accelero.odr = LSM303DLHC_A_400HZ;
     accelero.fs  = LSM303DLHC_A_4G;
     accelero.res = LSM303DLHC_A_HIGH_RESOLUTION;
@@ -26,7 +26,7 @@ void initMagneto(){
     i2c_port_t i2c = {
         .scl = make_pin(GPIO_PORT_B, 10),
         .sda = make_pin(GPIO_PORT_B, 11),
-        .i2c = i2c_port_2 };
+        .i2c = i2c_2 };
     magneto.odr = LSM303DLHC_M_75HZ;
     magneto.gain = LSM303DLHC_M_1_9GAUSS;
     lsm303dlhc_magneto_init(&magneto, i2c);

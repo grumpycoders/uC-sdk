@@ -16,11 +16,11 @@ void ssp_config(ssp_port_t ssp_port, uint32_t clock) {
     pin_t mosi = ssp_port.mosi;
 
     switch (ssp) {
-    case ssp_port_0:
+    case ssp_0:
         clkpwr = CLKPWR_PCLKSEL_SSP0;
         sspdef = LPC_SSP0;
         break;
-    case ssp_port_1:
+    case ssp_1:
         clkpwr = CLKPWR_PCLKSEL_SSP1;
         sspdef = LPC_SSP1;
         break;
@@ -62,8 +62,8 @@ uint8_t ssp_readwrite(ssp_t ssp, uint8_t value) {
     LPC_SSP_TypeDef * sspdef = NULL;
 
     switch (ssp) {
-        case ssp_port_0: sspdef = LPC_SSP0; break;
-        case ssp_port_1: sspdef = LPC_SSP1; break;
+        case ssp_0: sspdef = LPC_SSP0; break;
+        case ssp_1: sspdef = LPC_SSP1; break;
         default: return 0;
     }
 

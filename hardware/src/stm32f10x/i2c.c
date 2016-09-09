@@ -18,10 +18,10 @@ void i2c_config(i2c_port_t i2c_port, uint32_t speed)
     I2C_TypeDef * id = i2cs[i2c];
 
     switch (i2c) {
-    case i2c_port_1:
+    case i2c_1:
         RCC_APB1PeriphClockCmd(RCC_APB1Periph_I2C1, ENABLE);
         break;
-    case i2c_port_2:
+    case i2c_2:
         RCC_APB1PeriphClockCmd(RCC_APB1Periph_I2C2, ENABLE);
         break;
     default:

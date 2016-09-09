@@ -2,17 +2,18 @@
 
 #include <decl.h>
 #include <stdint.h>
+
 #include <gpio.h>
 
 // ought to be generic, cm3-specific for now
 typedef enum {
-    ssp_port_0,
-    ssp_port_1,
-    ssp_port_2,
-    ssp_port_3,
-    ssp_port_4,
-    ssp_port_5,
-    ssp_port_6,
+    ssp_0,
+    ssp_1,
+    ssp_2,
+    ssp_3,
+    ssp_4,
+    ssp_5,
+    ssp_6,
 } ssp_t;
 
 typedef struct {

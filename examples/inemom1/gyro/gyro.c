@@ -14,7 +14,7 @@ void initGyro()
     pin_t mosi = make_pin(GPIO_PORT_B, 15);
     pin_t miso = make_pin(GPIO_PORT_B, 14);
     pin_t cs   = make_pin(GPIO_PORT_B, 12);
-    ssp_port_t gyroport = { .ssp = ssp_port_2, .sclk = sclk, .mosi = mosi, .miso = miso };
+    ssp_port_t gyroport = { .ssp = ssp_2, .sclk = sclk, .mosi = mosi, .miso = miso };
 
     if (!l3gd20_init_ssp(&gyro, gyroport, cs))
         printf("Cannot initialize gyroscope");

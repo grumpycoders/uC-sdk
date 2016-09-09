@@ -7,10 +7,10 @@
 
 // ought to be generic, cm3-specific for now
 typedef enum {
-    i2c_port_0,
-    i2c_port_1,
-    i2c_port_2,
-    i2c_port_3,
+    i2c_0,
+    i2c_1,
+    i2c_2,
+    i2c_3,
 } i2c_t;
 
 typedef struct {
@@ -19,7 +19,7 @@ typedef struct {
     i2c_t i2c;
 } i2c_port_t;
 
-_Static_assert(sizeof(i2c_port_t) <= 6, "i2c_port_t isn't 24 bits-wide");
+_Static_assert(sizeof(i2c_port_t) <= 6, "i2c_port_t isn't 48 bits-wide");
 
 BEGIN_DECL
 

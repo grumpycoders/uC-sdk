@@ -40,107 +40,107 @@ uint8_t irq_gpio_channels[] = {
     EXTI15_10_IRQn,
     EXTI15_10_IRQn };
 
-#define IRQ_MAX 16
-static void (*irq_line_callback[IRQ_MAX])();
+#define IRQ_EXTI_MAX 16
+static void (*irq_exti_callback[IRQ_EXTI_MAX])();
+
+static void call_exti_callback(int index) {
+    if (irq_exti_callback[index]) {
+        irq_exti_callback[index]();
+    }
+}
 
 __attribute__((constructor)) static void irq_init() {
     int i;
-    for (i = 0; i < IRQ_MAX; i++)
-        irq_line_callback[i] = NULL;
-}
-
-static void call_callback(int index) {
-    if (irq_line_callback[index]) {
-        irq_line_callback[index]();
-    }
+    for (i = 0; i < IRQ_EXTI_MAX; i++)
+        irq_exti_callback[i] = NULL;
 }
 
 void EXTI0_IRQHandler() {
     if (EXTI_GetITStatus(EXTI_Line0) != RESET) {
-        call_callback(0);
+        call_exti_callback(0);
         EXTI_ClearITPendingBit(EXTI_Line0);
     }
 }
 
 void EXTI1_IRQHandler() {
     if (EXTI_GetITStatus(EXTI_Line1) != RESET) {
-        call_callback(1);
+        call_exti_callback(1);
         EXTI_ClearITPendingBit(EXTI_Line1);
     }
 }
 
 void EXTI2_IRQHandler() {
     if (EXTI_GetITStatus(EXTI_Line2) != RESET) {
-        call_callback(2);
+        call_exti_callback(2);
         EXTI_ClearITPendingBit(EXTI_Line2);
     }
 }
 
 void EXTI3_IRQHandler() {
     if (EXTI_GetITStatus(EXTI_Line3) != RESET) {
-        call_callback(3);
+        call_exti_callback(3);
         EXTI_ClearITPendingBit(EXTI_Line3);
     }
 }
 
 void EXTI4_IRQHandler() {
     if (EXTI_GetITStatus(EXTI_Line4) != RESET) {
-        call_callback(4);
+        call_exti_callback(4);
         EXTI_ClearITPendingBit(EXTI_Line4);
     }
 }
 
 void EXTI9_5_IRQHandler() {
     if (EXTI_GetITStatus(EXTI_Line5) != RESET) {
-        call_callback(5);
+        call_exti_callback(5);
         EXTI_ClearITPendingBit(EXTI_Line5);
     }
     else if (EXTI_GetITStatus(EXTI_Line6) != RESET) {
-        call_callback(6);
+        call_exti_callback(6);
         EXTI_ClearITPendingBit(EXTI_Line6);
     }
     else if (EXTI_GetITStatus(EXTI_Line7) != RESET) {
-        call_callback(7);
+        call_exti_callback(7);
         EXTI_ClearITPendingBit(EXTI_Line7);
     }
     else if (EXTI_GetITStatus(EXTI_Line8) != RESET) {
-        call_callback(8);
+        call_exti_callback(8);
         EXTI_ClearITPendingBit(EXTI_Line8);
     }
     else if (EXTI_GetITStatus(EXTI_Line9) != RESET) {
-        call_callback(9);
+        call_exti_callback(9);
         EXTI_ClearITPendingBit(EXTI_Line9);
     }
 }
 
 void EXTI15_10_IRQHandler() {
     if (EXTI_GetITStatus(EXTI_Line10) != RESET) {
-        call_callback(10);
+        call_exti_callback(10);
         EXTI_ClearITPendingBit(EXTI_Line10);
     }
     else if (EXTI_GetITStatus(EXTI_Line11) != RESET) {
-        call_callback(11);
+        call_exti_callback(11);
         EXTI_ClearITPendingBit(EXTI_Line11);
     }
     else if (EXTI_GetITStatus(EXTI_Line12) != RESET) {
-        call_callback(12);
+        call_exti_callback(12);
         EXTI_ClearITPendingBit(EXTI_Line12);
     }
     else if (EXTI_GetITStatus(EXTI_Line13) != RESET) {
-        call_callback(13);
+        call_exti_callback(13);
         EXTI_ClearITPendingBit(EXTI_Line13);
     }
     else if (EXTI_GetITStatus(EXTI_Line14) != RESET) {
-        call_callback(14);
+        call_exti_callback(14);
         EXTI_ClearITPendingBit(EXTI_Line14);
     }
     else if (EXTI_GetITStatus(EXTI_Line15) != RESET) {
-        call_callback(15);
+        call_exti_callback(15);
         EXTI_ClearITPendingBit(EXTI_Line15);
     }
 }
 
-void irq_gpio_init(pin_t pin, void (*callback)(), irq_trigger_t tt)
+void irq_gpio_init(pin_t pin, void (*cb)(), irq_trigger_t tt)
 {
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
 
@@ -166,12 +166,12 @@ void irq_gpio_init(pin_t pin, void (*callback)(), irq_trigger_t tt)
 
     NVIC_InitTypeDef nvic;
     nvic.NVIC_IRQChannel = irq_gpio_channels[pin.pin];
-    nvic.NVIC_IRQChannelPreemptionPriority = 0x00;
+    nvic.NVIC_IRQChannelPreemptionPriority = 0x01;
     nvic.NVIC_IRQChannelSubPriority = 0x01;
     nvic.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&nvic);
 
-    irq_line_callback[pin.pin] = callback;
+    irq_exti_callback[pin.pin] = cb;
 }
 
 void irq_gpio_deinit(pin_t pin)
@@ -186,5 +186,5 @@ void irq_gpio_deinit(pin_t pin)
     nvic.NVIC_IRQChannelCmd = DISABLE;
     NVIC_Init(&nvic);
 
-    irq_line_callback[pin.pin] = NULL;
+    irq_exti_callback[pin.pin] = NULL;
 }

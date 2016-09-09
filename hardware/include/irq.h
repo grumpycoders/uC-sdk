@@ -2,7 +2,9 @@
 
 #include <decl.h>
 #include <stdint.h>
-#include <gpio.h>
+
+#include "gpio.h"
+#include "timer.h"
 
 BEGIN_DECL
 

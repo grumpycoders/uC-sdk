@@ -177,5 +177,3 @@ void lsm303dlhc_magneto_read(lsm303dlhc_m_t magneto, float *data) {
     data[1] = (float)(buffer[5] | ((uint16_t)buffer[4]) << 8) / sensitivity_xy;
     data[2] = (float)(buffer[3] | ((uint16_t)buffer[2]) << 8) / sensitivity_z;
 }
-
-

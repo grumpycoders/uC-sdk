@@ -27,7 +27,7 @@ int main() {
     pin_t miso = { .port = GPIO_PORT_F, .pin = 8 };
     pin_t cs   = { .port = GPIO_PORT_C, .pin = 1 };
 
-    ssp_port_t ssp = { .ssp = ssp_port_5, .sclk = sclk, .mosi = mosi, .miso = miso };
+    ssp_port_t ssp = { .ssp = ssp_5, .sclk = sclk, .mosi = mosi, .miso = miso };
 
     if (!l3gd20_init_ssp(&l3gd20, ssp, cs))
     {

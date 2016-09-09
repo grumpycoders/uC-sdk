@@ -19,7 +19,7 @@ int main() {
     pin_t rw   = { .port = GPIO_PORT_F, .pin = 13 };
     pin_t e    = { .port = GPIO_PORT_C, .pin = 6 };
 
-    ssp_port_t ssp = { .ssp = ssp_port_3, .sclk = sclk, .mosi = mosi, .miso = miso};
+    ssp_port_t ssp = { .ssp = ssp_3, .sclk = sclk, .mosi = mosi, .miso = miso};
 
     if (!lcd_init(&lcd, ssp, cs, rs, rw, e))
     {

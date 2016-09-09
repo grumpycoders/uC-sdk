@@ -213,7 +213,7 @@ int main() {
     pin_t miso = { .port = GPIO_PORT_A, .pin = 8 };
     pin_t cs   = { .port = GPIO_PORT_A, .pin = 6 };
 
-    ssp_port_t ssp = { .ssp = ssp_port_1, .sclk = sclk, .mosi = mosi, .miso = miso };
+    ssp_port_t ssp = { .ssp = ssp_1, .sclk = sclk, .mosi = mosi, .miso = miso };
 
     if (sdcard_init(&sdcard, ssp, cs)) {
         printf("Successfully initialized sdcard - reading first sector\n");

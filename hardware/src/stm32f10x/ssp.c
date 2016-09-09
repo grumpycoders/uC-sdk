@@ -39,20 +39,20 @@ void ssp_config(ssp_port_t ssp_port, uint32_t clock)
     SPI_TypeDef * id = spis[ssp];
 
     switch (ssp) {
-    case ssp_port_1:
+    case ssp_1:
         RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1, ENABLE);
         break;
-    case ssp_port_2:
+    case ssp_2:
         RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI2, ENABLE);
         break;
-    case ssp_port_3:
+    case ssp_3:
         RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI3, ENABLE);
         break;
     default:
         return;
     }
 
-    if (ssp == ssp_port_3){
+    if (ssp == ssp_3){
         gpio_config_alternate(sclk, pin_dir_write, pull_down, 6);
         gpio_config_alternate(miso, pin_dir_write, pull_down, 6);
         gpio_config_alternate(mosi, pin_dir_write, pull_down, 6);
