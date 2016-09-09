@@ -10,10 +10,10 @@ float gyrovalues[3];
 
 void initGyro()
 {
-    pin_t sclk = make_pin(GPIO_PORT_B, 13);
-    pin_t mosi = make_pin(GPIO_PORT_B, 15);
-    pin_t miso = make_pin(GPIO_PORT_B, 14);
-    pin_t cs   = make_pin(GPIO_PORT_B, 12);
+    pin_t sclk = make_pin(gpio_port_b, 13);
+    pin_t mosi = make_pin(gpio_port_b, 15);
+    pin_t miso = make_pin(gpio_port_b, 14);
+    pin_t cs   = make_pin(gpio_port_b, 12);
     ssp_port_t gyroport = { .ssp = ssp_2, .sclk = sclk, .mosi = mosi, .miso = miso };
 
     if (!l3gd20_init_ssp(&gyro, gyroport, cs))

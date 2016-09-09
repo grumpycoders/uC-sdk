@@ -25,10 +25,10 @@
 #include <httpserver_raw/httpd.h>
 #include <lwip/dhcp.h>
 
-#define LED1_wire make_pin(GPIO_PORT_B, 18)
-#define LED2_wire make_pin(GPIO_PORT_B, 20)
-#define LED3_wire make_pin(GPIO_PORT_B, 21)
-#define LED4_wire make_pin(GPIO_PORT_B, 23)
+#define LED1_wire make_pin(gpio_port_b, 18)
+#define LED2_wire make_pin(gpio_port_b, 20)
+#define LED3_wire make_pin(gpio_port_b, 21)
+#define LED4_wire make_pin(gpio_port_b, 23)
 
 extern const char romfs[];
 
@@ -208,10 +208,10 @@ int main() {
     litLED(4, 0);
     sdcard_t sdcard;
 
-    pin_t sclk = { .port = GPIO_PORT_A, .pin = 7 };
-    pin_t mosi = { .port = GPIO_PORT_A, .pin = 9 };
-    pin_t miso = { .port = GPIO_PORT_A, .pin = 8 };
-    pin_t cs   = { .port = GPIO_PORT_A, .pin = 6 };
+    pin_t sclk = { .port = gpio_port_a, .pin = 7 };
+    pin_t mosi = { .port = gpio_port_a, .pin = 9 };
+    pin_t miso = { .port = gpio_port_a, .pin = 8 };
+    pin_t cs   = { .port = gpio_port_a, .pin = 6 };
 
     ssp_port_t ssp = { .ssp = ssp_1, .sclk = sclk, .mosi = mosi, .miso = miso };
 

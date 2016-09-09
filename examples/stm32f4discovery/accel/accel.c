@@ -8,10 +8,10 @@
 #include <semiio.h>
 #include <lis3dsh.h>
 
-#define led_w make_pin(GPIO_PORT_D, 12)
-#define led_n make_pin(GPIO_PORT_D, 13)
-#define led_e make_pin(GPIO_PORT_D, 14)
-#define led_s make_pin(GPIO_PORT_D, 15)
+#define led_w make_pin(gpio_port_d, 12)
+#define led_n make_pin(gpio_port_d, 13)
+#define led_e make_pin(gpio_port_d, 14)
+#define led_s make_pin(gpio_port_d, 15)
 
 int main() {
     init_malloc_wrapper();
@@ -21,10 +21,10 @@ int main() {
 
     lis3dsh_t lis3dsh;
 
-    pin_t sclk = { .port = GPIO_PORT_A, .pin = 5 };
-    pin_t mosi = { .port = GPIO_PORT_A, .pin = 7 };
-    pin_t miso = { .port = GPIO_PORT_A, .pin = 6 };
-    pin_t cs   = { .port = GPIO_PORT_E, .pin = 3 };
+    pin_t sclk = { .port = gpio_port_a, .pin = 5 };
+    pin_t mosi = { .port = gpio_port_a, .pin = 7 };
+    pin_t miso = { .port = gpio_port_a, .pin = 6 };
+    pin_t cs   = { .port = gpio_port_e, .pin = 3 };
 
     ssp_port_t ssp = { .ssp = ssp_1, .sclk = sclk, .mosi = mosi, .miso = miso };
 

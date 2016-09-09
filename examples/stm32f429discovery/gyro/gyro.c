@@ -7,8 +7,8 @@
 #include <semiio.h>
 #include <l3gd20.h>
 
-#define led_w make_pin(GPIO_PORT_G, 13)
-#define led_e make_pin(GPIO_PORT_G, 14)
+#define led_w make_pin(gpio_port_g, 13)
+#define led_e make_pin(gpio_port_g, 14)
 
 int main() {
     init_malloc_wrapper();
@@ -22,10 +22,10 @@ int main() {
 
     l3gd20_t l3gd20;
 
-    pin_t sclk = { .port = GPIO_PORT_F, .pin = 7 };
-    pin_t mosi = { .port = GPIO_PORT_F, .pin = 9 };
-    pin_t miso = { .port = GPIO_PORT_F, .pin = 8 };
-    pin_t cs   = { .port = GPIO_PORT_C, .pin = 1 };
+    pin_t sclk = { .port = gpio_port_f, .pin = 7 };
+    pin_t mosi = { .port = gpio_port_f, .pin = 9 };
+    pin_t miso = { .port = gpio_port_f, .pin = 8 };
+    pin_t cs   = { .port = gpio_port_c, .pin = 1 };
 
     ssp_port_t ssp = { .ssp = ssp_5, .sclk = sclk, .mosi = mosi, .miso = miso };
 

@@ -5,9 +5,9 @@
 int main() {
     //declare the pin structures for the sensor
     //We plug our first sensor on PA0
-    pin_t sensor1 = make_pin(GPIO_PORT_A, 0);
+    pin_t sensor1 = make_pin(gpio_port_a, 0);
     //and the second sensor on PA1
-    pin_t sensor2 = make_pin(GPIO_PORT_A, 1);
+    pin_t sensor2 = make_pin(gpio_port_a, 1);
 
     //configure the ADC
     //PA0 is connected to ADC 1, 2 or 3, channel 0

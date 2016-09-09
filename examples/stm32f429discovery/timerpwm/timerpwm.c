@@ -1,12 +1,10 @@
 #include <timer.h>
 
-#include <stm32f4xx_tim.h>
-
 int main() {
     //Initialize the pin_t structure with the pin port and number
     //Pin PB0 is connected to Timer 3 channel 3.
     //Plug an LED on this pin
-    pin_t pin = make_pin(GPIO_PORT_B, 0);
+    pin_t pin = make_pin(gpio_port_b, 0);
 
     //Initialize Timer 3, channel 3
     timer_port_t timer = { .timer = 3, .channel = 3 };

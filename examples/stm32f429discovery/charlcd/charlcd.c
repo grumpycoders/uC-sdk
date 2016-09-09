@@ -11,13 +11,13 @@ int main() {
 
     lcd_t lcd;
 
-    pin_t sclk = { .port = GPIO_PORT_C, .pin = 10 };
-    pin_t mosi = { .port = GPIO_PORT_C, .pin = 12 };
-    pin_t miso = { .port = GPIO_PORT_C, .pin = 11 };
-    pin_t cs   = { .port = GPIO_PORT_C, .pin = 8 };
-    pin_t rs   = { .port = GPIO_PORT_F, .pin = 12 };
-    pin_t rw   = { .port = GPIO_PORT_F, .pin = 13 };
-    pin_t e    = { .port = GPIO_PORT_C, .pin = 6 };
+    pin_t sclk = { .port = gpio_port_c, .pin = 10 };
+    pin_t mosi = { .port = gpio_port_c, .pin = 12 };
+    pin_t miso = { .port = gpio_port_c, .pin = 11 };
+    pin_t cs   = { .port = gpio_port_c, .pin = 8 };
+    pin_t rs   = { .port = gpio_port_f, .pin = 12 };
+    pin_t rw   = { .port = gpio_port_f, .pin = 13 };
+    pin_t e    = { .port = gpio_port_c, .pin = 6 };
 
     ssp_port_t ssp = { .ssp = ssp_3, .sclk = sclk, .mosi = mosi, .miso = miso};
 

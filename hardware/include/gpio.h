@@ -5,17 +5,18 @@
 
 BEGIN_DECL
 
-#define GPIO_PORT_A 0
-#define GPIO_PORT_B 1
-#define GPIO_PORT_C 2
-#define GPIO_PORT_D 3
-#define GPIO_PORT_E 4
-#define GPIO_PORT_F 5
-#define GPIO_PORT_G 6
-#define GPIO_PORT_H 7
-#define GPIO_PORT_I 8
-#define GPIO_PORT_J 9
-#define GPIO_PORT_K 10
+typedef enum {
+    gpio_port_a,
+    gpio_port_b,
+    gpio_port_c,
+    gpio_port_d,
+    gpio_port_e,
+    gpio_port_f,
+    gpio_port_g,
+    gpio_port_h,
+    gpio_port_i,
+    gpio_port_j,
+} gpio_port_t;
 
 typedef struct {
     uint8_t port;
@@ -36,7 +37,7 @@ typedef enum {
 } pull_t;
 
 //initialize a pin structure for use in functions below
-static __inline__ pin_t make_pin(uint8_t port, uint8_t pin) { pin_t p = { port, pin }; return p; }
+static __inline__ pin_t make_pin(gpio_port_t port, uint8_t pin) { pin_t p = { port, pin }; return p; }
 
 /*
     Initializes a GPIO
@@ -57,5 +58,10 @@ void gpio_set(pin_t pin, int enabled);
     Reads a value on a pin
 */
 uint8_t gpio_get(pin_t pin);
+
+
+void gpio_irq_init(pin_t pin, void (*cb)(), irq_trigger_t tt);
+void gpio_irq_deinit(pin_t pin);
+
 
 END_DECL

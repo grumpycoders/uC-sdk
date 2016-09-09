@@ -8,8 +8,8 @@
 #include <uart.h>
 
 void BoardConsoleInit() {
-    pin_t rx = make_pin(GPIO_PORT_A, 9);
-    pin_t tx = make_pin(GPIO_PORT_A, 10);
+    pin_t rx = make_pin(gpio_port_a, 9);
+    pin_t tx = make_pin(gpio_port_a, 10);
 
     uart_port_t uart = { .uart = uart_port_1, .rx = rx, .tx = tx };
 

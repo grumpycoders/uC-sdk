@@ -1,9 +1,9 @@
 #include <gpio.h>
 
-#define LED1_wire make_pin(GPIO_PORT_B, 18)
-#define LED2_wire make_pin(GPIO_PORT_B, 20)
-#define LED3_wire make_pin(GPIO_PORT_B, 21)
-#define LED4_wire make_pin(GPIO_PORT_B, 23)
+#define LED1_wire make_pin(gpio_port_b, 18)
+#define LED2_wire make_pin(gpio_port_b, 20)
+#define LED3_wire make_pin(gpio_port_b, 21)
+#define LED4_wire make_pin(gpio_port_b, 23)
 
 static void setupLEDs() {
     gpio_config(LED1_wire, pin_dir_write, pull_up);
