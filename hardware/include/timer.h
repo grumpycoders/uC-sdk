@@ -36,20 +36,20 @@ typedef enum {
 typedef struct {
     timer_t timer;
     uint8_t channel;
-} timer_port_t;
+} timer_channel_t;
 
-_Static_assert(sizeof(timer_port_t) <= 4, "timer_port_t isn't 32 bits-wide");
+_Static_assert(sizeof(timer_channel_t) <= 4, "timer_channel_t isn't 32 bits-wide");
 
 BEGIN_DECL
 
-void timer_config(timer_port_t timer_port, uint16_t prescale, uint32_t period);
+void timer_config(timer_t timer, uint16_t prescale, uint32_t period);
 
-uint32_t timer_get_clock_freq(timer_port_t timer_port);
+uint32_t timer_get_clock_freq(timer_t timer);
 
 //void timer_init(uint8_t timer, uint8_t channel, uint16_t prescale, uint32_t period);
-void timer_pwmchannel_init(timer_port_t timer_port, pin_t pin, uint32_t pulse);
+void timer_pwmchannel_init(timer_channel_t timer_port, pin_t pin, uint32_t pulse);
 
-void timer_irq_init(timer_port_t timer_port, irq_timer_event_t event, void (*cb)());
-void timer_irq_deinit(timer_port_t timer_port, irq_timer_event_t event);
+void timer_irq_init(timer_channel_t timer_port, irq_timer_event_t event, void (*cb)());
+void timer_irq_deinit(timer_t timer, irq_timer_event_t event);
 
 END_DECL

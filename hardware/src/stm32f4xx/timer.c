@@ -9,14 +9,12 @@
 
 static TIM_TypeDef *const timers[] = { (void *) 0, TIM1, TIM2, TIM3, TIM4, TIM5, TIM6, TIM7, TIM8, TIM9, TIM10, TIM11, TIM12, TIM13, TIM14 };
 
-void timer_config(timer_port_t timer_port, uint16_t prescale, uint32_t period)
+void timer_config(timer_t timer, uint16_t prescale, uint32_t period)
 {
-    timer_t timer = timer_port.timer;
-    uint8_t channel = timer_port.channel;
 
     TIM_TypeDef *id = timers[timer];
 
-    if (timer < timer_1 || timer > timer_14 || channel < 1 || channel > 4)
+    if (timer < timer_1 || timer > timer_14)
         return;
 
     //only TIM2 and TIM5 are 32 bits
@@ -83,10 +81,8 @@ void timer_config(timer_port_t timer_port, uint16_t prescale, uint32_t period)
     TIM_Cmd(id, ENABLE);
 }
 
-uint32_t timer_get_clock_freq(timer_port_t timer_port)
+uint32_t timer_get_clock_freq(timer_t timer)
 {
-    timer_t timer = timer_port.timer;
-
     RCC_ClocksTypeDef def;
     RCC_GetClocksFreq(&def);
 
@@ -95,7 +91,7 @@ uint32_t timer_get_clock_freq(timer_port_t timer_port)
     else
         return def.PCLK1_Frequency;
 }
-void timer_pwmchannel_init(timer_port_t timer_port, pin_t pin, uint32_t pulse)
+void timer_pwmchannel_init(timer_channel_t timer_port, pin_t pin, uint32_t pulse)
 {
     timer_t timer = timer_port.timer;
     uint8_t channel = timer_port.channel;
@@ -201,6 +197,26 @@ void TIM1_BRK_TIM9_IRQHandler() {
         call_timer_callback(timer_9, event_update);
         TIM_ClearITPendingBit(TIM9, TIM_IT_Update);
     }
+    else if (TIM_GetITStatus(TIM9, TIM_IT_Trigger) != RESET){
+        call_timer_callback(timer_9, event_trigger);
+        TIM_ClearITPendingBit(TIM9, TIM_IT_Trigger);
+    }
+    else if (TIM_GetITStatus(TIM9, TIM_IT_CC1) != RESET){
+        call_timer_callback(timer_9, event_output_capture);
+        TIM_ClearITPendingBit(TIM9, TIM_IT_CC1);
+    }
+    else if (TIM_GetITStatus(TIM9, TIM_IT_CC2) != RESET){
+        call_timer_callback(timer_9, event_output_capture);
+        TIM_ClearITPendingBit(TIM9, TIM_IT_CC2);
+    }
+    else if (TIM_GetITStatus(TIM9, TIM_IT_CC3) != RESET){
+        call_timer_callback(timer_9, event_output_capture);
+        TIM_ClearITPendingBit(TIM9, TIM_IT_CC3);
+    }
+    else if (TIM_GetITStatus(TIM9, TIM_IT_CC4) != RESET){
+        call_timer_callback(timer_9, event_output_capture);
+        TIM_ClearITPendingBit(TIM9, TIM_IT_CC4);
+    }
 }
 
 void TIM1_UP_TIM10_IRQHandler() {
@@ -211,6 +227,10 @@ void TIM1_UP_TIM10_IRQHandler() {
     else if (TIM_GetITStatus(TIM10, TIM_IT_Update) != RESET){
         call_timer_callback(timer_10, event_update);
         TIM_ClearITPendingBit(TIM10, TIM_IT_Update);
+    }
+    else if (TIM_GetITStatus(TIM10, TIM_IT_CC1) != RESET){
+        call_timer_callback(timer_10, event_output_capture);
+        TIM_ClearITPendingBit(TIM10, TIM_IT_CC1);
     }
 }
 
@@ -226,6 +246,10 @@ void TIM1_TRG_COM_TIM11_IRQHandler() {
     else if (TIM_GetITStatus(TIM11, TIM_IT_Update) != RESET){
         call_timer_callback(timer_11, event_update);
         TIM_ClearITPendingBit(TIM9, TIM_IT_Update);
+    }
+    else if (TIM_GetITStatus(TIM11, TIM_IT_CC1) != RESET){
+        call_timer_callback(timer_11, event_output_capture);
+        TIM_ClearITPendingBit(TIM11, TIM_IT_CC1);
     }
 }
 
@@ -253,12 +277,52 @@ void TIM2_IRQHandler() {
         call_timer_callback(timer_2, event_update);
         TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
     }
+    else if (TIM_GetITStatus(TIM2, TIM_IT_Trigger) != RESET){
+        call_timer_callback(timer_2, event_trigger);
+        TIM_ClearITPendingBit(TIM2, TIM_IT_Trigger);
+    }
+    else if (TIM_GetITStatus(TIM2, TIM_IT_CC1) != RESET){
+        call_timer_callback(timer_2, event_output_capture);
+        TIM_ClearITPendingBit(TIM2, TIM_IT_CC1);
+    }
+    else if (TIM_GetITStatus(TIM2, TIM_IT_CC2) != RESET){
+        call_timer_callback(timer_2, event_output_capture);
+        TIM_ClearITPendingBit(TIM2, TIM_IT_CC2);
+    }
+    else if (TIM_GetITStatus(TIM2, TIM_IT_CC3) != RESET){
+        call_timer_callback(timer_2, event_output_capture);
+        TIM_ClearITPendingBit(TIM2, TIM_IT_CC3);
+    }
+    else if (TIM_GetITStatus(TIM2, TIM_IT_CC4) != RESET){
+        call_timer_callback(timer_2, event_output_capture);
+        TIM_ClearITPendingBit(TIM2, TIM_IT_CC4);
+    }
 }
 
 void TIM3_IRQHandler() {
     if (TIM_GetITStatus(TIM3, TIM_IT_Update) != RESET){
         call_timer_callback(timer_3, event_update);
         TIM_ClearITPendingBit(TIM3, TIM_IT_Update);
+    }
+    else if (TIM_GetITStatus(TIM3, TIM_IT_Trigger) != RESET){
+        call_timer_callback(timer_3, event_trigger);
+        TIM_ClearITPendingBit(TIM3, TIM_IT_Trigger);
+    }
+    else if (TIM_GetITStatus(TIM3, TIM_IT_CC1) != RESET){
+        call_timer_callback(timer_3, event_output_capture);
+        TIM_ClearITPendingBit(TIM3, TIM_IT_CC1);
+    }
+    else if (TIM_GetITStatus(TIM3, TIM_IT_CC2) != RESET){
+        call_timer_callback(timer_3, event_output_capture);
+        TIM_ClearITPendingBit(TIM3, TIM_IT_CC2);
+    }
+    else if (TIM_GetITStatus(TIM3, TIM_IT_CC3) != RESET){
+        call_timer_callback(timer_3, event_output_capture);
+        TIM_ClearITPendingBit(TIM3, TIM_IT_CC3);
+    }
+    else if (TIM_GetITStatus(TIM3, TIM_IT_CC4) != RESET){
+        call_timer_callback(timer_3, event_output_capture);
+        TIM_ClearITPendingBit(TIM3, TIM_IT_CC4);
     }
 }
 
@@ -267,12 +331,52 @@ void TIM4_IRQHandler() {
         call_timer_callback(timer_4, event_update);
         TIM_ClearITPendingBit(TIM4, TIM_IT_Update);
     }
+    else if (TIM_GetITStatus(TIM4, TIM_IT_Trigger) != RESET){
+        call_timer_callback(timer_4, event_trigger);
+        TIM_ClearITPendingBit(TIM4, TIM_IT_Trigger);
+    }
+    else if (TIM_GetITStatus(TIM4, TIM_IT_CC1) != RESET){
+        call_timer_callback(timer_4, event_output_capture);
+        TIM_ClearITPendingBit(TIM4, TIM_IT_CC1);
+    }
+    else if (TIM_GetITStatus(TIM4, TIM_IT_CC2) != RESET){
+        call_timer_callback(timer_4, event_output_capture);
+        TIM_ClearITPendingBit(TIM4, TIM_IT_CC2);
+    }
+    else if (TIM_GetITStatus(TIM4, TIM_IT_CC3) != RESET){
+        call_timer_callback(timer_4, event_output_capture);
+        TIM_ClearITPendingBit(TIM4, TIM_IT_CC3);
+    }
+    else if (TIM_GetITStatus(TIM4, TIM_IT_CC4) != RESET){
+        call_timer_callback(timer_4, event_output_capture);
+        TIM_ClearITPendingBit(TIM4, TIM_IT_CC4);
+    }
 }
 
 void TIM5_IRQHandler() {
     if (TIM_GetITStatus(TIM5, TIM_IT_Update) != RESET){
         call_timer_callback(timer_5, event_update);
         TIM_ClearITPendingBit(TIM5, TIM_IT_Update);
+    }
+    else if (TIM_GetITStatus(TIM5, TIM_IT_Trigger) != RESET){
+        call_timer_callback(timer_5, event_trigger);
+        TIM_ClearITPendingBit(TIM5, TIM_IT_Trigger);
+    }
+    else if (TIM_GetITStatus(TIM5, TIM_IT_CC1) != RESET){
+        call_timer_callback(timer_5, event_output_capture);
+        TIM_ClearITPendingBit(TIM5, TIM_IT_CC1);
+    }
+    else if (TIM_GetITStatus(TIM5, TIM_IT_CC2) != RESET){
+        call_timer_callback(timer_5, event_output_capture);
+        TIM_ClearITPendingBit(TIM5, TIM_IT_CC2);
+    }
+    else if (TIM_GetITStatus(TIM5, TIM_IT_CC3) != RESET){
+        call_timer_callback(timer_5, event_output_capture);
+        TIM_ClearITPendingBit(TIM5, TIM_IT_CC3);
+    }
+    else if (TIM_GetITStatus(TIM5, TIM_IT_CC4) != RESET){
+        call_timer_callback(timer_5, event_output_capture);
+        TIM_ClearITPendingBit(TIM5, TIM_IT_CC4);
     }
 }
 
@@ -292,6 +396,18 @@ void TIM8_BRK_TIM12_IRQHandler() {
         call_timer_callback(timer_12, event_update);
         TIM_ClearITPendingBit(TIM12, TIM_IT_Update);
     }
+    else if (TIM_GetITStatus(TIM12, TIM_IT_Trigger) != RESET){
+        call_timer_callback(timer_12, event_trigger);
+        TIM_ClearITPendingBit(TIM12, TIM_IT_Trigger);
+    }
+    else if (TIM_GetITStatus(TIM12, TIM_IT_CC1) != RESET){
+        call_timer_callback(timer_12, event_output_capture);
+        TIM_ClearITPendingBit(TIM12, TIM_IT_CC1);
+    }
+    else if (TIM_GetITStatus(TIM12, TIM_IT_CC2) != RESET){
+        call_timer_callback(timer_12, event_output_capture);
+        TIM_ClearITPendingBit(TIM12, TIM_IT_CC2);
+    }
 }
 
 void TIM8_UP_TIM13_IRQHandler() {
@@ -302,6 +418,10 @@ void TIM8_UP_TIM13_IRQHandler() {
     else if (TIM_GetITStatus(TIM13, TIM_IT_Update) != RESET){
         call_timer_callback(timer_13, event_update);
         TIM_ClearITPendingBit(TIM13, TIM_IT_Update);
+    }
+    else if (TIM_GetITStatus(TIM13, TIM_IT_CC1) != RESET){
+        call_timer_callback(timer_13, event_output_capture);
+        TIM_ClearITPendingBit(TIM13, TIM_IT_CC1);
     }
 }
 
@@ -317,6 +437,10 @@ void TIM8_TRG_COM_TIM14_IRQHandler() {
     else if (TIM_GetITStatus(TIM14, TIM_IT_Update) != RESET){
         call_timer_callback(timer_14, event_update);
         TIM_ClearITPendingBit(TIM4, TIM_IT_Update);
+    }
+    else if (TIM_GetITStatus(TIM14, TIM_IT_CC1) != RESET){
+        call_timer_callback(timer_14, event_output_capture);
+        TIM_ClearITPendingBit(TIM14, TIM_IT_CC1);
     }
 }
 
@@ -339,7 +463,7 @@ void TIM8_CC_IRQHandler() {
     }
 }
 
-void timer_irq_init(timer_port_t timer_port, irq_timer_event_t event, void (*cb)()){
+void timer_irq_init(timer_channel_t timer_port, irq_timer_event_t event, void (*cb)()){
     timer_t timer = timer_port.timer;
     uint8_t channel = timer_port.channel;
 
@@ -350,18 +474,21 @@ void timer_irq_init(timer_port_t timer_port, irq_timer_event_t event, void (*cb)
 
     switch(event){
         case event_update:
+            TIM_ClearITPendingBit(id, TIM_IT_Update);
             TIM_ITConfig(id, TIM_IT_Update, ENABLE);
         break;
         case event_commutation:
             if (timer != timer_1 && timer != timer_8)
                 return;
+            TIM_ClearITPendingBit(id, TIM_IT_COM);
             TIM_ITConfig(id, TIM_IT_COM, ENABLE);
             break;
         case event_trigger:
-            if (timer == timer_6 || timer != timer_7 ||
-                timer == timer_10 || timer != timer_11 ||
-                timer == timer_13 || timer != timer_14)
+            if (timer == timer_6 || timer == timer_7 ||
+                timer == timer_10 || timer == timer_11 ||
+                timer == timer_13 || timer == timer_14)
                 return;
+            TIM_ClearITPendingBit(id, TIM_IT_Trigger);
             TIM_ITConfig(id, TIM_IT_Trigger, ENABLE);
             break;
         case event_break:
@@ -372,25 +499,29 @@ void timer_irq_init(timer_port_t timer_port, irq_timer_event_t event, void (*cb)
         case event_output_capture:
             switch(channel){
                 case 1:
-                    if (timer == timer_6 || timer != timer_7)
+                    if (timer == timer_6 || timer == timer_7)
                         return;
+                    TIM_ClearITPendingBit(id, TIM_IT_CC1);
                     TIM_ITConfig(id, TIM_IT_CC1, ENABLE);
                     break;
                 case  2:
-                    if (timer == timer_6 || timer != timer_7 ||
-                        timer == timer_10 || timer != timer_11 ||
-                        timer == timer_13 || timer != timer_14)
+                    if (timer == timer_6 || timer == timer_7 ||
+                        timer == timer_10 || timer == timer_11 ||
+                        timer == timer_13 || timer == timer_14)
                         return;
+                    TIM_ClearITPendingBit(id, TIM_IT_CC2);
                     TIM_ITConfig(id, TIM_IT_CC2, ENABLE);
                     break;
                 case 3:
                     if (timer > timer_5 && timer != timer_8)
                         return;
+                    TIM_ClearITPendingBit(id, TIM_IT_CC3);
                     TIM_ITConfig(id, TIM_IT_CC3, ENABLE);
                     break;
                 case 4:
                     if (timer > timer_5 && timer != timer_8)
                         return;
+                    TIM_ClearITPendingBit(id, TIM_IT_CC4);
                     TIM_ITConfig(id, TIM_IT_CC4, ENABLE);
                     break;
             }
@@ -406,9 +537,7 @@ void timer_irq_init(timer_port_t timer_port, irq_timer_event_t event, void (*cb)
     set_timer_callback(timer, event, cb);
 }
 
-void timer_irq_deinit(timer_port_t timer_port, irq_timer_event_t event){
-    timer_t timer = timer_port.timer;
-
+void timer_irq_deinit(timer_t timer, irq_timer_event_t event){
     NVIC_InitTypeDef nvic;
     nvic.NVIC_IRQChannel = irq_timer_channels[(timer - 1) * 5 + event];
     nvic.NVIC_IRQChannelCmd = DISABLE;

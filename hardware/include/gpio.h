@@ -66,8 +66,14 @@ void gpio_set(pin_t pin, int enabled);
 */
 uint8_t gpio_get(pin_t pin);
 
-
+/*
+    Use a callback on events from a GPIO pin
+*/
 void gpio_irq_init(pin_t pin, void (*cb)(), irq_trigger_t tt);
+
+/*
+    Disables a callback
+*/
 void gpio_irq_deinit(pin_t pin);
 
 
