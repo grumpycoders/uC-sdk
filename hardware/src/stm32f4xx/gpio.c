@@ -207,6 +207,8 @@ void gpio_irq_init(pin_t pin, void (*cb)(), irq_trigger_t tt)
     nvic.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&nvic);
 
+    EXTI_ClearITPendingBit(1 << pin.pin);
+
     exti_irq_callback[pin.pin] = cb;
 }
 
