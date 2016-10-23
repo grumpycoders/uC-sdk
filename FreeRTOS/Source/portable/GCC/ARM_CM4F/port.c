@@ -481,7 +481,6 @@ void xPortPendSVHandler( void )
 }
 /*-----------------------------------------------------------*/
 
-#if 0
 void xPortSysTickHandler( void )
 {
 	/* The SysTick runs at the lowest interrupt priority, so when this interrupt
@@ -500,7 +499,7 @@ void xPortSysTickHandler( void )
 	}
 	portCLEAR_INTERRUPT_MASK_FROM_ISR( 0 );
 }
-#endif
+
 /*-----------------------------------------------------------*/
 
 #if configUSE_TICKLESS_IDLE == 1

@@ -91,14 +91,12 @@ __attribute__((constructor)) static void irq_init() {
         exti_irq_callback[i] = NULL;
 }
 
-#if 0
 void EXTI0_IRQHandler() {
     if (EXTI_GetITStatus(EXTI_Line0) != RESET) {
         call_exti_callback(0);
         EXTI_ClearITPendingBit(EXTI_Line0);
     }
 }
-#endif
 
 void EXTI1_IRQHandler() {
     if (EXTI_GetITStatus(EXTI_Line1) != RESET) {
