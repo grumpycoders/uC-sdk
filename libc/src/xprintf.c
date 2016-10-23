@@ -262,8 +262,8 @@ int vxprintf(func,arg,format,ap)
       register int amt;
       bufpt = (char *)fmt;
       amt = 1;
-      while( (c=(*++fmt))!='%' && c!=0 ) amt++;
       #if 0
+      while( (c=(*++fmt))!='%' && c!=0 ) amt++;
       (*func)(bufpt,amt,arg);
       count += amt;
       if( c==0 ) break;
