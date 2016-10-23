@@ -43,13 +43,13 @@ void BoardConsolePrintf(const char * fmt, ...) {
     va_end(ap);
 }
 
-//static void xprintfCallback(const char * str, int strsize, void * opaque0) {
+static void xprintfCallback(const char * str, int strsize, void * opaque0) {
 //    taskENTER_CRITICAL();
-//    while (strsize--)
-//        BoardConsolePutc(*str++);
+    while (strsize--)
+        BoardConsolePutc(*str++);
 //    taskEXIT_CRITICAL();
-//}
+}
 
 void BoardConsoleVPrintf(const char * fmt, va_list ap) {
-//    vxprintf(xprintfCallback, NULL, fmt, ap);
+    vxprintf(xprintfCallback, NULL, fmt, ap);
 }
