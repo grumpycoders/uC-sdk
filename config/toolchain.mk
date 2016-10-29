@@ -45,7 +45,7 @@ endif
 
 TARGET_CPPFLAGS += -ffunction-sections -fdata-sections -fno-builtin-malloc -fno-builtin-realloc -fno-builtin-free
 
-TARGET_CXXFLAGS += -fno-exceptions
+TARGET_CXXFLAGS += -fno-exceptions -fno-rtti
 
 TARGET_CC = $(TOOLCHAIN)-gcc
 TARGET_CXX = $(TOOLCHAIN)-g++
