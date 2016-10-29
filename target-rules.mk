@@ -4,11 +4,11 @@
 
 %.o: %.cc
 	$(E) "[TCXX]   Compiling $<"
-	$(Q)$(TARGET_CXX) -ffunction-sections -Wall -Werror $(addprefix -I, $(TARGET_INCLUDES)) $(TARGET_CFLAGS) $(TARGET_CPPFLAGS) -g -c -o $@ $<
+	$(Q)$(TARGET_CXX) -ffunction-sections -Wall -Werror $(addprefix -I, $(TARGET_INCLUDES)) $(TARGET_CXXFLAGS) $(TARGET_CPPFLAGS) -g -c -o $@ $<
 
 %.o: %.cpp
 	$(E) "[TCXX]   Compiling $<"
-	$(Q)$(TARGET_CXX) -ffunction-sections -Wall -Werror $(addprefix -I, $(TARGET_INCLUDES)) $(TARGET_CFLAGS) $(TARGET_CPPFLAGS) -g -c -o $@ $<
+	$(Q)$(TARGET_CXX) -ffunction-sections -Wall -Werror $(addprefix -I, $(TARGET_INCLUDES)) $(TARGET_CXXFLAGS) $(TARGET_CPPFLAGS) -g -c -o $@ $<
 
 %.o: %.s
 	$(E) "[TS]     Compiling $<"
@@ -18,10 +18,10 @@
 	$(Q)$(TARGET_CC) -ffunction-sections -Wall -Werror $(addprefix -I, $(TARGET_INCLUDES)) $(TARGET_CFLAGS) $(TARGET_CPPFLAGS) -g -M -MT $(addsuffix .o, $(basename $@)) -MF $@ $<
 
 %.dep: %.cc
-	$(Q)$(TARGET_CXX) -ffunction-sections -Wall -Werror $(addprefix -I, $(TARGET_INCLUDES)) $(TARGET_CFLAGS) $(TARGET_CPPFLAGS) -g -M -MT $(addsuffix .o, $(basename $@)) -MF $@ $<
+	$(Q)$(TARGET_CXX) -ffunction-sections -Wall -Werror $(addprefix -I, $(TARGET_INCLUDES)) $(TARGET_CXXFLAGS) $(TARGET_CPPFLAGS) -g -M -MT $(addsuffix .o, $(basename $@)) -MF $@ $<
 
 %.dep: %.cpp
-	$(Q)$(TARGET_CXX) -ffunction-sections -Wall -Werror $(addprefix -I, $(TARGET_INCLUDES)) $(TARGET_CFLAGS) $(TARGET_CPPFLAGS) -g -M -MT $(addsuffix .o, $(basename $@)) -MF $@ $<
+	$(Q)$(TARGET_CXX) -ffunction-sections -Wall -Werror $(addprefix -I, $(TARGET_INCLUDES)) $(TARGET_CXXFLAGS) $(TARGET_CPPFLAGS) -g -M -MT $(addsuffix .o, $(basename $@)) -MF $@ $<
 
 %.dep: %.s
 	$(Q)touch $@
