@@ -262,14 +262,11 @@ int vxprintf(func,arg,format,ap)
       register int amt;
       bufpt = (char *)fmt;
       amt = 1;
-      #if 0
       while( (c=(*++fmt))!='%' && c!=0 ) amt++;
       (*func)(bufpt,amt,arg);
       count += amt;
       if( c==0 ) break;
-      #endif
     }
-  #if 0
     if( (c=(*++fmt))==0 ){
       errorflag = 1;
       (*func)("%",1,arg);
@@ -667,7 +664,6 @@ int vxprintf(func,arg,format,ap)
         if( nspace>0 ) (*func)(spaces,nspace,arg);
       }
     }
-  #endif
   }/* End for loop over the format string */
   return errorflag ? -1 : count;
 } /* End of function */
