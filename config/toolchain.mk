@@ -30,7 +30,7 @@ endif
 ifeq ($(CPU),stm32f429)
 TARGET_CPPFLAGS += -DSTM32F429_439xx
 endif
-TARGET_CPPFLAGS += -mapcs-frame -mno-sched-prolog -fno-hosted -ffunction-sections -fdata-sections -fshort-wchar -D__LITTLE_ENDIAN
+TARGET_CPPFLAGS += -mapcs-frame -mno-sched-prolog -fshort-wchar -D__LITTLE_ENDIAN
 TARGET_LDFLAGS += -Wl,--no-wchar-size-warning
 endif
 
@@ -40,8 +40,12 @@ TARGET_FORMAT = elf32-littlemips
 ifeq ($(CPU_SUBFAMILY),mips4)
 TARGET_CPPFLAGS += 
 endif
-TARGET_CPPFLAGS += -msoft-float -fno-hosted -ffunction-sections -fdata-sections -fshort-wchar -D__LITTLE_ENDIAN
+TARGET_CPPFLAGS += -msoft-float -fno-hosted -fshort-wchar -D__LITTLE_ENDIAN
 endif
+
+TARGET_CPPFLAGS += -ffunction-sections -fdata-sections -fno-builtin-malloc -fno-builtin-realloc -fno-builtin-free
+
+TARGET_CXXFLAGS += -fno-exceptions -fno-rtti
 
 TARGET_CC = $(TOOLCHAIN)-gcc
 TARGET_CXX = $(TOOLCHAIN)-g++

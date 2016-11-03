@@ -107,7 +107,7 @@ static __inline__ char * strncpy(char * s1, const char * s2, size_t n) {
     return r;
 }
 
-static __inline__ char * strchr(const char * s, char c) {
+static __inline__ char * strchr(const char * s, int c) {
     while (*s) {
         if (*s == c)
             return (char *) s;
@@ -117,7 +117,7 @@ static __inline__ char * strchr(const char * s, char c) {
     return NULL;
 }
 
-static __inline__ char * strrchr(const char * s, char c) {
+static __inline__ char * strrchr(const char * s, int c) {
     const char * r = NULL;
     
     while (*s) {
