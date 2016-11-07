@@ -2,9 +2,9 @@
 
 #include <hardware.h>
 
-#include <stm32f4xx_gpio.h>
-#include <stm32f4xx_rcc.h>
 #include <stm32f4xx_i2c.h>
+
+#include <gpio.h>
 
 static I2C_TypeDef * const i2cs[] = { (void *) 0, I2C1, I2C2, I2C3 };
 
@@ -15,46 +15,11 @@ void i2c_config(i2c_port_t i2c_port, uint32_t speed)
     pin_t sda = i2c_port.sda;
 
     I2C_TypeDef *id = i2cs[i2c];
-    uint8_t af;
 
-    switch (i2c) {
-    case i2c_1:
-        af = GPIO_AF_I2C1;
-        RCC_APB1PeriphClockCmd(RCC_APB1Periph_I2C1, ENABLE);
-        break;
-    case i2c_2:
-        af = GPIO_AF_I2C2;
-        RCC_APB1PeriphClockCmd(RCC_APB1Periph_I2C2, ENABLE);
-        break;
-    case i2c_3:
-        af = GPIO_AF_I2C3;
-        RCC_APB1PeriphClockCmd(RCC_APB1Periph_I2C3, ENABLE);
-        break;
-    default:
-        return;
-    }
+    RCC->APB1ENR |= RCC_APB1Periph_I2C1 << (i2c - 1);
 
-    uint32_t port_flags = 0;
-    port_flags |= 1 << scl.port;
-    port_flags |= 1 << sda.port;
-    RCC_AHB1PeriphClockCmd(port_flags, ENABLE);
-
-
-    GPIO_InitTypeDef GPIO_InitStructure;
-
-    GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_AF;
-    GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;
-    GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_DOWN;
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-
-    GPIO_InitStructure.GPIO_Pin   = 1 << scl.pin;
-    GPIO_PinAFConfig(stm32f4xx_gpio_ports[scl.port], scl.pin, af);
-    GPIO_Init(stm32f4xx_gpio_ports[scl.port], &GPIO_InitStructure);
-
-    GPIO_InitStructure.GPIO_Pin   = 1 << sda.pin;
-    GPIO_PinAFConfig(stm32f4xx_gpio_ports[sda.port], sda.pin, af);
-    GPIO_Init(stm32f4xx_gpio_ports[sda.port], &GPIO_InitStructure);
-
+    gpio_config_alternate(sda, pin_dir_read, pull_down, 4);
+    gpio_config_alternate(scl, pin_dir_read, pull_down, 4);
 
     //Init I2C
     I2C_InitTypeDef i2cdef;
@@ -112,11 +77,11 @@ void i2c_read_polling(i2c_t i2c, uint8_t *value, uint8_t nb)
     while (nb--){
         if (nb == 0)
             I2C_AcknowledgeConfig(id, DISABLE);
-      
+
         while (!I2C_CheckEvent(id, I2C_EVENT_MASTER_BYTE_RECEIVED));
         *value++ = I2C_ReceiveData(id);
     }
-    
+
     I2C_AcknowledgeConfig(id, ENABLE);
 }
 

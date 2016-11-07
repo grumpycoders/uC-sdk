@@ -391,11 +391,17 @@
 #define PLL_R      7
 #endif /* STM32F446xx */ 
 
-#if defined(STM32F40_41xxx) || defined(STM32F427_437xx) || defined(STM32F429_439xx) || defined(STM32F446xx)
+#if defined(STM32F40_41xxx)
+#define PLL_N      336
+/* SYSCLK = PLL_VCO / PLL_P */
+#define PLL_P      2
+#endif /* STM32F40_41xxx */
+
+#if defined(STM32F427_437xx) || defined(STM32F429_439xx) || defined(STM32F446xx)
 #define PLL_N      360
 /* SYSCLK = PLL_VCO / PLL_P */
 #define PLL_P      2
-#endif /* STM32F40_41xxx || STM32F427_437x || STM32F429_439xx || STM32F446xx */
+#endif /*  STM32F427_437x || STM32F429_439xx || STM32F446xx */
 
 #if defined(STM32F401xx)
 #define PLL_N      336
