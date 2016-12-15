@@ -52,6 +52,11 @@ static __inline__ pin_t make_pin(gpio_port_t port, uint8_t pin) { pin_t p = { po
 void gpio_config(pin_t pin, pin_dir_t dir, pull_t pull);
 
 /*
+    Initializes a GPIO for analog use
+*/
+void gpio_config_analog(pin_t pin, pin_dir_t dir, pull_t pull);
+
+/*
     Initializes a GPIO for an alternate function
 */
 void gpio_config_alternate(pin_t pin, pin_dir_t dir, pull_t pull, uint8_t af);

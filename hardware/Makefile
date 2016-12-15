@@ -27,6 +27,7 @@ endif
 ifeq ($(CPU_SUBFAMILY),CM4F)
 ifeq ($(CPU_FLAVOR),stm32f4xx)
 TARGET_SRCS += src/stm32f4xx/adc.c
+TARGET_SRCS += src/stm32f4xx/dac.c
 TARGET_SRCS += src/stm32f4xx/gpio.c
 TARGET_SRCS += src/stm32f4xx/i2c.c
 TARGET_SRCS += src/stm32f4xx/ssp.c

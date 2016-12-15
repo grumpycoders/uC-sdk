@@ -1,9 +1,9 @@
+#include "adc.h"
+
 #include <stm32f4xx.h>
 #include <stm32f4xx_adc.h>
 
 #include <hardware.h>
-
-#include <adc.h>
 
 static ADC_TypeDef *adclist[] = {ADC1, ADC2, ADC3};
 
@@ -17,27 +17,20 @@ void adc_config_all()
 {
     ADC_CommonInitTypeDef commondef;
     commondef.ADC_Mode = ADC_Mode_Independent;				//Each ADC is independent of others
-    commondef.ADC_Prescaler = ADC_Prescaler_Div2;			//smallest prescale
+    commondef.ADC_Prescaler = ADC_Prescaler_Div8;
     commondef.ADC_DMAAccessMode = ADC_DMAAccessMode_Disabled;		//NO DMA, ADC_DMAAccessMode_1 if we want a sequence of 16b values
     commondef.ADC_TwoSamplingDelay = ADC_TwoSamplingDelay_5Cycles;	//smallest delay
     ADC_CommonInit(&commondef);
 }
 
-void adc_config_single(uint8_t adc, uint8_t channel, pin_t pin)
+void adc_config_single(adc_t adc, uint8_t channel, pin_t pin)
 {
-    if (adc < 1 || adc > 3 || channel > 18)
+    if (adc < adc_1 || adc > adc_3 || channel > 18)
         return;
 
-    RCC_AHB1PeriphClockCmd(1 << pin.port, ENABLE);
+    gpio_config_analog(pin, pin_dir_read, pull_none);
 
-    GPIO_InitTypeDef gpiodef;
-    GPIO_StructInit(&gpiodef);
-    gpiodef.GPIO_Pin = 1 << pin.pin;
-    gpiodef.GPIO_Mode = GPIO_Mode_AN;
-    gpiodef.GPIO_PuPd = GPIO_PuPd_NOPULL;
-    GPIO_Init(stm32f4xx_gpio_ports[pin.port], &gpiodef);
-
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1 << (adc - 1),ENABLE);
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1 << (adc - 1), ENABLE);
 
     ADC_InitTypeDef def;
     ADC_StructInit(&def);
@@ -55,9 +48,9 @@ void adc_config_single(uint8_t adc, uint8_t channel, pin_t pin)
     ADC_Cmd(adclist[adc - 1],ENABLE);
 }
 
-void adc_config_continuous(uint8_t adc, uint8_t *channel, pin_t *pin, uint16_t *dest, uint8_t nb)
+void adc_config_continuous(adc_t adc, uint8_t *channel, pin_t *pin, uint16_t *dest, uint8_t nb)
 {
-    if (adc < 1 || adc > 3)
+    if (adc < adc_1 || adc > adc_3)
         return;
     int i;
     for (i = 0 ; i < nb ; i++)
@@ -65,16 +58,7 @@ void adc_config_continuous(uint8_t adc, uint8_t *channel, pin_t *pin, uint16_t *
             return;
 
     for (i = 0 ; i < nb ; i++)
-    {
-        RCC_AHB1PeriphClockCmd(1 << pin[i].port, ENABLE);
-
-        GPIO_InitTypeDef gpiodef;
-        GPIO_StructInit(&gpiodef);
-        gpiodef.GPIO_Pin = 1 << pin[i].pin;
-        gpiodef.GPIO_Mode = GPIO_Mode_AN;
-        gpiodef.GPIO_PuPd = GPIO_PuPd_NOPULL;
-        GPIO_Init(stm32f4xx_gpio_ports[pin[i].port], &gpiodef);
-    }
+        gpio_config_analog(pin[i], pin_dir_read, pull_none);
 
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_DMA2,ENABLE);
 
@@ -108,7 +92,7 @@ void adc_config_continuous(uint8_t adc, uint8_t *channel, pin_t *pin, uint16_t *
     DMA_Init(dmastreams[adc - 1], &dmadef);
     DMA_Cmd(dmastreams[adc - 1], ENABLE);
 
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1 << (adc - 1),ENABLE);
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1 << (adc - 1), ENABLE);
 
     ADC_CommonInitTypeDef commondef;
     commondef.ADC_Mode = ADC_Mode_Independent;
@@ -140,9 +124,9 @@ void adc_config_continuous(uint8_t adc, uint8_t *channel, pin_t *pin, uint16_t *
     ADC_SoftwareStartConv(adclist[adc - 1]);
 }
 
-uint16_t adc_get(uint8_t adc)
+uint16_t adc_get(adc_t adc)
 {
-    if (adc < 1 || adc > 3)
+    if (adc < adc_1 || adc > adc_3)
         return 0;
 
     ADC_SoftwareStartConv(adclist[adc - 1]);
