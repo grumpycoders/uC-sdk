@@ -4,6 +4,7 @@
 *.elf
 *.a
 *.map
+*.swp
 tools/cm3-checksum/cm3-checksum
 tools/romfs/mkromfs
 *~

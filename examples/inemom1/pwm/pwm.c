@@ -7,9 +7,9 @@ int main() {
     pin_t pin = make_pin(gpio_port_a, 1);
 
     //Initialize Timer 3, channel 3
-    timer_port_t timer = { .timer = 2, .channel = 2 };
+    timer_channel_t timer = { .timer = 2, .channel = 2 };
 
-    timer_config(timer, 4096, 1000);
+    timer_config(timer_2, 4096, 1000);
 
     timer_pwmchannel_init(timer, pin, 500);
 

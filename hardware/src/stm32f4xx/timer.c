@@ -11,7 +11,6 @@ static TIM_TypeDef *const timers[] = { (void *) 0, TIM1, TIM2, TIM3, TIM4, TIM5,
 
 void timer_config(timer_t timer, uint16_t prescale, uint32_t period)
 {
-
     TIM_TypeDef *id = timers[timer];
 
     if (timer < timer_1 || timer > timer_14)
@@ -81,6 +80,16 @@ void timer_config(timer_t timer, uint16_t prescale, uint32_t period)
     TIM_Cmd(id, ENABLE);
 }
 
+uint32_t timer_get_count(timer_t timer)
+{
+    return TIM_GetCounter(timers[timer]);
+}
+
+void timer_set_count(timer_t timer, uint32_t value)
+{
+    TIM_SetCounter(timers[timer], value);
+}
+
 uint32_t timer_get_clock_freq(timer_t timer)
 {
     RCC_ClocksTypeDef def;
@@ -91,6 +100,7 @@ uint32_t timer_get_clock_freq(timer_t timer)
     else
         return def.PCLK1_Frequency;
 }
+
 void timer_pwmchannel_init(timer_channel_t timer_port, pin_t pin, uint32_t pulse)
 {
     timer_t timer = timer_port.timer;
