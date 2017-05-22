@@ -40,7 +40,11 @@ typedef struct {
     uint8_t channel;
 } timer_channel_t;
 
+#ifdef __cplusplus
+static_assert(sizeof(timer_channel_t) <= 4, "timer_channel_t isn't 32 bits-wide");
+#else
 _Static_assert(sizeof(timer_channel_t) <= 4, "timer_channel_t isn't 32 bits-wide");
+#endif
 
 BEGIN_DECL
 

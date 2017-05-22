@@ -20,11 +20,11 @@ extern free_t free;
 extern realloc_t realloc;
 
 static __inline__ void * calloc(size_t nmemb, size_t size) {
-    uint8_t * r = malloc(nmemb * size);
+    uint8_t * r = (uint8_t *)malloc(nmemb * size);
     size_t i;
     for (i = 0; i < (size * nmemb); i++)
         r[i] = 0;
-    return r;
+    return (void *)r;
 }
 
 END_DECL

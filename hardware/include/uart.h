@@ -26,8 +26,12 @@ typedef struct {
     uart_t uart;
 } uart_port_t;
 
+#ifdef __cplusplus
+static_assert(sizeof(uart_port_t) <= 6, "uart_port_t isn't 48 bits-wide");
+#else
 //_Static_assert(sizeof(uart_port_t) <= 10, "uart_port_t isn't 80 bits-wide");
 _Static_assert(sizeof(uart_port_t) <= 6, "uart_port_t isn't 48 bits-wide");
+#endif
 
 BEGIN_DECL
 

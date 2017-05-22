@@ -23,7 +23,11 @@ typedef struct {
     ssp_t ssp;
 } ssp_port_t;
 
+#ifdef __cplusplus
+static_assert(sizeof(ssp_port_t) <= 8, "ssp_port_t isn't 64 bits-wide");
+#else
 _Static_assert(sizeof(ssp_port_t) <= 8, "ssp_port_t isn't 64 bits-wide");
+#endif
 
 BEGIN_DECL
 
