@@ -80,6 +80,16 @@ void timer_config(timer_t timer, uint16_t prescale, uint32_t period)
     TIM_Cmd(id, ENABLE);
 }
 
+void timer_enable(timer_t timer)
+{
+    TIM_Cmd(timers[timer], ENABLE);
+}
+
+void timer_disable(timer_t timer)
+{
+    TIM_Cmd(timers[timer], DISABLE);
+}
+
 uint32_t timer_get_count(timer_t timer)
 {
     return TIM_GetCounter(timers[timer]);

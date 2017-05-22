@@ -50,6 +50,9 @@ BEGIN_DECL
 
 void timer_config(timer_t timer, uint16_t prescale, uint32_t period);
 
+void timer_enable(timer_t timer);
+void timer_disable(timer_t timer);
+
 uint32_t timer_get_count(timer_t timer);
 void timer_set_count(timer_t timer, uint32_t value);
 
