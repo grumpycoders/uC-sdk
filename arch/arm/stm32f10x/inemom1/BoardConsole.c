@@ -7,8 +7,6 @@
 
 #include <uart.h>
 
-static USART_TypeDef * const uarts[] = { (void *) 0, USART1, USART2, USART3, UART4, UART5 };
-
 void BoardConsoleInit() {
     pin_t rx = make_pin(gpio_port_a, 9);
     pin_t tx = make_pin(gpio_port_a, 10);
