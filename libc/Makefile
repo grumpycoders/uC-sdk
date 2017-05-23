@@ -13,6 +13,7 @@ TARGET_CPPFLAGS += -DNOFLOATINGPOINT
 endif
 
 TARGET_SRCS = \
+src/cxx-glue.c \
 src/unistd.c \
 src/stdio.c \
 src/errno.c \

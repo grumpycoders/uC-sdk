@@ -199,13 +199,6 @@ void base_free(void * ptr) {
     cur->prev->next = cur->next;
 }
 
-__attribute__((weak)) void * __builtin_new(size_t size) { return malloc(size); }
-__attribute__((weak)) void __builtin_delete(void * ptr) { free(ptr); }
-__attribute__((weak)) void * _Znwj(unsigned int size) { return malloc(size); }
-__attribute__((weak)) void * _Znaj(unsigned int size) { return malloc(size); }
-__attribute__((weak)) void _ZdlPv(void * ptr) { free(ptr); }
-__attribute__((weak)) void _ZdaPv(void * ptr) { free(ptr); }
-
 malloc_t malloc = base_malloc;
 free_t free = base_free;
 realloc_t realloc = base_realloc;
