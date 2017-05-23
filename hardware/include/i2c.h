@@ -19,12 +19,7 @@ typedef struct {
     i2c_t i2c;
 } i2c_port_t;
 
-
-#ifdef __cplusplus
-static_assert(sizeof(i2c_port_t) <= 6, "i2c_port_t isn't 48 bits-wide");
-#else
-_Static_assert(sizeof(i2c_port_t) <= 6, "i2c_port_t isn't 48 bits-wide");
-#endif
+ucsdk_static_assert(sizeof(i2c_port_t) <= 6, "i2c_port_t isn't 48 bits-wide");
 
 BEGIN_DECL
 

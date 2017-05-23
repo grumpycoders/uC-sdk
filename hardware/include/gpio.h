@@ -30,11 +30,7 @@ typedef struct {
     uint8_t pin;
 } pin_t;
 
-#ifdef __cplusplus
-static_assert(sizeof(pin_t) == 2, "pin_t isn't 16 bits-wide");
-#else
-_Static_assert(sizeof(pin_t) == 2, "pin_t isn't 16 bits-wide");
-#endif
+ucsdk_static_assert(sizeof(pin_t) == 2, "pin_t isn't 16 bits-wide");
 
 typedef enum {
     pin_dir_read = 0,
