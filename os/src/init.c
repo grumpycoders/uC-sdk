@@ -25,7 +25,7 @@ void _exit(int return_code) {
     while(1);
 }
 
-void _start() {
+void _ucsdk_start() {
     BoardEarlyInit();
     cpu_early_init();
 

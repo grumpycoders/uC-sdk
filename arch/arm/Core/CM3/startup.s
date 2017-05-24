@@ -196,7 +196,7 @@ __cs3_reset_cortex_m:
     LDR     R2, =__bss_ram_len
     BL      startup_memset
     
-    B       _start
+    B       _ucsdk_start
     .pool
     .cantunwind
     .fnend

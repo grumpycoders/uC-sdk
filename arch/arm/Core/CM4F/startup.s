@@ -251,7 +251,7 @@ __cs3_reset_cortex_m:
     DSB
     ISB
 
-    B       _start
+    B       _ucsdk_start
     .pool
     .cantunwind
     .fnend
