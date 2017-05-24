@@ -3,12 +3,10 @@ TARGET_INCLUDES += $(ROOTDIR)/arch/arm/include
 
 ifeq ($(CPU_SUBFAMILY),CM3)
 TARGET_INCLUDES += $(ROOTDIR)/arch/arm/Core/CM3/CoreSupport
-SPECS = $(ROOTDIR)/arch/arm/src/specs
 endif
 
 ifeq ($(CPU_SUBFAMILY),CM4F)
 TARGET_INCLUDES += $(ROOTDIR)/arch/arm/Core/CM4F/CoreSupport
-SPECS = $(ROOTDIR)/arch/arm/src/specs
 endif
 
 ifeq ($(CPU_FLAVOR),lpc17xx)
