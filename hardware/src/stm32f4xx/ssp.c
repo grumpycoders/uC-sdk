@@ -31,9 +31,11 @@ static __inline__ uint16_t compute_prescaler(uint32_t clock) {
 
 void ssp_config(ssp_port_t ssp_port, uint32_t clock) {
     ssp_t ssp = ssp_port.ssp;
+    ssp_mode_t mode = ssp_port.mode;
     pin_t sclk = ssp_port.sclk;
     pin_t miso = ssp_port.miso;
     pin_t mosi = ssp_port.mosi;
+    pin_t ss = ssp_port.ss;
 
     SPI_TypeDef * id = spis[ssp];
 
@@ -64,11 +66,15 @@ void ssp_config(ssp_port_t ssp_port, uint32_t clock) {
         gpio_config_alternate(sclk, pin_dir_write, pull_down, 6);
         gpio_config_alternate(miso, pin_dir_write, pull_down, 6);
         gpio_config_alternate(mosi, pin_dir_write, pull_down, 6);
+        if (valid_pin(ss))
+            gpio_config_alternate(ss, pin_dir_read, pull_up, 6);
     }
     else{
         gpio_config_alternate(sclk, pin_dir_write, pull_down, 5);
         gpio_config_alternate(miso, pin_dir_write, pull_down, 5);
         gpio_config_alternate(mosi, pin_dir_write, pull_down, 5);
+        if (valid_pin(ss))
+            gpio_config_alternate(ss, pin_dir_read, pull_up, 5);
     }
 
     SPI_InitTypeDef SPI_InitStructure;
@@ -78,11 +84,18 @@ void ssp_config(ssp_port_t ssp_port, uint32_t clock) {
     SPI_InitStructure.SPI_DataSize = SPI_DataSize_8b;
     SPI_InitStructure.SPI_CPOL = SPI_CPOL_Low;
     SPI_InitStructure.SPI_CPHA = SPI_CPHA_1Edge;
-    SPI_InitStructure.SPI_NSS = SPI_NSS_Soft;
+    if (valid_pin(ss))
+        SPI_InitStructure.SPI_NSS = SPI_NSS_Soft;
+    else
+        SPI_InitStructure.SPI_NSS = SPI_NSS_Hard;
+
     SPI_InitStructure.SPI_BaudRatePrescaler = compute_prescaler(clock);
     SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB;
     SPI_InitStructure.SPI_CRCPolynomial = 7;
-    SPI_InitStructure.SPI_Mode = SPI_Mode_Master;
+    if (mode == ssp_slave)
+        SPI_InitStructure.SPI_Mode = SPI_Mode_Slave;
+    else
+        SPI_InitStructure.SPI_Mode = SPI_Mode_Master;
     SPI_Init(id, &SPI_InitStructure);
 
     SPI_Cmd(id, ENABLE);

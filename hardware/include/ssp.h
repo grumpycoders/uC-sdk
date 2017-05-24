@@ -16,14 +16,21 @@ typedef enum {
     ssp_6,
 } ssp_t;
 
+typedef enum {
+    ssp_slave,
+    ssp_master,
+} ssp_mode_t;
+
 typedef struct {
     pin_t sclk;
     pin_t mosi;
     pin_t miso;
+    pin_t ss;
+    ssp_mode_t mode;
     ssp_t ssp;
 } ssp_port_t;
 
-ucsdk_static_assert(sizeof(ssp_port_t) <= 8, "ssp_port_t isn't 64 bits-wide");
+ucsdk_static_assert(sizeof(ssp_port_t) <= 11, "ssp_port_t isn't 88 bits-wide");
 
 BEGIN_DECL
 

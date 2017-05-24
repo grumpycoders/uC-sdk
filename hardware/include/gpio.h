@@ -2,6 +2,7 @@
 
 #include <decl.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 BEGIN_DECL
 
@@ -45,6 +46,10 @@ typedef enum {
 
 //initialize a pin structure for use in functions below
 static __inline__ pin_t make_pin(gpio_port_t port, uint8_t pin) { pin_t p = { port, pin }; return p; }
+
+#define PIN_NULL { .port = 0xff, .pin = 0xff }
+
+static __inline__ bool valid_pin(pin_t pin) { return pin.port == 0xff && pin.pin == 0xff; }
 
 /*
     Initializes a GPIO
