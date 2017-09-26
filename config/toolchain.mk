@@ -44,7 +44,7 @@ TARGET_CPPFLAGS += -msoft-float -fno-hosted -fshort-wchar -D__LITTLE_ENDIAN
 endif
 
 
-TARGET_CPPFLAGS += -ffunction-sections -fdata-sections -fno-builtin-malloc -fno-builtin-realloc -fno-builtin-free
+TARGET_CPPFLAGS += -fno-strict-aliasing -ffunction-sections -fdata-sections -fno-builtin-malloc -fno-builtin-realloc -fno-builtin-free -fno-builtin-memset -fno-builtin-memcpy
 
 TARGET_CFLAGS += -std=c99
 
@@ -71,5 +71,3 @@ HOST_AR = ar
 HOST_AS = as
 
 HOST_CPPFLAGS += -O3 -g -fno-strict-aliasing
-
-TARGET_CPPFLAGS += -fno-strict-aliasing
