@@ -41,6 +41,7 @@ __attribute__((constructor)) static void fio_init() {
     fio_fds[0].fdread = stdin_read;
     fio_fds[1].fdwrite = stdout_write;
     fio_fds[2].fdwrite = stdout_write;
+    _uc_sdk_ensure_malloc_exists();
     fio_sem = xSemaphoreCreateMutex();
 }
 
