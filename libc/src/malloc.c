@@ -202,3 +202,11 @@ void base_free(void * ptr) {
 malloc_t malloc = base_malloc;
 free_t free = base_free;
 realloc_t realloc = base_realloc;
+
+// Due to chicken-and-egg issues, we may need to call this from other modules.
+// Only call it from global constructors however.
+void _uc_sdk_ensure_malloc_exists() {
+    malloc = base_malloc;
+    free = base_free;
+    realloc = base_realloc;
+}
