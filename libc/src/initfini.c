@@ -81,6 +81,6 @@ void exit(int return_code) {
 }
 
 void libc_init() {
-    __sinit(_impure_ptr);
     __libc_init_array();
+    __sinit(_impure_ptr);
 }

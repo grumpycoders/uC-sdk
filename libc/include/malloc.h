@@ -7,10 +7,6 @@
 
 BEGIN_DECL
 
-// Due to chicken-and-egg issues, we may need to call this from other modules.
-// Only call it from global constructors however.
-void _uc_sdk_ensure_malloc_exists();
-
 typedef void * (*malloc_t)(size_t size);
 typedef void (*free_t)(void * ptr);
 typedef void * (*realloc_t)(void * ptr, size_t size);
@@ -19,9 +15,13 @@ void * base_malloc(size_t size);
 void base_free(void * ptr);
 void * base_realloc(void * ptr, size_t size);
 
-extern malloc_t malloc;
-extern free_t free;
-extern realloc_t realloc;
+void * malloc(size_t size);
+void free(void * ptr);
+void * realloc(void * ptr, size_t size);
+
+extern malloc_t malloc_ptr;
+extern free_t free_ptr;
+extern realloc_t realloc_ptr;
 
 static __inline__ void * calloc(size_t nmemb, size_t size) {
     uint8_t * r = (uint8_t *)malloc(nmemb * size);
