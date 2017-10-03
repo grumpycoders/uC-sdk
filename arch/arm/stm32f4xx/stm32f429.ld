@@ -53,6 +53,8 @@ PROVIDE(__registry_space_1_len = __registry_space_1_end - __registry_space_1);
 PROVIDE(__registry_space_2_len = __registry_space_2_end - __registry_space_2);
 PROVIDE(__registry_space_3_len = __registry_space_3_end - __registry_space_3);
 
+ENTRY(__cs3_reset_cortex_m);
+
 SECTIONS
 {
   .text :

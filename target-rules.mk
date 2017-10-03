@@ -41,7 +41,7 @@ endif
 
 $(TARGET_ELF): $(TARGET_OBJS) $(LIBDEPS) $(LDSCRIPT)
 	$(E) "[TL]     Linking $@"
-	$(Q)$(TARGET_LD) -Wl,--gc-sections -Wl,-Map=$(TARGET_MAP) -o $@ $(TARGET_OBJS) $(TARGET_LDFLAGS) -g -T$(LDSCRIPT) -Wl,--entry=_ucsdk_start $(LIBS)
+	$(Q)$(TARGET_LD) -Wl,--gc-sections -Wl,-Map=$(TARGET_MAP) -o $@ $(TARGET_OBJS) $(TARGET_LDFLAGS) -g -T$(LDSCRIPT) $(LIBS)
 
 $(TARGET_MAP): $(TARGET_ELF)
 
