@@ -199,14 +199,18 @@ void base_free(void * ptr) {
     cur->prev->next = cur->next;
 }
 
-malloc_t malloc = base_malloc;
-free_t free = base_free;
-realloc_t realloc = base_realloc;
+malloc_t malloc_ptr = NULL;
+free_t free_ptr = NULL;
+realloc_t realloc_ptr = NULL;
 
-// Due to chicken-and-egg issues, we may need to call this from other modules.
-// Only call it from global constructors however.
-void _uc_sdk_ensure_malloc_exists() {
-    malloc = base_malloc;
-    free = base_free;
-    realloc = base_realloc;
+void * malloc(size_t size) {
+    return malloc_ptr ? malloc_ptr(size) : base_malloc(size);
+}
+
+void free(void * ptr) {
+    free_ptr ? free_ptr(ptr) : base_free(ptr);
+}
+
+void * realloc(void * ptr, size_t size) {
+    return realloc_ptr ? realloc_ptr(size) : base_realloc(ptr, size);
 }
