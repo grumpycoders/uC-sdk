@@ -21,7 +21,7 @@ void * sbrk(ptrdiff_t incr) {
     prev_heap_end = heap_end ? heap_end : (void *) &__heap_start;
 
     /* Align to always be on 8-byte boundaries */
-    next_heap_end = (void *)((((uintptr_t)heap_end + incr) + 7) & ~7);
+    next_heap_end = (void *)((((uintptr_t)prev_heap_end + incr) + 7) & ~7);
 
     /* Check if this allocation would exceed the end of the ram - would probably get into the stack first however */
     if (next_heap_end > stack_min) {

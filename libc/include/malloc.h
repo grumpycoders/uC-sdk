@@ -7,10 +7,6 @@
 
 BEGIN_DECL
 
-// Due to chicken-and-egg issues, we may need to call this from other modules.
-// Only call it from global constructors however.
-void _uc_sdk_ensure_malloc_exists();
-
 typedef void * (*malloc_t)(size_t size);
 typedef void (*free_t)(void * ptr);
 typedef void * (*realloc_t)(void * ptr, size_t size);
