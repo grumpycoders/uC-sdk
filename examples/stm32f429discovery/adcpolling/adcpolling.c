@@ -12,14 +12,14 @@ int main() {
     //configure the ADC
     //PA0 is connected to ADC 1, 2 or 3, channel 0
     //We use ADC 1
-    adc_config_single(1, 0, sensor1);
+    adc_config_single(adc_1, 0, sensor1);
     //PA1 is connected to ADC 1, 2 or 3, channel 1
     //We use ADC 2
-    adc_config_single(2, 1, sensor2);
+    adc_config_single(adc_2, 1, sensor2);
 
     //Loop
     while (1)
-        printf("x=%4d y=%4d\n", adc_get(1), adc_get(2));
+        printf("x=%4d y=%4d\n", adc_get(adc_1), adc_get(adc_2));
 
     return 0;
 }

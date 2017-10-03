@@ -148,7 +148,7 @@ static __inline__ int fclose(FILE * stream) {
 
 // Again, the compiler should do the right thing, and optimize depending on the values of size and nmemb.
 // Luckily, we always will get into the short cases.
-static __inline__ size_t fread(void * _ptr, size_t size, size_t nmemb, FILE * stream) {
+static __inline__ size_t fread(void * _ptr, ssize_t size, ssize_t nmemb, FILE * stream) {
     int i;
     uint8_t * ptr = (uint8_t *) _ptr;
     ssize_t r;
@@ -193,7 +193,7 @@ static __inline__ size_t fread(void * _ptr, size_t size, size_t nmemb, FILE * st
     return nmemb;
 }
 
-static __inline__ size_t fwrite(const void * _ptr, size_t size, size_t nmemb, FILE * stream) {
+static __inline__ size_t fwrite(const void * _ptr, ssize_t size, ssize_t nmemb, FILE * stream) {
     int i;
     const uint8_t * ptr = (const uint8_t *) _ptr;
     ssize_t r;

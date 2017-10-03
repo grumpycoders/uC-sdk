@@ -38,14 +38,19 @@ ifeq ($(CPU_FAMILY),mips)
 TOOLCHAIN = mipsel-elf
 TARGET_FORMAT = elf32-littlemips
 ifeq ($(CPU_SUBFAMILY),mips4)
-TARGET_CPPFLAGS += 
+TARGET_CPPFLAGS +=
 endif
 TARGET_CPPFLAGS += -msoft-float -fno-hosted -fshort-wchar -D__LITTLE_ENDIAN
 endif
 
-TARGET_CPPFLAGS += -ffunction-sections -fdata-sections -fno-builtin-malloc -fno-builtin-realloc -fno-builtin-free
 
-TARGET_CXXFLAGS += -fno-exceptions -fno-rtti
+TARGET_CPPFLAGS += -fno-strict-aliasing -ffunction-sections -fdata-sections -fno-builtin-malloc -fno-builtin-realloc -fno-builtin-free -fno-builtin-memset -fno-builtin-memcpy -fno-builtin-memcmp
+
+TARGET_CFLAGS += -std=c99
+
+TARGET_CXXFLAGS += -fno-exceptions -fno-rtti -std=c++11
+
+TARGET_LDFLAGS += -nodefaultlibs -lgcc
 
 TARGET_CC = $(TOOLCHAIN)-gcc
 TARGET_CXX = $(TOOLCHAIN)-g++
@@ -66,5 +71,3 @@ HOST_AR = ar
 HOST_AS = as
 
 HOST_CPPFLAGS += -O3 -g -fno-strict-aliasing
-
-TARGET_CPPFLAGS += -fno-strict-aliasing

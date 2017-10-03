@@ -23,6 +23,8 @@ typedef enum {
     timer_13,
     timer_14,
     timer_15,
+    timer_16,
+    timer_17
 } timer_t;
 
 typedef enum {
@@ -38,11 +40,17 @@ typedef struct {
     uint8_t channel;
 } timer_channel_t;
 
-_Static_assert(sizeof(timer_channel_t) <= 4, "timer_channel_t isn't 32 bits-wide");
+ucsdk_static_assert(sizeof(timer_channel_t) <= 4, "timer_channel_t isn't 32 bits-wide");
 
 BEGIN_DECL
 
 void timer_config(timer_t timer, uint16_t prescale, uint32_t period);
+
+void timer_enable(timer_t timer);
+void timer_disable(timer_t timer);
+
+uint32_t timer_get_count(timer_t timer);
+void timer_set_count(timer_t timer, uint32_t value);
 
 uint32_t timer_get_clock_freq(timer_t timer);
 

@@ -27,6 +27,23 @@ void gpio_config(pin_t pin, pin_dir_t dir, pull_t pull) {
     GPIO_Init(stm32f4xx_gpio_ports[pin.port], &def);
 }
 
+void gpio_config_analog(pin_t pin, pin_dir_t dir, pull_t pull) {
+    //Clock the port
+    RCC_AHB1PeriphClockCmd(1 << pin.port, ENABLE);
+
+    GPIO_InitTypeDef def;
+    def.GPIO_Pin = 1 << pin.pin;
+    def.GPIO_Mode = GPIO_Mode_AN;
+    def.GPIO_Speed = GPIO_Speed_100MHz;
+    if (dir)
+        def.GPIO_OType = GPIO_OType_PP; //output : Push Pull
+    else
+        def.GPIO_OType = GPIO_OType_OD; //input : Open Drain
+    def.GPIO_PuPd = pull;
+
+    GPIO_Init(stm32f4xx_gpio_ports[pin.port], &def);
+}
+
 void gpio_config_alternate(pin_t pin, pin_dir_t dir, pull_t pull, uint8_t af) {
     if (af > 15)
         return;

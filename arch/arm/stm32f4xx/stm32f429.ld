@@ -22,7 +22,7 @@ GROUP(-lgcc)
 MEMORY
 {
   rom (rx)  : ORIGIN = 0x08000000, LENGTH = 2048K
-  ram (rwx) : ORIGIN = 0x20000000, LENGTH =  256K
+  ram (rwx) : ORIGIN = 0x20000000, LENGTH =  192K
 }
 
 /* These force the linker to search for particular symbols from
@@ -53,6 +53,8 @@ PROVIDE(__registry_space_1_len = __registry_space_1_end - __registry_space_1);
 PROVIDE(__registry_space_2_len = __registry_space_2_end - __registry_space_2);
 PROVIDE(__registry_space_3_len = __registry_space_3_end - __registry_space_3);
 
+ENTRY(__cs3_reset_cortex_m);
+
 SECTIONS
 {
   .text :
@@ -61,7 +63,7 @@ SECTIONS
     CREATE_OBJECT_SYMBOLS
     __cs3_region_start_rom = .;
     __privileged_code_start__ = . ;
-    
+
     *(.cs3.region-head.rom)
     __cs3_interrupt_vector = __cs3_interrupt_vector_cortex_m;
     *(.cs3.interrupt_vector)
@@ -89,7 +91,7 @@ SECTIONS
 
     *( .privileged_code )
     *( privileged_functions )
-    
+
     __privileged_code_end__ = .;
     __privileged_functions_end__ = .;
 
@@ -97,9 +99,9 @@ SECTIONS
     *(.cs3.reset)
     /* Make sure we pulled in some reset code.  */
     ASSERT (. != __cs3_reset, "No reset code");
-    
+
     *(.handlers)
-    
+
     *(.text .text.* .gnu.linkonce.t.*)
     *(.plt)
     *(.gnu.warning)
@@ -172,7 +174,7 @@ SECTIONS
   } >rom
   __cs3_region_size_rom = LENGTH(rom);
   __cs3_region_num = 1;
-  
+
   .data_begin :
   {
     . = ALIGN(32);
@@ -236,7 +238,7 @@ SECTIONS
   __cs3_region_zero_size_ram = _end - _edata;
   __cs3_region_size_ram = LENGTH(ram);
   __cs3_region_num = 1;
-  
+
   .stab 0 (NOLOAD) : { *(.stab) }
   .stabstr 0 (NOLOAD) : { *(.stabstr) }
   /* DWARF debug sections.

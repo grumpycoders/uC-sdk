@@ -16,14 +16,26 @@ typedef enum {
     ssp_6,
 } ssp_t;
 
+typedef enum {
+    ssp_slave,
+    ssp_master,
+} ssp_mode_t;
+
+typedef enum {
+    event_read,
+    event_write,
+}irq_ssp_event_t;
+
 typedef struct {
     pin_t sclk;
     pin_t mosi;
     pin_t miso;
+    pin_t ss;
+    ssp_mode_t mode;
     ssp_t ssp;
 } ssp_port_t;
 
-_Static_assert(sizeof(ssp_port_t) <= 8, "ssp_port_t isn't 64 bits-wide");
+ucsdk_static_assert(sizeof(ssp_port_t) <= 11, "ssp_port_t isn't 88 bits-wide");
 
 BEGIN_DECL
 
@@ -31,5 +43,11 @@ void ssp_config(ssp_port_t ssp_port, uint32_t clock);
 uint8_t ssp_readwrite(ssp_t ssp, uint8_t value);
 static __inline__ void ssp_write(ssp_t ssp, uint8_t value) { (void) ssp_readwrite(ssp, value); }
 static __inline__ uint8_t ssp_read(ssp_t ssp) { return ssp_readwrite(ssp, 0xff); }
+
+void ssp_irq_init(ssp_t ssp, irq_ssp_event_t event, void (*cb)());
+void ssp_slave_start_read(ssp_t ssp);
+void ssp_slave_stop_read(ssp_t ssp);
+void ssp_slave_start_write(ssp_t ssp);
+void ssp_slave_stop_write(ssp_t ssp);
 
 END_DECL

@@ -18,7 +18,7 @@ int main() {
     //PA1 is connected to ADC 1, 2 or 3, channel 1
     //We use ADC 1, with channels 0 and 1
     uint8_t channels[] = {0, 1};
-    adc_config_continuous(1, channels, sensors, values, 2);
+    adc_config_continuous(adc_1, channels, sensors, values, 2);
 
     //Loop
     while (1)

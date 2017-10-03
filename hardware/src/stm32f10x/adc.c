@@ -1,3 +1,5 @@
+#include "adc.h"
+
 #include <stm32f10x.h>
 #include <stm32f10x_adc.h>
 #include <stm32f10x_rcc.h>
@@ -5,8 +7,6 @@
 #include <stm32f10x_dma.h>
 
 #include <stddef.h>
-
-#include "adc.h"
 
 #include "hardware.h"
 
@@ -66,9 +66,9 @@ static ADC_TypeDef *adclist[] = {ADC1, ADC2, ADC3};
 
 */
 
-void adc_calibrate(uint8_t adc)
+void adc_calibrate(adc_t adc)
 {
-    if (adc < 1 || adc > 3)
+    if (adc < adc_1 || adc > adc_3)
         return;
 
     ADC_ResetCalibration(adclist[adc - 1]);
@@ -83,9 +83,9 @@ void adc_config_all()
 {
 }
 
-void adc_config_single(uint8_t adc, uint8_t channel, pin_t pin)
+void adc_config_single(adc_t adc, uint8_t channel, pin_t pin)
 {
-    if (adc < 1 || adc > 3 || channel > 17)
+    if (adc < adc_1 || adc > adc_3 || channel > 17)
         return;
 
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1 << (adc - 1),ENABLE);
@@ -118,9 +118,9 @@ void adc_config_single(uint8_t adc, uint8_t channel, pin_t pin)
     adc_calibrate(adc);
 }
 
-void adc_config_continuous(uint8_t adc, uint8_t *channel, pin_t *pin, uint16_t *dest, uint8_t nb)
+void adc_config_continuous(adc_t adc, uint8_t *channel, pin_t *pin, uint16_t *dest, uint8_t nb)
 {
-    if (adc < 1 || adc > 3 || adc == 2) //looks like adc2 has no DMA capability
+    if (adc < adc_1 || adc > adc_3 || adc == adc_2) //looks like adc2 has no DMA capability
         return;
     int i;
     for (i = 0 ; i < nb ; i++)
@@ -190,9 +190,9 @@ void adc_config_continuous(uint8_t adc, uint8_t *channel, pin_t *pin, uint16_t *
     ADC_SoftwareStartConvCmd(adclist[adc - 1], ENABLE);
 }
 
-uint16_t adc_get(uint8_t adc)
+uint16_t adc_get(adc_t adc)
 {
-    if (adc < 1 || adc > 3)
+    if (adc < adc_1 || adc > adc_3)
         return 0;
 
     ADC_SoftwareStartConvCmd(adclist[adc - 1], ENABLE);

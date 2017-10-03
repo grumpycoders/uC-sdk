@@ -31,11 +31,11 @@ static void free_wrap(void * p) {
 
 void init_malloc_wrapper() {
     malloc_sem = xSemaphoreCreateRecursiveMutex();
-    old_malloc = malloc;
-    old_realloc = realloc;
-    old_free = free;
-    malloc = malloc_wrap;
-    realloc = realloc_wrap;
-    free = free_wrap;
+    old_malloc = malloc_ptr;
+    old_realloc = realloc_ptr;
+    old_free = free_ptr;
+    malloc_ptr = malloc_wrap;
+    realloc_ptr = realloc_wrap;
+    free_ptr = free_wrap;
 }
 

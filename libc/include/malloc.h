@@ -15,16 +15,20 @@ void * base_malloc(size_t size);
 void base_free(void * ptr);
 void * base_realloc(void * ptr, size_t size);
 
-extern malloc_t malloc;
-extern free_t free;
-extern realloc_t realloc;
+void * malloc(size_t size);
+void free(void * ptr);
+void * realloc(void * ptr, size_t size);
+
+extern malloc_t malloc_ptr;
+extern free_t free_ptr;
+extern realloc_t realloc_ptr;
 
 static __inline__ void * calloc(size_t nmemb, size_t size) {
-    uint8_t * r = malloc(nmemb * size);
+    uint8_t * r = (uint8_t *)malloc(nmemb * size);
     size_t i;
     for (i = 0; i < (size * nmemb); i++)
         r[i] = 0;
-    return r;
+    return (void *)r;
 }
 
 END_DECL

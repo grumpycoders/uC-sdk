@@ -1,14 +1,3 @@
-/*****************************************************************************/
-/* startup_LPC17xx.s: Startup file for LPC17xx device series                 */
-/*****************************************************************************/
-/* Version: CodeSourcery Sourcery G++ Lite (with CS3)                        */
-/*****************************************************************************/
-
-
-/*
-//*** <<< Use Configuration Wizard in Context Menu >>> ***
-*/
-
     .cpu cortex-m4
     .syntax unified
 
@@ -159,6 +148,16 @@ __cs3_interrupt_vector_cortex_m_mutable:
     .long   CRYP_IRQHandler               /* 0x0000 017C CRYP crypto                                           */ 
     .long   HASH_RNG_IRQHandler           /* 0x0000 0180 Hash and Rng                                          */
     .long   FPU_IRQHandler                /* 0x0000 0184 FPU                                                   */
+    /* STM32F42xxx and STM32F43xxx */
+    .long   UART7_IRQHandler              /* 0x0000 0188 FPU                                                   */
+    .long   UART8_IRQHandler              /* 0x0000 018C FPU                                                   */
+    .long   SPI4_IRQHandler               /* 0x0000 0190 FPU                                                   */
+    .long   SPI5_IRQHandler               /* 0x0000 0194 FPU                                                   */
+    .long   SPI6_IRQHandler               /* 0x0000 0198 FPU                                                   */
+    .long   SAI1_IRQHandler               /* 0x0000 019C FPU                                                   */
+    .long   LCD_TFT_IRQHandler            /* 0x0000 01A0 FPU                                                   */
+    .long   LCD_TFT_ERROR_IRQHandler      /* 0x0000 01A4 FPU                                                   */
+    .long   DMA2D_IRQHandler              /* 0x0000 01A8 FPU                                                   */
 
     .size   __cs3_interrupt_vector_cortex_m_mutable, . - __cs3_interrupt_vector_cortex_m_mutable
 
@@ -251,7 +250,7 @@ __cs3_reset_cortex_m:
     DSB
     ISB
 
-    B       _start
+    B       _ucsdk_start
     .pool
     .cantunwind
     .fnend
@@ -363,6 +362,14 @@ Default_Handler:
     IRQ   CRYP_IRQHandler
     IRQ   HASH_RNG_IRQHandler
     IRQ   FPU_IRQHandler
-
+    IRQ   UART7_IRQHandler
+    IRQ   UART8_IRQHandler
+    IRQ   SPI4_IRQHandler
+    IRQ   SPI5_IRQHandler
+    IRQ   SPI6_IRQHandler
+    IRQ   SAI1_IRQHandler
+    IRQ   LCD_TFT_IRQHandler
+    IRQ   LCD_TFT_ERROR_IRQHandler
+    IRQ   DMA2D_IRQHandler
 
     .end
