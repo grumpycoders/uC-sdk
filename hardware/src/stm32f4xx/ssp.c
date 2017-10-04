@@ -119,7 +119,13 @@ uint8_t ssp_readwrite(ssp_t ssp, uint8_t value) {
     return SPI_I2S_ReceiveData(id);
 }
 
+#if defined(STM32F40_41xxx)
+uint8_t irq_ssp_channels[] = { 0, SPI1_IRQn, SPI2_IRQn , SPI3_IRQn };
+#elif defined(STM32F427_437xx) || defined(STM32F429_439xx)
 uint8_t irq_ssp_channels[] = { 0, SPI1_IRQn, SPI2_IRQn , SPI3_IRQn, SPI4_IRQn, SPI5_IRQn, SPI6_IRQn };
+#elif defined(STM32F446xx)
+uint8_t irq_ssp_channels[] = { 0, SPI1_IRQn, SPI2_IRQn , SPI3_IRQn, SPI4_IRQn };
+#endif
 #define IRQ_SSP_MAX (6 * 2)
 static void (*irq_ssp_callback[IRQ_SSP_MAX])();
 
