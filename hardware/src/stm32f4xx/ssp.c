@@ -184,6 +184,7 @@ void SPI3_IRQHandler(void){
     }
 }
 
+#if defined(STM32F446xx) || defined(STM32F427_437xx) || defined(STM32F429_439xx)
 void SPI4_IRQHandler(void){
     if (SPI_I2S_GetITStatus(spis[4], SPI_I2S_IT_RXNE) == SET)
     {
@@ -196,7 +197,9 @@ void SPI4_IRQHandler(void){
         SPI_I2S_ClearITPendingBit(spis[4], SPI_I2S_IT_TXE);
     }
 }
+#endif
 
+#if defined(STM32F427_437xx) || defined(STM32F429_439xx)
 void SPI5_IRQHandler(void){
     if (SPI_I2S_GetITStatus(spis[5], SPI_I2S_IT_RXNE) == SET)
     {
@@ -222,6 +225,7 @@ void SPI6_IRQHandler(void){
         SPI_I2S_ClearITPendingBit(spis[6], SPI_I2S_IT_TXE);
     }
 }
+#endif
 
 void ssp_slave_start_read(ssp_t ssp){
     if (ssp < ssp_1 || ssp > ssp_6)
