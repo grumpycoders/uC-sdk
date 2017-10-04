@@ -8,10 +8,10 @@
 #include <uart.h>
 
 void BoardConsoleInit() {
-    pin_t rx = make_pin(gpio_port_a, 9);
-    pin_t tx = make_pin(gpio_port_a, 10);
+    pin_t rx = make_pin(gpio_port_a, 3);
+    pin_t tx = make_pin(gpio_port_a, 2);
 
-    uart_port_t uart = { .uart = uart_port_1, .rx = rx, .tx = tx };
+    uart_port_t uart = { .uart = uart_port_2, .rx = rx, .tx = tx };
 
     uart_config(uart, 115200);
 }
@@ -28,11 +28,11 @@ void BoardConsolePutc(int c) {
     if (c == '\r') return;
     if (c == '\n') c = '\r';
 
-    uart_send_char(uart_port_1, c);
+    uart_send_char(uart_port_2, c);
 
     if (c == '\r') {
         c = '\n';
-        uart_send_char(uart_port_1, c);
+        uart_send_char(uart_port_2, c);
     }
 }
 
