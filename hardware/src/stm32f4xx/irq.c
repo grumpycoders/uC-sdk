@@ -24,7 +24,7 @@ void unset_timer(){
     SysTick_Config(0xffffffff);
 }
 
-extern volatile void * __cs3_interrupt_vector_cortex_m_mutable[];
+extern  void * volatile __cs3_interrupt_vector_cortex_m_mutable[];
 
 void *set_irq_handler(uint16_t irq, void * handler) {
     void * ret = NULL;
@@ -33,3 +33,14 @@ void *set_irq_handler(uint16_t irq, void * handler) {
     } while (!__sync_bool_compare_and_swap(__cs3_interrupt_vector_cortex_m_mutable + irq, ret, handler));
     return ret;
 }
+
+/*
+  //enable interrupts
+  NVIC_InitTypeDef nvic;
+  NVIC_PriorityGroupConfig(NVIC_PriorityGroup_X);
+  nvic.NVIC_IRQChannel = XXX_IRQn;
+  nvic.NVIC_IRQChannelPreemptionPriority = X;
+  nvic.NVIC_IRQChannelSubPriority = X;
+  nvic.NVIC_IRQChannelCmd = ENABLE;
+  NVIC_Init(&nvic);
+*/
