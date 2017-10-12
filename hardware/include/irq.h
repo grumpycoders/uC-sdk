@@ -4,7 +4,6 @@
 #include <stdint.h>
 
 BEGIN_DECL
-#pragma once
 
 void *set_irq_handler(uint16_t irq, void * handler);
 
