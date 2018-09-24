@@ -144,9 +144,9 @@ void l3gd20_frequency(l3gd20_t *l3gd20, l3gd20_datarate_t odr, l3gd20_bandwidth_
     l3gd20_power(l3gd20, l3gd20->power);
 }
 
-void l3gd20_read(l3gd20_t l3gd20, float data[3]) {
-    pin_t cs = l3gd20.cs;
-    ssp_t ssp = l3gd20.ssp;
+void l3gd20_read(l3gd20_t *l3gd20, float data[3]) {
+    pin_t cs = l3gd20->cs;
+    ssp_t ssp = l3gd20->ssp;
 
     uint8_t buffer[6];
     gpio_set(cs, 0);
@@ -154,7 +154,7 @@ void l3gd20_read(l3gd20_t l3gd20, float data[3]) {
     gpio_set(cs, 1);
 
     float sensitivity = 0.0f;
-    switch (l3gd20.scale) {
+    switch (l3gd20->scale) {
     case L3GD20_250DPS:
         sensitivity = 8.75f;
         break;

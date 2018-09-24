@@ -52,6 +52,6 @@ void l3gd20_power(l3gd20_t *l3gd20, int power);
 void l3gd20_scale(l3gd20_t *l3gd20, l3gd20_scale_t scale);
 void l3gd20_frequency(l3gd20_t *l3gd20, l3gd20_datarate_t odr, l3gd20_bandwidth_t bw);
 void l3gd20_filter(l3gd20_t *l3gd20, float cutoff);
-void l3gd20_read(l3gd20_t l3gd20, float axis[3]);
+void l3gd20_read(l3gd20_t *l3gd20, float axis[3]);
 
 END_DECL
