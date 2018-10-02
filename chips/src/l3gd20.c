@@ -144,7 +144,7 @@ void l3gd20_frequency(l3gd20_t *l3gd20, l3gd20_datarate_t odr, l3gd20_bandwidth_
     l3gd20_power(l3gd20, l3gd20->power);
 }
 
-void l3gd20_read(l3gd20_t *l3gd20, float data[3]) {
+void l3gd20_read(const l3gd20_t *l3gd20, float data[3]) {
     pin_t cs = l3gd20->cs;
     ssp_t ssp = l3gd20->ssp;
 
