@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/grumpycoders/uC-sdk.svg?branch=master)](https://travis-ci.org/grumpycoders/uC-sdk)
+
 uC-sdk - a lightweight development kit for embedded micro-controllers
 =====================================================================
 
