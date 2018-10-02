@@ -50,7 +50,7 @@ TARGET_CFLAGS += -std=c99
 
 TARGET_CXXFLAGS += -fno-exceptions -fno-rtti -std=c++11
 
-TARGET_LDFLAGS += -nodefaultlibs -lgcc
+TARGET_LDFLAGS += -nodefaultlibs -nostartfiles -lgcc
 
 TARGET_CC = $(TOOLCHAIN)-gcc
 TARGET_CXX = $(TOOLCHAIN)-g++
