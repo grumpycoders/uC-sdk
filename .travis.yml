@@ -1,8 +1,8 @@
+services:
+ - docker
 language: cpp
 before_install:
-  - sudo add-apt-repository ppa:team-gcc-arm-embedded/ppa -y
-  - sudo apt-get update -qq
-  - sudo apt-get install -qq gcc-arm-embedded
+  - docker pull grumpycoders/uc-sdk-build-env
 env:
   matrix:
     - TARGET=inemom1/leds
@@ -10,6 +10,6 @@ env:
     - TARGET=stm32f429discovery/leds
     - TARGET=mbed-lpc1768/leds
 script:
-  - make -C examples/$TARGET
+  - docker run -v `pwd`:/uC-sdk grumpycoders/uc-sdk-build-env make -C /uC-sdk/examples/$TARGET
 notifications:
   email: false
