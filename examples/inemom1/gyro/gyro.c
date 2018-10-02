@@ -24,7 +24,7 @@ void gyroTask()
 {
     while(1)
     {
-        l3gd20_read(gyro, gyrovalues);
+        l3gd20_read(&gyro, gyrovalues);
         printf("x:%.2f y:%.2f z:%.2f\n", gyrovalues[0], gyrovalues[1], gyrovalues[2]);
 
         vTaskDelay(10);

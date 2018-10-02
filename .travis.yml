@@ -5,9 +5,24 @@ before_install:
   - docker pull grumpycoders/uc-sdk-build-env
 env:
   matrix:
+    - TARGET=inemom1/accelero
+    - TARGET=inemom1/gyro
     - TARGET=inemom1/leds
+    - TARGET=inemom1/pwm
+    - TARGET=stm32f4discovery/accel
+    - TARGET=stm32f4discovery/audio
+    - TARGET=stm32f4discovery/leds
     - TARGET=stm32f4discovery/skel
+    - TARGET=stm32f4discovery/timerirq
+    - TARGET=stm32f429discovery/adcdma
+    - TARGET=stm32f429discovery/adcpolling
+    - TARGET=stm32f429discovery/button
+    - TARGET=stm32f429discovery/gyro
     - TARGET=stm32f429discovery/leds
+    - TARGET=stm32f429discovery/spimaster
+    - TARGET=stm32f429discovery/spislave
+    - TARGET=stm32f429discovery/timerirq
+    - TARGET=stm32f429discovery/timerpwm
     - TARGET=mbed-lpc1768/leds
 script:
   - docker run -v `pwd`:/uC-sdk grumpycoders/uc-sdk-build-env make -C /uC-sdk/examples/$TARGET
