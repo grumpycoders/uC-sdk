@@ -2,6 +2,12 @@
 
 #include <stm32f4xx_ltdc.h>
 
+#define  LCD_PIXEL_WIDTH    ((uint16_t)240)
+#define  LCD_PIXEL_HEIGHT   ((uint16_t)320)
+
+#define LCD_FRAME_BUFFER       ((uint32_t)0xD0000000)
+#define BUFFER_OFFSET          ((uint32_t)0x50000) 
+
 void lcddriver_config() {
   LTDC_InitTypeDef ltcd;
 
@@ -122,7 +128,7 @@ void lcddriver_config() {
   LTDC_ReloadConfig(LTDC_IMReload);
 
   /* Set default font */
-  LCD_SetFont(&LCD_DEFAULT_FONT);
+  //LCD_SetFont(&LCD_DEFAULT_FONT);
 
   /* dithering activation */
   LTDC_DitherCmd(ENABLE);
@@ -133,6 +139,6 @@ void lcddriver_config() {
 //  LCD_SetFont(&Font8x8);
 //  LCD_SetLayer(LCD_BACKGROUND_LAYER);
 //    LCD_Clear(ASSEMBLE_RGB(0x00, 0x66, 0x00));
-  LCD_SetLayer(LCD_FOREGROUND_LAYER);
+//  LCD_SetLayer(LCD_FOREGROUND_LAYER);
 //  LCD_SetBackColor(ASSEMBLE_RGB(0x00, 0x00, 0xFF));
 }
