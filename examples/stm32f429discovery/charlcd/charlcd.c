@@ -19,7 +19,15 @@ int main() {
     pin_t rw   = { .port = gpio_port_f, .pin = 13 };
     pin_t e    = { .port = gpio_port_c, .pin = 6 };
 
-    ssp_port_t ssp = { .ssp = ssp_3, .sclk = sclk, .mosi = mosi, .miso = miso};
+    ssp_port_t ssp = { 
+        .ssp = ssp_3,
+        .sclk = sclk,
+        .mosi = mosi,
+        .miso = miso,
+        .ss = PIN_NULL,
+        .mode = ssp_master,
+        .polarity = ssp_polarity_mode_0
+    };
 
     if (!lcd_init(&lcd, ssp, cs, rs, rw, e))
     {

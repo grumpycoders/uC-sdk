@@ -34,6 +34,7 @@ static __inline__ uint16_t compute_prescaler(uint32_t clock) {
 void ssp_config(ssp_port_t ssp_port, uint32_t clock) {
     ssp_t ssp = ssp_port.ssp;
     ssp_mode_t mode = ssp_port.mode;
+    ssp_polarity_t polarity = ssp_port.polarity;
     pin_t sclk = ssp_port.sclk;
     pin_t miso = ssp_port.miso;
     pin_t mosi = ssp_port.mosi;
@@ -91,8 +92,25 @@ void ssp_config(ssp_port_t ssp_port, uint32_t clock) {
     SPI_I2S_DeInit(id);
     spi.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
     spi.SPI_DataSize = SPI_DataSize_8b;
-    spi.SPI_CPOL = SPI_CPOL_Low;
-    spi.SPI_CPHA = SPI_CPHA_1Edge;
+    switch(polarity)
+    {
+        case ssp_polarity_mode_0:
+            spi.SPI_CPOL = SPI_CPOL_Low;
+            spi.SPI_CPHA = SPI_CPHA_1Edge;
+            break;
+        case ssp_polarity_mode_1:
+            spi.SPI_CPOL = SPI_CPOL_Low;
+            spi.SPI_CPHA = SPI_CPHA_2Edge;
+            break;
+        case ssp_polarity_mode_2:
+            spi.SPI_CPOL = SPI_CPOL_High;
+            spi.SPI_CPHA = SPI_CPHA_1Edge;
+            break;
+        case ssp_polarity_mode_3:
+            spi.SPI_CPOL = SPI_CPOL_High;
+            spi.SPI_CPHA = SPI_CPHA_2Edge;
+            break;
+    }
     if (valid_pin(ss))
         spi.SPI_NSS = SPI_NSS_Soft;
     else

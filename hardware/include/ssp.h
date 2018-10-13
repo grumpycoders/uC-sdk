@@ -22,6 +22,13 @@ typedef enum {
 } ssp_mode_t;
 
 typedef enum {
+    ssp_polarity_mode_0, // CPOL=0; CPHA=0
+    ssp_polarity_mode_1, // CPOL=0; CPHA=1
+    ssp_polarity_mode_2, // CPOL=1; CPHA=0
+    ssp_polarity_mode_3, // CPOL=1; CPHA=1
+} ssp_polarity_t;
+
+typedef enum {
     event_read,
     event_write,
 }irq_ssp_event_t;
@@ -32,6 +39,7 @@ typedef struct {
     pin_t miso;
     pin_t ss;
     ssp_mode_t mode;
+    ssp_polarity_t polarity;
     ssp_t ssp;
 } ssp_port_t;
 

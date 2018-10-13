@@ -30,10 +30,19 @@ int main(){
     gpio_config(led2, pin_dir_write, pull_down);
 
     //SPI4
-    pin_t sck = make_pin(gpio_port_e, 2);
+    pin_t sclk = make_pin(gpio_port_e, 2);
     pin_t miso = make_pin(gpio_port_e, 5);
     pin_t mosi = make_pin(gpio_port_e, 6);
-    ssp_port_t master = { .sclk = sck, .mosi = mosi, .miso = miso, .ss = PIN_NULL, .mode = ssp_master, .ssp = ssp_4 };
+
+    ssp_port_t master = { 
+        .ssp = ssp_4,
+        .sclk = sclk,
+        .mosi = mosi,
+        .miso = miso,
+        .ss = PIN_NULL,
+        .mode = ssp_master,
+        .polarity = ssp_polarity_mode_0
+    };
     ssp_config(master, 8000000);
 
     //user button on PA0
