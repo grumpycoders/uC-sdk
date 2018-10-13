@@ -26,7 +26,15 @@ int main() {
     pin_t miso = { .port = gpio_port_a, .pin = 6 };
     pin_t cs   = { .port = gpio_port_e, .pin = 3 };
 
-    ssp_port_t ssp = { .ssp = ssp_1, .sclk = sclk, .mosi = mosi, .miso = miso };
+    ssp_port_t ssp = { 
+        .ssp = ssp_1,
+        .sclk = sclk,
+        .mosi = mosi,
+        .miso = miso,
+        .ss = PIN_NULL,
+        .mode = ssp_master,
+        .polarity = ssp_polarity_mode_0
+    };
 
     lis3dsh_init_ssp(&lis3dsh, ssp, cs);
 

@@ -27,7 +27,13 @@ int main() {
     pin_t miso = { .port = gpio_port_f, .pin = 8 };
     pin_t cs   = { .port = gpio_port_c, .pin = 1 };
 
-    ssp_port_t ssp = { .ssp = ssp_5, .sclk = sclk, .mosi = mosi, .miso = miso };
+    ssp_port_t ssp = { 
+        .ssp = ssp_5,
+        .sclk = sclk,
+        .mosi = mosi,
+        .miso = miso,
+        .mode = ssp_master,
+        .polarity = ssp_polarity_mode_0 };
 
     if (!l3gd20_init_ssp(&l3gd20, ssp, cs))
     {

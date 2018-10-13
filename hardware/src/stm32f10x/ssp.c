@@ -35,6 +35,7 @@ void ssp_config(ssp_port_t ssp_port, uint32_t clock)
     pin_t sclk = ssp_port.sclk;
     pin_t miso = ssp_port.miso;
     pin_t mosi = ssp_port.mosi;
+    ssp_polarity_t polarity = ssp_port.polarity;
 
     SPI_TypeDef * id = spis[ssp];
 
@@ -68,8 +69,25 @@ void ssp_config(ssp_port_t ssp_port, uint32_t clock)
     spidef.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
     spidef.SPI_Mode = SPI_Mode_Master;
     spidef.SPI_DataSize = SPI_DataSize_8b;
-    spidef.SPI_CPOL = SPI_CPOL_Low;
-    spidef.SPI_CPHA = SPI_CPHA_1Edge;
+    switch(polarity)
+    {
+        case ssp_polarity_mode_0:
+            spidef.SPI_CPOL = SPI_CPOL_Low;
+            spidef.SPI_CPHA = SPI_CPHA_1Edge;
+            break;
+        case ssp_polarity_mode_1:
+            spidef.SPI_CPOL = SPI_CPOL_Low;
+            spidef.SPI_CPHA = SPI_CPHA_2Edge;
+            break;
+        case ssp_polarity_mode_2:
+            spidef.SPI_CPOL = SPI_CPOL_High;
+            spidef.SPI_CPHA = SPI_CPHA_1Edge;
+            break;
+        case ssp_polarity_mode_3:
+            spidef.SPI_CPOL = SPI_CPOL_High;
+            spidef.SPI_CPHA = SPI_CPHA_2Edge;
+            break;
+    }
     spidef.SPI_NSS = SPI_NSS_Soft;
     spidef.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_4;
     spidef.SPI_FirstBit = SPI_FirstBit_MSB;
