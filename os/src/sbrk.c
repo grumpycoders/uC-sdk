@@ -1,13 +1,4 @@
-#include <reent.h>
-#include <errno.h>
 #include <stdlib.h>
-
-#include <FreeRTOS.h>
-#include <task.h>
-#include <semphr.h>
-#include <mpu_wrappers.h>
-
-#include "osdebug.h"
 
 extern uintptr_t __heap_start;
 extern uintptr_t __stack_start;
