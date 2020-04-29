@@ -72,12 +72,13 @@ static __inline__ const void * memchr(const void * _s, int c, size_t n) {
 
 static __inline__ char * strcat(char * s1, const char * s2) {
     char * r = s1;
+    char c;
     
     while (*s1)
         s1++;
     
-    while (*s2)
-        *s1++ = *s2++;
+    while ((c = *s2++))
+        *s1++ = c;
     
     *s1 = 0;
     
@@ -94,11 +95,12 @@ static __inline__ char * strcpy(char * s1, const char * s2) {
 
 static __inline__ char * strncpy(char * s1, const char * s2, size_t n) {
     char * r = s1;
+    char c;
     size_t i;
     
     for (i = 0; i < n; i++) {
-        if (*s2) {
-            *s1++ = *s2++;
+        if ((c = *s2++)) {
+            *s1++ = c;
         } else {
             *s1++ = 0;
         }
@@ -108,8 +110,9 @@ static __inline__ char * strncpy(char * s1, const char * s2, size_t n) {
 }
 
 static __inline__ char * strchr(const char * s, int c) {
-    while (*s) {
-        if (*s == c)
+    char b;
+    while ((b = *s)) {
+        if (b == c)
             return (char *) s;
         s++;
     }
@@ -119,9 +122,10 @@ static __inline__ char * strchr(const char * s, int c) {
 
 static __inline__ char * strrchr(const char * s, int c) {
     const char * r = NULL;
+    char b;
     
-    while (*s) {
-        if (*s == c)
+    while ((b = *s)) {
+        if (b == c)
             r = s;
         s++;
     }
@@ -149,37 +153,34 @@ static __inline__ char * strncat(char * s1, const char * s2, size_t n) {
 }
 
 static __inline__ int strcmp(const char * s1, const char * s2) {
-    while (*s1 && *s2) {
-        if (!*s1) {
+    char c1, c2;
+    while ((c1 = *s1++) && (c2 = *s2++)) {
+        if (!c1) {
             return -1;
-        } else if (!*s2) {
+        } else if (!c2) {
             return 1;
-        } else if (*s1 < *s2) {
+        } else if (c1 < c2) {
             return -1;
-        } else if (*s1 > *s2) {
+        } else if (c1 > c2) {
             return 1;
         }
-        s1++;
-        s2++;
     }
     
     return 0;
 }
 
 static __inline__ int strncmp(const char * s1, const char * s2, size_t n) {
-    while (*s1 && *s2 && n) {
-        if (!*s1) {
+    char c1, c2;
+    while ((c1 = *s1++) && (c2 = *s2++) && n--) {
+        if (!c1) {
             return -1;
-        } else if (!*s2) {
+        } else if (!c2) {
             return 1;
-        } else if (*s1 < *s2) {
+        } else if (c1 < c2) {
             return -1;
-        } else if (*s1 > *s2) {
+        } else if (c1 > c2) {
             return 1;
         }
-        s1++;
-        s2++;
-        n--;
     }
     
     return 0;
