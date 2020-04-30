@@ -153,18 +153,20 @@ static __inline__ char * strncat(char * s1, const char * s2, size_t n) {
 }
 
 static __inline__ int strcmp(const char * s1, const char * s2) {
-    char c1, c2;
-    while ((c1 = *s1++)) {
-        if ((c2 = *s2++) != c1) break;
+    int c1, c2;
+    while (1) {
+        if (((c1 = *s1++) != (c2 = *s2++)) || !c1 || !c2)
+            break;
     }
     return c1 - c2;
 }
 
 static __inline__ int strncmp(const char * s1, const char * s2, size_t n) {
-    char c1, c2;
-    while (n--)
-        if ((c1 = *s1++) != (c2 = *s2++))
+    int c1, c2;
+    while (n--) {
+        if (((c1 = *s1++) != (c2 = *s2++)) || !c1 || !c2)
             return c1 - c2;
+    }
     
     return 0;
 }
