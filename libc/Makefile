@@ -16,6 +16,7 @@ TARGET_SRCS = \
 src/cxx-glue.c \
 src/unistd.c \
 src/stdio.c \
+src/string.c \
 src/errno.c \
 \
 src/qsort.c \

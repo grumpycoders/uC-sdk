@@ -123,10 +123,10 @@ lseek      - ok
 String:
 ------
 
-memcpy      - ok, inlined
-memmove     - ok, inlined
-memset      - ok, inlined
-memcmp      - ok, inlined
+memcpy      - ok
+memmove     - ok
+memset      - ok
+memcmp      - ok
 memchr      - ok, inlined
 
 strcpy      - ok, inlined
