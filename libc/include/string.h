@@ -47,12 +47,14 @@ static __inline__ char * strncpy(char * s1, const char * s2, size_t n) {
     char * r = s1;
     char c;
     size_t i;
+    int done = 0;
     
     for (i = 0; i < n; i++) {
-        if ((c = *s2++)) {
+        if (!done && (c = *s2++)) {
             *s1++ = c;
         } else {
             *s1++ = 0;
+            done = 1;
         }
     }
     
