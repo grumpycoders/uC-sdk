@@ -96,10 +96,15 @@ static __inline__ size_t strlen(const char * s) {
 
 static __inline__ char * strncat(char * s1, const char * s2, size_t n) {
     char * r = s1;
+    char c;
     
     while (*s1)
         s1++;
-    strncpy(s1, s2, n);
+    
+    while (n-- && ((c = *s2++)))
+        *s1++ = c;
+    
+    *s1 = 0;
     
     return r;
 }
