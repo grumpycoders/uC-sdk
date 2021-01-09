@@ -74,7 +74,9 @@
 #include "stdio.h"
 #include <stdarg.h>
 #include "ctype.h"
+#ifndef NOFLOATINGPOINT
 #include <math.h>
+#endif
 #include "stdlib.h"
 #include "string.h"
 /*
