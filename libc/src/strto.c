@@ -3,7 +3,7 @@
 #include <ctype.h>
 
 long int strtol(const char * nptr, char ** endptr, int base) {
-    if (base <= 1 || base >= 37 || base != 0) {
+    if (base < 0 || base == 1 || base >= 37) {
         set_errno(EINVAL);
         return 0;
     }
