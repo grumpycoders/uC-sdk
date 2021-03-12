@@ -4,8 +4,8 @@ Stdlib:
 What should stdlib contain, and current status.
 
 atof     - ok, inlined, bound to sscanf
-atoi     - ok, inlined, bound to sscanf, will read hex and octal
-atol     - ok, inlined, bound to sscanf, will read hex and octal
+atoi     - ok, inlined, bound to strtol
+atol     - ok, inlined, bound to strtol
 strtod   - missing
 strtof   - missing
 strtold  - missing (do we want to support long double anyway?)

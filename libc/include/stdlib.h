@@ -21,11 +21,10 @@ int rand_r(unsigned int * seed);
 static __inline__ int rand(void) { return rand_r(&_seed); }
 static __inline__ void srand(unsigned int seed) { _seed = seed * 3835238167UL; }
 
-static __inline__ double atof(const char * str) { double r = 0; sscanf(str, "%lf", &r); return r; }
-static __inline__ int atoi(const char * str) { int i; sscanf(str, "%i", &i); return i; }
-static __inline__ int atol(const char * str) { long l; sscanf(str, "%li", &l); return l; }
-
 long int strtol(const char * nptr, char ** endptr, int base);
 
-END_DECL
+static __inline__ double atof(const char * str) { double r = 0; sscanf(str, "%lf", &r); return r; }
+static __inline__ int atoi(const char *str) { return strtol(str, NULL, 10); }
+static __inline__ long atol(const char * str) { return strtol(str, NULL, 10); }
 
+END_DECL
