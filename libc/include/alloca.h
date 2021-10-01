@@ -5,6 +5,6 @@
 
 BEGIN_DECL
 
-static __inline__ void * alloca(unsigned size) { return __builtin_alloca(size); }
+#define alloca(size ) __builtin_alloca(size)
 
 END_DECL
