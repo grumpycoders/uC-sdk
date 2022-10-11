@@ -94,11 +94,12 @@ uint8_t gpio_irq_channels[] = {
     EXTI15_10_IRQn };
 
 #define IRQ_EXTI_MAX 16
-static void (*exti_irq_callback[IRQ_EXTI_MAX])();
+static void (*exti_irq_callback[IRQ_EXTI_MAX])(void *);
+static void *exti_irq_parameter[IRQ_EXTI_MAX];
 
 static void call_exti_callback(int index) {
     if (exti_irq_callback[index]) {
-        exti_irq_callback[index]();
+        exti_irq_callback[index](exti_irq_parameter[index]);
     }
 }
 
@@ -193,7 +194,7 @@ void EXTI15_10_IRQHandler() {
     }
 }
 
-void gpio_irq_init(pin_t pin, void (*cb)(), irq_trigger_t tt)
+void gpio_irq_init(pin_t pin, void (*cb)(), void *parameter, irq_trigger_t tt)
 {
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
 
@@ -227,6 +228,7 @@ void gpio_irq_init(pin_t pin, void (*cb)(), irq_trigger_t tt)
     EXTI_ClearITPendingBit(1 << pin.pin);
 
     exti_irq_callback[pin.pin] = cb;
+    exti_irq_parameter[pin.pin] = parameter;
 }
 
 void gpio_irq_deinit(pin_t pin)
