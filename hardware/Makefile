@@ -34,6 +34,7 @@ TARGET_SRCS += src/stm32f4xx/ssp.c
 TARGET_SRCS += src/stm32f4xx/timer.c
 TARGET_SRCS += src/stm32f4xx/uart.c
 TARGET_SRCS += src/stm32f4xx/irq.c
+TARGET_SRCS += src/stm32f4xx/lcddriver.c
 endif
 endif
 
