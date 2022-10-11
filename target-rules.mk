@@ -1,27 +1,27 @@
 %.o: %.c
 	$(E) "[TC]     Compiling $<"
-	$(Q)$(TARGET_CC) -ffunction-sections -Wall -Werror $(addprefix -I, $(TARGET_INCLUDES)) $(TARGET_CFLAGS) $(TARGET_CPPFLAGS) -g -c -o $@ $<
+	$(Q)$(TARGET_CC) -ffunction-sections -Wall -Werror $(addprefix -I, $(TARGET_INCLUDES)) $(TARGET_CFLAGS) $(TARGET_CPPFLAGS) -g3 -c -o $@ $<
 
 %.o: %.cc
 	$(E) "[TCXX]   Compiling $<"
-	$(Q)$(TARGET_CXX) -ffunction-sections -Wall -Werror $(addprefix -I, $(TARGET_INCLUDES)) $(TARGET_CXXFLAGS) $(TARGET_CPPFLAGS) -g -c -o $@ $<
+	$(Q)$(TARGET_CXX) -ffunction-sections -Wall -Werror $(addprefix -I, $(TARGET_INCLUDES)) $(TARGET_CXXFLAGS) $(TARGET_CPPFLAGS) -g3 -c -o $@ $<
 
 %.o: %.cpp
 	$(E) "[TCXX]   Compiling $<"
-	$(Q)$(TARGET_CXX) -ffunction-sections -Wall -Werror $(addprefix -I, $(TARGET_INCLUDES)) $(TARGET_CXXFLAGS) $(TARGET_CPPFLAGS) -g -c -o $@ $<
+	$(Q)$(TARGET_CXX) -ffunction-sections -Wall -Werror $(addprefix -I, $(TARGET_INCLUDES)) $(TARGET_CXXFLAGS) $(TARGET_CPPFLAGS) -g3 -c -o $@ $<
 
 %.o: %.s
 	$(E) "[TS]     Compiling $<"
-	$(Q)$(TARGET_AS) $(addprefix -I, $(TARGET_INCLUDES)) $(TARGET_ASFLAGS) $(TARGET_CPPFLAGS) -g -c -o $@ $<
+	$(Q)$(TARGET_AS) $(addprefix -I, $(TARGET_INCLUDES)) $(TARGET_ASFLAGS) $(TARGET_CPPFLAGS) -g3 -c -o $@ $<
 
 %.dep: %.c
-	$(Q)$(TARGET_CC) -ffunction-sections -Wall -Werror $(addprefix -I, $(TARGET_INCLUDES)) $(TARGET_CFLAGS) $(TARGET_CPPFLAGS) -g -M -MT $(addsuffix .o, $(basename $@)) -MF $@ $<
+	$(Q)$(TARGET_CC) -ffunction-sections -Wall -Werror $(addprefix -I, $(TARGET_INCLUDES)) $(TARGET_CFLAGS) $(TARGET_CPPFLAGS) -g3 -M -MT $(addsuffix .o, $(basename $@)) -MF $@ $<
 
 %.dep: %.cc
-	$(Q)$(TARGET_CXX) -ffunction-sections -Wall -Werror $(addprefix -I, $(TARGET_INCLUDES)) $(TARGET_CXXFLAGS) $(TARGET_CPPFLAGS) -g -M -MT $(addsuffix .o, $(basename $@)) -MF $@ $<
+	$(Q)$(TARGET_CXX) -ffunction-sections -Wall -Werror $(addprefix -I, $(TARGET_INCLUDES)) $(TARGET_CXXFLAGS) $(TARGET_CPPFLAGS) -g3 -M -MT $(addsuffix .o, $(basename $@)) -MF $@ $<
 
 %.dep: %.cpp
-	$(Q)$(TARGET_CXX) -ffunction-sections -Wall -Werror $(addprefix -I, $(TARGET_INCLUDES)) $(TARGET_CXXFLAGS) $(TARGET_CPPFLAGS) -g -M -MT $(addsuffix .o, $(basename $@)) -MF $@ $<
+	$(Q)$(TARGET_CXX) -ffunction-sections -Wall -Werror $(addprefix -I, $(TARGET_INCLUDES)) $(TARGET_CXXFLAGS) $(TARGET_CPPFLAGS) -g3 -M -MT $(addsuffix .o, $(basename $@)) -MF $@ $<
 
 %.dep: %.s
 	$(Q)touch $@
@@ -41,7 +41,7 @@ endif
 
 $(TARGET_ELF): $(TARGET_OBJS) $(LIBDEPS) $(LDSCRIPT)
 	$(E) "[TL]     Linking $@"
-	$(Q)$(TARGET_LD) -Wl,--gc-sections -Wl,-Map=$(TARGET_MAP) -o $@ $(TARGET_OBJS) $(TARGET_LDFLAGS) -g -T$(LDSCRIPT) $(LIBS)
+	$(Q)$(TARGET_LD) -Wl,--gc-sections -Wl,-Map=$(TARGET_MAP) -o $@ $(TARGET_OBJS) $(TARGET_LDFLAGS) -g3 -T$(LDSCRIPT) $(LIBS)
 
 $(TARGET_MAP): $(TARGET_ELF)
 
