@@ -30,7 +30,7 @@ void rtc_init(rtc_date_t *date, rtc_time_t *time) {
     return;
   }
   RCC_RTCCLKConfig(RCC_RTCCLKSource_HSE_Div8);
-  //(1 Mhz / 125) = 7999 ticks per second
+  //(1 Mhz / 125) = 8000 ticks per second
   def.RTC_AsynchPrediv = 124;
   def.RTC_SynchPrediv = 7999;
   RCC_RTCCLKCmd(ENABLE);
