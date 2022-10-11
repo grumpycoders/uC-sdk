@@ -44,6 +44,7 @@ endif
 ifeq ($(BOARD),stm32f429discovery)
 TARGET_INCLUDES += $(ROOTDIR)/arch/arm/stm32f4xx/stm32f429discovery
 TARGET_CPPFLAGS += -DHSE_VALUE=8000000
+TARGET_CPPFLAGS += -DUSE_HSE_BYPASS
 TARGET_CPPFLAGS += -DPLL_M=8
 LDSCRIPT = $(ROOTDIR)/arch/arm/stm32f4xx/stm32f429.ld
 endif
