@@ -10,6 +10,7 @@ void callback(void *parameter) {
     while(1) {
         status ^= 1;
         gpio_set(*pin, status);
+        //Sleep
         vTaskDelay(1000);
     }
 }
