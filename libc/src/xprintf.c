@@ -74,7 +74,9 @@
 #include "stdio.h"
 #include <stdarg.h>
 #include "ctype.h"
+#ifndef NOFLOATINGPOINT
 #include <math.h>
+#endif
 #include "stdlib.h"
 #include "string.h"
 /*
@@ -649,9 +651,11 @@ int vxprintf(func,arg,format,ap)
       (*func)(bufpt,length,arg);
       count += length;
     }
+#ifndef XPRINTFNOALLOC
     if( xtype==MEM_STRING && zMem ){
       free(zMem);
     }
+#endif
     if( flag_leftjustify ){
       register int nspace;
       nspace = width-length;
@@ -718,6 +722,7 @@ int vsnprintf(char *buf, size_t n, const char *fmt, va_list ap){
   return vxprintf(sout,&arg,fmt,ap);
 }
 
+#ifndef XPRINTFNOALLOC
 /*
 ** The following section of code handles the mprintf routine, that
 ** writes to memory obtained from malloc().
@@ -787,7 +792,9 @@ int vasprintf(char ** out, const char *zFormat,va_list ap){
   *out = sMprintf.zText;
   return r;
 }
+#endif
 
+#ifndef XPRINTFNOSTDIO
 /*
 ** The following section of code handles the standard fprintf routines
 ** for pthreads.
@@ -806,3 +813,4 @@ static void fout(zNewText,nNewChar,arg)
 int vdprintf(int fd, const char *zFormat, va_list ap){
   return vxprintf(fout,&fd,zFormat,ap);
 }
+#endif

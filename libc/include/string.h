@@ -4,60 +4,10 @@
 #include <stddef.h>
 #include <malloc.h>
 
-static __inline__ void * memcpy(void * _s1, const void * _s2, size_t n) {
-    uint8_t * s1 = (uint8_t *) _s1;
-    const uint8_t * s2 = (uint8_t *) _s2;
-    size_t i;
-    
-    for (i = 0; i < n; i++)
-        *s1++ = *s2++;
-    
-    return _s1;
-}
-
-static __inline__ void * memmove(void * _s1, const void * _s2, size_t n) {
-    uint8_t * s1 = (uint8_t *) _s1;
-    const uint8_t * s2 = (uint8_t *) _s2;
-    size_t i;
-    
-    if (s1 < s2) {
-        for (i = 0; i < n; i++)
-            *s1++ = *s2++;
-    } else if (s1 > s2) {
-        s1 += n;
-        s2 += n;
-        for (i = 0; i < n; i++)
-            *--s1 = *--s2;
-    }
-    
-    return _s1;
-}
-
-static __inline__ int memcmp(const void * _s1, const void * _s2, size_t n) {
-    uint8_t * s1 = (uint8_t *) _s1;
-    const uint8_t * s2 = (uint8_t *) _s2;
-    size_t i;
-    
-    for (i = 0; i < n; i++, s1++, s2++) {
-        if (*s1 < *s2) {
-            return -1;
-        } else if (*s1 > *s2) {
-            return 1;
-        }
-    }
-    
-    return 0;
-}
-
-static __inline__ void * memset(void * _s, int c, size_t n) {
-    uint8_t * s = (uint8_t *) _s;
-    size_t i;
-    
-    for (i = 0; i < n; i++)
-        *s++ = (uint8_t) c;
-    
-    return _s;
-}
+void * memcpy(void * _s1, const void * _s2, size_t n);
+void * memmove(void * _s1, const void * _s2, size_t n);
+int memcmp(const void * _s1, const void * _s2, size_t n);
+void * memset(void * _s, int c, size_t n);
 
 static __inline__ const void * memchr(const void * _s, int c, size_t n) {
     const uint8_t * s = (uint8_t *) _s;
@@ -72,12 +22,13 @@ static __inline__ const void * memchr(const void * _s, int c, size_t n) {
 
 static __inline__ char * strcat(char * s1, const char * s2) {
     char * r = s1;
+    char c;
     
     while (*s1)
         s1++;
     
-    while (*s2)
-        *s1++ = *s2++;
+    while ((c = *s2++))
+        *s1++ = c;
     
     *s1 = 0;
     
@@ -94,13 +45,16 @@ static __inline__ char * strcpy(char * s1, const char * s2) {
 
 static __inline__ char * strncpy(char * s1, const char * s2, size_t n) {
     char * r = s1;
+    char c;
     size_t i;
+    int done = 0;
     
     for (i = 0; i < n; i++) {
-        if (*s2) {
-            *s1++ = *s2++;
+        if (!done && (c = *s2++)) {
+            *s1++ = c;
         } else {
             *s1++ = 0;
+            done = 1;
         }
     }
     
@@ -108,8 +62,9 @@ static __inline__ char * strncpy(char * s1, const char * s2, size_t n) {
 }
 
 static __inline__ char * strchr(const char * s, int c) {
-    while (*s) {
-        if (*s == c)
+    char b;
+    while ((b = *s)) {
+        if (b == c)
             return (char *) s;
         s++;
     }
@@ -119,9 +74,10 @@ static __inline__ char * strchr(const char * s, int c) {
 
 static __inline__ char * strrchr(const char * s, int c) {
     const char * r = NULL;
+    char b;
     
-    while (*s) {
-        if (*s == c)
+    while ((b = *s)) {
+        if (b == c)
             r = s;
         s++;
     }
@@ -140,46 +96,33 @@ static __inline__ size_t strlen(const char * s) {
 
 static __inline__ char * strncat(char * s1, const char * s2, size_t n) {
     char * r = s1;
+    char c;
     
     while (*s1)
         s1++;
-    strncpy(s1, s2, n);
+    
+    while (n-- && ((c = *s2++)))
+        *s1++ = c;
+    
+    *s1 = 0;
     
     return r;
 }
 
 static __inline__ int strcmp(const char * s1, const char * s2) {
-    while (*s1 && *s2) {
-        if (!*s1) {
-            return -1;
-        } else if (!*s2) {
-            return 1;
-        } else if (*s1 < *s2) {
-            return -1;
-        } else if (*s1 > *s2) {
-            return 1;
-        }
-        s1++;
-        s2++;
+    int c1, c2;
+    while (1) {
+        if (((c1 = *s1++) != (c2 = *s2++)) || !c1 || !c2)
+            break;
     }
-    
-    return 0;
+    return c1 - c2;
 }
 
 static __inline__ int strncmp(const char * s1, const char * s2, size_t n) {
-    while (*s1 && *s2 && n) {
-        if (!*s1) {
-            return -1;
-        } else if (!*s2) {
-            return 1;
-        } else if (*s1 < *s2) {
-            return -1;
-        } else if (*s1 > *s2) {
-            return 1;
-        }
-        s1++;
-        s2++;
-        n--;
+    int c1, c2;
+    while (n--) {
+        if (((c1 = *s1++) != (c2 = *s2++)) || !c1 || !c2)
+            return c1 - c2;
     }
     
     return 0;

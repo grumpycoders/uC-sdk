@@ -87,7 +87,7 @@ depend dep: .depend
 include .depend
 
 $(LWIPLIB): $(LWIPOBJS) unixlib.o
-	$(CC) -g -nostartfiles -shared -o $@ $^
+	$(CC) -g3 -nostartfiles -shared -o $@ $^
 
 .depend: unixlib.c $(LWIPFILES)
 	$(CCDEP) $(CFLAGS) -MM $^ > .depend || rm -f .depend

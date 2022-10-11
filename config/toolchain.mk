@@ -1,7 +1,7 @@
 ifeq ($(DEBUG),true)
-TARGET_CPPFLAGS += -g -O0 -D_DEBUG
+TARGET_CPPFLAGS += -g3 -O0 -D_DEBUG
 else
-TARGET_CPPFLAGS += -g -Os -DNDEBUG
+TARGET_CPPFLAGS += -g3 -Os -DNDEBUG
 endif
 
 ifeq ($(CPU_FAMILY),arm)
@@ -50,7 +50,7 @@ TARGET_CFLAGS += -std=c99
 
 TARGET_CXXFLAGS += -fno-exceptions -fno-rtti -std=c++11
 
-TARGET_LDFLAGS += -nodefaultlibs -lgcc
+TARGET_LDFLAGS += -nodefaultlibs -nostartfiles -lgcc
 
 TARGET_CC = $(TOOLCHAIN)-gcc
 TARGET_CXX = $(TOOLCHAIN)-g++
@@ -70,4 +70,4 @@ HOST_RANLIB = ranlib
 HOST_AR = ar
 HOST_AS = as
 
-HOST_CPPFLAGS += -O3 -g -fno-strict-aliasing
+HOST_CPPFLAGS += -O3 -g3 -fno-strict-aliasing

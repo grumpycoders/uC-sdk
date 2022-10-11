@@ -3,7 +3,9 @@
 #include <stdarg.h>
 #include <limits.h>
 #include <ctype.h>
+#ifndef NOFLOATINGPOINT
 #include <math.h>
+#endif
 
 /* some macros to cut this short
  * NEXT(c);     read next character

@@ -1,27 +1,27 @@
 %.o: %.c
 	$(E) "[C]      Compiling $<"
-	$(Q)$(HOST_CC) -Wall -Werror $(addprefix -I, $(HOST_INCLUDES)) $(HOST_CFLAGS) $(HOST_CPPFLAGS) -g -c -o $@ $<
+	$(Q)$(HOST_CC) -Wall -Werror $(addprefix -I, $(HOST_INCLUDES)) $(HOST_CFLAGS) $(HOST_CPPFLAGS) -g3 -c -o $@ $<
 
 %.o: %.cc
 	$(E) "[CXX]    Compiling $<"
-	$(Q)$(HOST_CXX) -Wall -Werror $(addprefix -I, $(HOST_INCLUDES)) $(HOST_CFLAGS) $(HOST_CPPFLAGS) -g -c -o $@ $<
+	$(Q)$(HOST_CXX) -Wall -Werror $(addprefix -I, $(HOST_INCLUDES)) $(HOST_CFLAGS) $(HOST_CPPFLAGS) -g3 -c -o $@ $<
 
 %.o: %.cpp
 	$(E) "[CXX]    Compiling $<"
-	$(Q)$(HOST_CXX) -Wall -Werror $(addprefix -I, $(HOST_INCLUDES)) $(HOST_CFLAGS) $(HOST_CPPFLAGS) -g -c -o $@ $<
+	$(Q)$(HOST_CXX) -Wall -Werror $(addprefix -I, $(HOST_INCLUDES)) $(HOST_CFLAGS) $(HOST_CPPFLAGS) -g3 -c -o $@ $<
 
 %.o: %.s
 	$(E) "[S]      Compiling $<"
-	$(Q)$(HOST_AS) $(addprefix -I, $(HOST_INCLUDES)) $(HOST_ASFLAGS) $(HOST_CPPFLAGS) -g -c -o $@ $<
+	$(Q)$(HOST_AS) $(addprefix -I, $(HOST_INCLUDES)) $(HOST_ASFLAGS) $(HOST_CPPFLAGS) -g3 -c -o $@ $<
 
 %.dep: %.c
-	$(Q)$(HOST_CC) -Wall -Werror $(addprefix -I, $(HOST_INCLUDES)) $(HOST_CFLAGS) $(HOST_CPPFLAGS) -g -M -MT $(addsuffix .o, $(basename $@)) -MF $@ $<
+	$(Q)$(HOST_CC) -Wall -Werror $(addprefix -I, $(HOST_INCLUDES)) $(HOST_CFLAGS) $(HOST_CPPFLAGS) -g3 -M -MT $(addsuffix .o, $(basename $@)) -MF $@ $<
 
 %.dep: %.cc
-	$(Q)$(HOST_CXX) -Wall -Werror $(addprefix -I, $(HOST_INCLUDES)) $(HOST_CFLAGS) $(HOST_CPPFLAGS) -g -M -MT $(addsuffix .o, $(basename $@)) -MF $@ $<
+	$(Q)$(HOST_CXX) -Wall -Werror $(addprefix -I, $(HOST_INCLUDES)) $(HOST_CFLAGS) $(HOST_CPPFLAGS) -g3 -M -MT $(addsuffix .o, $(basename $@)) -MF $@ $<
 
 %.dep: %.cpp
-	$(Q)$(HOST_CXX) -Wall -Werror $(addprefix -I, $(HOST_INCLUDES)) $(HOST_CFLAGS) $(HOST_CPPFLAGS) -g -M -MT $(addsuffix .o, $(basename $@)) -MF $@ $<
+	$(Q)$(HOST_CXX) -Wall -Werror $(addprefix -I, $(HOST_INCLUDES)) $(HOST_CFLAGS) $(HOST_CPPFLAGS) -g3 -M -MT $(addsuffix .o, $(basename $@)) -MF $@ $<
 
 %.dep: %.s
 	$(Q)touch $@
@@ -39,7 +39,7 @@ endif
 
 $(TARGET): $(TARGET_OBJS) $(LIBDEPS)
 	$(E) "[L]      Linking $@"
-	$(Q)$(HOST_LD) -o $@ $(TARGET_OBJS) $(HOST_LDFLAGS) -g $(LIBS)
+	$(Q)$(HOST_LD) -o $@ $(TARGET_OBJS) $(HOST_LDFLAGS) -g3 $(LIBS)
 
 $(TARGET_LIB): $(TARGET_OBJS)
 	$(E) "[LIB]    Creating $@"

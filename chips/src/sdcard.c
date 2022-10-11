@@ -191,7 +191,7 @@ int sdcard_init(sdcard_t * sdcard, ssp_port_t ssp_port, pin_t cs) {
         ssp_write(sdcard->ssp, 0xff);
 
     uint8_t argument[4] = { 0, 0, 0, 0 };
-    uint8_t response[6];
+    uint8_t response[17];
 
     // the card ought to be ready for us to send things now; let's start with tuning on SPI mode
     SDPUTS("Sending GO_IDLE_STATE command.");
@@ -354,7 +354,7 @@ int sdcard_init(sdcard_t * sdcard, ssp_port_t ssp_port, pin_t cs) {
 
 int sdcard_read(sdcard_t * sdcard, uint8_t * data, unsigned int block) {
     uint8_t argument[4] = { 0, 0, 0, 0 };
-    uint8_t response[6];
+    uint8_t response[17];
     uint32_t offset = block;
     if (sdcard->sdhc)
         offset *= 512;

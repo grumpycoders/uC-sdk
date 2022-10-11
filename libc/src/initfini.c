@@ -9,8 +9,6 @@ extern void (*__init_array_end []) (void) __attribute__((weak));
 extern void (*__fini_array_start []) (void) __attribute__((weak));
 extern void (*__fini_array_end []) (void) __attribute__((weak));
 
-void _init();
-void _fini();
 void _exit(int return_code) __attribute__((noreturn));
 
 
@@ -20,8 +18,6 @@ static void __libc_init_array() {
     count = __preinit_array_end - __preinit_array_start;
     for (i = 0; i < count; i++)
         __preinit_array_start[i]();
-
-    _init();
 
     count = __init_array_end - __init_array_start;
     for (i = 0; i < count; i++)
@@ -34,8 +30,6 @@ static void __libc_fini_array() {
     count = __fini_array_end - __fini_array_start;
     for (i = count - 1; i >= 0; i--)
         __fini_array_start[i]();
-
-    _fini();
 }
 
 #define MAX_ATEXIT 32
