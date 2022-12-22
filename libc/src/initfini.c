@@ -16,20 +16,26 @@ static void __libc_init_array() {
     size_t count, i;
 
     count = __preinit_array_end - __preinit_array_start;
-    for (i = 0; i < count; i++)
-        __preinit_array_start[i]();
+    for (i = 0; i < count; i++) {
+        void (*ptr)() = __preinit_array_start[i];
+        if (ptr) ptr();
+    }
 
     count = __init_array_end - __init_array_start;
-    for (i = 0; i < count; i++)
-        __init_array_start[i]();
+    for (i = 0; i < count; i++) {
+        void (*ptr)() = __init_array_start[i];
+        if (ptr) ptr();
+    }
 }
 
 static void __libc_fini_array() {
     ssize_t count, i;
 
     count = __fini_array_end - __fini_array_start;
-    for (i = count - 1; i >= 0; i--)
-        __fini_array_start[i]();
+    for (i = count - 1; i >= 0; i--) {
+        void (*ptr)() = __fini_array_start[i];
+        if (ptr) ptr();
+    }
 }
 
 #define MAX_ATEXIT 32
