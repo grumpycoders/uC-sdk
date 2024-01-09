@@ -116,15 +116,15 @@ void * base_realloc(void * ptr, size_t size) {
     if (!ptr)
         return malloc(size);
 
-    size = (size + sizeof(heap_t) + 7) & ~7;
+    size_t block_size = (size + sizeof(heap_t) + 7) & ~7;
 
     prev = (heap_t *) ((uintptr_t) ptr - sizeof(heap_t));
 
     // New memory block shorter ?
-    if (prev->size >= size) {
-        prev->size = size;
+    if (prev->size >= block_size) {
+        prev->size = block_size;
         if (!prev->next)
-            sbrk(ptr + size - sbrk(0));
+            sbrk(ptr + block_size - sbrk(0));
 
         return ptr;
     }
@@ -132,17 +132,17 @@ void * base_realloc(void * ptr, size_t size) {
     // New memory block larger
     // Is it the last one ?
     if (!prev->next) {
-        new = sbrk(size - prev->size);
+        new = sbrk(block_size - prev->size);
         if (!new)
             return NULL;
 
-        prev->size = size;
+        prev->size = block_size;
         return ptr;
     }
 
     // Do we have free memory after it ?
-    if ((prev->next->ptr - ptr) > size) {
-        prev->size = size;
+    if ((prev->next->ptr - ptr) > block_size) {
+        prev->size = block_size;
         return ptr;
     }
 
