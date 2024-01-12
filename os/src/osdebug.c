@@ -4,7 +4,12 @@
 #include <BoardConsole.h>
 #include <osdebug.h>
 
-static const char hex_conv[] = "0123456789ABCDEF";
+static const char *hex_conv[2] =
+{
+    "0123456789abcdef", // lower-case
+    "0123456789ABCDEF" // upper-case
+};
+
 static void dbgput(const void * _str, int n) {
     const char * str = (const char *) _str;
     while(n--)
@@ -29,6 +34,7 @@ void osDbgPrintf(const char * str, ...) {
     long arg_i;
     uintptr_t arg_p;
     int str_size, i;
+    int ucase = 0;
 
     va_start(ap, str);
 
@@ -75,7 +81,7 @@ void osDbgPrintf(const char * str, ...) {
             tmp_conv_ptr = tmp_n_conv + 32;
             *tmp_conv_ptr = 0;
             do {
-                *--tmp_conv_ptr = hex_conv[arg_u % 10];
+                *--tmp_conv_ptr = hex_conv[0][arg_u % 10];
                 arg_u /= 10;
             } while (arg_u);
             dbgput(tmp_conv_ptr, strlen(tmp_conv_ptr));
@@ -84,20 +90,25 @@ void osDbgPrintf(const char * str, ...) {
             arg_p = va_arg(ap, uintptr_t);
             dbgput("0x", 2);
             for (i = sizeof(arg_p) * 2 - 1; i >= 0; i--) {
-                dbgput(&hex_conv[(arg_p >> (i << 2)) & 15], 1);
+                dbgput(&hex_conv[1][(arg_p >> (i << 2)) & 15], 1);
             }
             break;
+        case 'X': // same as x but uppercase for alpha chars
+            ucase = 1;
+            // fall through
         case 'x':
             arg_u = va_arg(ap, unsigned long);
             seen_something = 0;
+            const char *hex_p = hex_conv[ucase];
             for (i = sizeof(arg_p) * 2 - 1; i >= 0; i--) {
                 if (!seen_something && ((arg_u >> (i << 2)) == 0))
                     continue;
-                dbgput(&hex_conv[(arg_u >> (i << 2)) & 15], 1);
+                dbgput(&hex_p[(arg_u >> (i << 2)) & 15], 1);
                 seen_something = 1;
             }
             if (!seen_something)
                 dbgput("0", 1);
+            ucase = 0;
             break;
         case 0:  // malformed format string with a trailing %.
             dbgput("%", 1);
